@@ -46,48 +46,54 @@ config.workflow["association"].task["isr"].scriptDir = "workers"
 #config.workflow["association"].task["isr"].preScript.outputFile = "pre.sh"
 
 #
-# There are two stages of templating.  
+# There are two stages of templating.
 # [preJob|postJob|workerJob].script.template is used to create
 # [preJob|postJob|workerJob].script.output
-# This "output" file is the executable script condor will run. 
+# This "output" file is the executable script condor will run.
 #
-# That file is substituted in the [preJob|postJob|workerJob].template 
+# That file is substituted in the [preJob|postJob|workerJob].template
 # to create the [preJob|postJob|workerJob].outputFile, which is the
 # actual Condor file used in the Condor DAG.
 
 
-# 
+#
 # preJob
 #
-config.workflow["association"].task["isr"].preJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/preJob.sh.template"
+config.workflow["association"].task[
+    "isr"].preJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/preJob.sh.template"
 config.workflow["association"].task["isr"].preJob.script.outputFile = "preJob.sh"
-config.workflow["association"].task["isr"].preJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/preJob.condor.template"
+config.workflow["association"].task[
+    "isr"].preJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/preJob.condor.template"
 config.workflow["association"].task["isr"].preJob.outputFile = "W2012Pipe.pre"
 
-# 
+#
 # postJob
 #
-config.workflow["association"].task["isr"].postJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/postJob.sh.template"
+config.workflow["association"].task[
+    "isr"].postJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/postJob.sh.template"
 config.workflow["association"].task["isr"].postJob.script.outputFile = "postJob.sh"
-config.workflow["association"].task["isr"].postJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/postJob.condor.template"
+config.workflow["association"].task[
+    "isr"].postJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/postJob.condor.template"
 config.workflow["association"].task["isr"].postJob.outputFile = "W2012Pipe.post"
 
-# 
+#
 # workerJob
 #
-config.workflow["association"].task["isr"].workerJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/helloworld.sh.template"
+config.workflow["association"].task[
+    "isr"].workerJob.script.template = "$CTRL_ORCA_DIR/etc/condor/templates/helloworld.sh.template"
 config.workflow["association"].task["isr"].workerJob.script.outputFile = "helloworld.sh"
-config.workflow["association"].task["isr"].workerJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/localworkerJob.condor.template"
+config.workflow["association"].task[
+    "isr"].workerJob.template = "$CTRL_ORCA_DIR/etc/condor/templates/localworkerJob.condor.template"
 config.workflow["association"].task["isr"].workerJob.outputFile = "W2012Pipeline-template.condor"
 
 #
 # This configures a diamond condor DAG.
 # The "preJob" is the head of the diamond
 # The contents dagGenerator.input are used in conjunction with the workerJob
-# to form the middle of the diamond and the "postJob" is the tail of the 
+# to form the middle of the diamond and the "postJob" is the tail of the
 # diamond
 #
 config.workflow["association"].task["isr"].dagGenerator.dagName = "W2012Pipe"
-config.workflow["association"].task["isr"].dagGenerator.script = "$CTRL_ORCA_DIR/etc/condor/scripts/generateDag.py"
+config.workflow["association"].task[
+    "isr"].dagGenerator.script = "$CTRL_ORCA_DIR/etc/condor/scripts/generateDag.py"
 config.workflow["association"].task["isr"].dagGenerator.input = "$CTRL_ORCA_DIR/etc/condor/input/short.input"
-

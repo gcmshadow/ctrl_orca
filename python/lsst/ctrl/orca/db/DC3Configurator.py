@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,18 +9,19 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import os, stat
+import os
+import stat
 import lsst.ctrl.orca as orca
 import lsst.ctrl.provenance.dc3 as dc3
 import lsst.log as log
@@ -28,7 +29,10 @@ from lsst.ctrl.orca.db.MySQLConfigurator import MySQLConfigurator
 from lsst.ctrl.orca.config.AuthConfig import AuthConfig
 
 ## @deprecated DC3Configurator
+
+
 class DC3Configurator:
+
     def __init__(self, runid, dbConfig, prodConfig=None, wfConfig=None):
         """
         create a generic 
@@ -74,9 +78,10 @@ class DC3Configurator:
         minPercDiskSpaceReq = dbConfig.configuration["production"].minPercDiskSpaceReq
         userRunLife = dbConfig.configuration["production"].userRunLife
 
-        self.delegate = MySQLConfigurator(self.dbHostName, self.dbPort, globalDbName, dcVersion, dcDbName, minPercDiskSpaceReq, userRunLife)
+        self.delegate = MySQLConfigurator(self.dbHostName, self.dbPort,
+                                          globalDbName, dcVersion, dcDbName, minPercDiskSpaceReq, userRunLife)
 
-    ## setup for a new run 
+    ## setup for a new run
     def setup(self, provSetup):
         log.debug("DC3Configurator:setup")
 
@@ -105,7 +110,7 @@ class DC3Configurator:
 
     ## @return a dictory containing the "host", "port", "runid" and "dbrun" (database)
     def getDBInfo(self):
-        dbInfo = {} 
+        dbInfo = {}
         dbInfo["host"] = self.dbHostName
         dbInfo["port"] = self.dbPort
         dbInfo["runid"] = self.runid
@@ -162,7 +167,8 @@ class DC3Configurator:
 
         permissions = stat.S_IMODE(mode)
 
-        errorText = "File permissions on "+checkFile+" should not be readable, writable, or executable  by 'group' or 'other'.  Use chmod to fix this. (chmod 700 ~/.lsst)"
+        errorText = "File permissions on "+checkFile + \
+            " should not be readable, writable, or executable  by 'group' or 'other'.  Use chmod to fix this. (chmod 700 ~/.lsst)"
 
         if (mode & getattr(stat, "S_IRWXG")) != 0:
             raise RuntimeError(errorText)
@@ -196,12 +202,12 @@ class DC3Configurator:
     # config.database.authInfo["cred2"].password = "natasha"
     # config.database.authInfo["cred2"].port = 3306
     #
-    # Terms "database.host" and "database.port" must be specified, 
-    # and will match against the first "database.authInfo.host" and 
+    # Terms "database.host" and "database.port" must be specified,
+    # and will match against the first "database.authInfo.host" and
     # "database.authInfo.port"  in the credentials config.
     #
     # If there is no match, an exception is thrown.
-    # 
+    #
     def initAuthInfo(self, dbConfig):
         host = dbConfig.system.authInfo.host
         if host == None:
@@ -210,7 +216,7 @@ class DC3Configurator:
         if port == None:
             raise RuntimeError("database port must be specified in config")
         dbAuthFile = os.path.join(os.environ["HOME"], ".lsst/db-auth.py")
-        
+
         authConfig = AuthConfig()
         authConfig.load(dbAuthFile)
 
@@ -230,7 +236,7 @@ class DC3Configurator:
                 self.dbPort = auth.port
                 ## database user name
                 self.dbUser = auth.user
-                ## database authentication 
+                ## database authentication
                 self.dbPassword = auth.password
                 return
         raise RuntimeError("couldn't find any matching authorization for host %s and port %d " % (host, port))

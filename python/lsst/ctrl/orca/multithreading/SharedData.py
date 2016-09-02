@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,20 +9,21 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
 #
 from __future__ import with_statement
 import threading
+
 
 class SharedData(object):
     """
@@ -73,15 +74,15 @@ class SharedData(object):
         # behave like a Condition
 
         ## acquire method
-        self.acquire   = cond.acquire
+        self.acquire = cond.acquire
         ## release method
-        self.release   = cond.release
+        self.release = cond.release
         ## notify method
-        self.notify    = cond.notify
+        self.notify = cond.notify
         ## notifyall method
         self.notifyAll = cond.notifyAll
         ## wait method
-        self.wait      = cond.wait
+        self.wait = cond.wait
         self._is_owned = cond._is_owned
 
         self._lockOnRead = needLockOnRead
@@ -90,7 +91,7 @@ class SharedData(object):
             self.initData(data)
         if data is None:
             self._d["__"] = True
-        
+
     ## overrides __enter__
     def __enter__(self, *args, **kwds):
         return self._cond.__enter__(*args, **kwds)
@@ -98,28 +99,26 @@ class SharedData(object):
     ## overrides __exit__
     def __exit__(self, *args, **kwds):
         return self._cond.__exit__(*args, **kwds)
-    
+
     ## overrides __getattribute__
     def __getattribute__(self, name):
         if name == "_d" or len(self._d) == 0 or not self._d.has_key(name):
             return object.__getattribute__(self, name)
-        
+
         if self._lockOnRead and not self._is_owned():
             raise AttributeError("%s: lock required for read access" % name)
         return self._d[name]
-        
 
     ## overrides __setattr__
     def __setattr__(self, name, value):
         if name == "_d" or len(self._d) == 0 or name in self.__dict__.keys():
             object.__setattr__(self, name, value)
-            return 
-        
+            return
+
         if not self._is_owned():
             raise AttributeError("%s: lock required for write access" % name)
-        
+
         self._d[name] = value
-        
 
     def initData(self, data):
         """
@@ -147,9 +146,8 @@ class SharedData(object):
                 self._d[key] = data[key]
 
             if len(self._d) == 0:
-                self._d["__"] = True 
+                self._d["__"] = True
 
     ## overrides dir() method
     def dir(self):
         return filter(lambda k: k != "__", self._d.keys())
-    

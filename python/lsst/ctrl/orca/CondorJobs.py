@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,14 +11,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -32,30 +32,30 @@ import lsst.log as log
 
 
 ## CondorJobs - handles interaction with HTCondor
-# This class is highly dependent on the output of the condor commands 
+# This class is highly dependent on the output of the condor commands
 # condor_submit and condor_q
 #
 class CondorJobs:
     ## initializer
+
     def __init__(self):
         log.debug("CondorJobs:__init__")
         return
-
 
     ## submit a condor file, and return the job number associated with it.
     # expected output:
     # Submitting job(s).
     # Logging submit event(s).
     # 1 job(s) submitted to cluster 1317.
-    
+
     def submitJob(self, condorFile):
         log.debug("CondorJobs:submitJob")
         clusterexp = re.compile("1 job\(s\) submitted to cluster (\d+).")
-    
+
         submitRequest = "condor_submit %s" % condorFile
-    
+
         pop = os.popen(submitRequest, "r")
-    
+
         line = pop.readline()
         #line = pop.readline()
         line = pop.readline()
@@ -64,16 +64,14 @@ class CondorJobs:
             return None
         print "submitted job # %s as file %s" % (num[0], condorFile)
         return num[0]
-    
-    
-    
+
     ## wait for a condor job to reach it's run state.
     # expected output:
     #-- Submitter: srp@lsst6.ncsa.uiuc.edu : <141.142.15.103:40900> : lsst6.ncsa.uiuc.edu
-    # ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD               
+    # ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
     #1016.0   srp             5/24 09:17   0+00:00:00 I  0   0.0  launch_joboffices_
     #1017.0   srp             5/24 09:18   0+00:00:00 R  0   0.0  launch_joboffices_
-    
+
     def waitForJobToRun(self, num, extramsg=None):
         log.debug("CondorJobs:waitForJobToRun")
         jobNum = "%s.0" % num
@@ -168,7 +166,7 @@ class CondorJobs:
         log.debug("CondorJobs: submitCondorDag "+filename)
         # Just a note about why this was done this way...
         # There's something wierd about how "condor_submit_dag" prints it's output.
-        # If you run it on the command line, it'll print the "1 job(s) submitted" 
+        # If you run it on the command line, it'll print the "1 job(s) submitted"
         # message as one of the last lines of output.
         # If you redirect output, even on the command line, to a file, it will
         # be one of the first lines.
@@ -211,7 +209,7 @@ class CondorJobs:
         stdoutdata, stderrdata = process.communicate()
 
     ## check to see if the job with id "cid" is still alive
-    def isJobAlive(self,cid):
+    def isJobAlive(self, cid):
         jobNum = "%s.0" % cid
         queueExp = re.compile("\S+")
         process = subprocess.Popen("condor_q", shell=False, stdout=subprocess.PIPE)

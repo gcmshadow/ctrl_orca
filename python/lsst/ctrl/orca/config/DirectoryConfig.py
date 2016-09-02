@@ -2,18 +2,20 @@ import sys
 import lsst.pex.config as pexConfig
 
 ## directory configuration
+
+
 class DirectoryConfig(pexConfig.Config):
     ## path to default root
-    defaultRoot = pexConfig.Field("default root",str)
+    defaultRoot = pexConfig.Field("default root", str)
     ## pattern for run directories
-    runDirPattern = pexConfig.Field("pattern",str)
+    runDirPattern = pexConfig.Field("pattern", str)
     ## working directory
-    workDir = pexConfig.Field("work directory",str)
+    workDir = pexConfig.Field("work directory", str)
     ## input directory
-    inputDir = pexConfig.Field("input directory",str)
+    inputDir = pexConfig.Field("input directory", str)
     ## output directory
-    outputDir = pexConfig.Field("output directory",str)
+    outputDir = pexConfig.Field("output directory", str)
     ## update directory
-    updateDir = pexConfig.Field("update directory",str)
+    updateDir = pexConfig.Field("update directory", str)
     ## scratch directory
-    scratchDir = pexConfig.Field("scratch directory",str)
+    scratchDir = pexConfig.Field("scratch directory", str)

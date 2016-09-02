@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,14 +11,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -32,13 +32,15 @@ from lsst.ctrl.orca.db.DatabaseLogger import DatabaseLogger
 from lsst.daf.persistence import DbAuth
 from lsst.pex.policy import Policy
 
+
 class EventChecker(object):
+
     def __init__(self, broker, runid):
         self.runid = runid
 
         # create an event receiver
         self.receiver = events.EventReceiver(broker, events.LogEvent.LOGGING_TOPIC, "RUNID = '%s'" % runid)
-        
+
         # create an event transmitter
         self.transmitter = events.EventTransmitter(broker, "LoggerStatus")
 
@@ -68,27 +70,25 @@ class Logger(EventChecker):
         self.highwatermark = 10000
 
         self.database = database
-        
+
         #
         # get database authorization info
         #
         home = os.getenv("HOME")
         pol = Policy(home+"/.lsst/db-auth.paf")
-        
+
         dbAuth = DbAuth()
         dbAuth.setPolicy(pol)
-        
-        user = dbAuth.username(host,port)
-        password = dbAuth.password(host,port)
-        
+
+        user = dbAuth.username(host, port)
+        password = dbAuth.password(host, port)
+
         #
         # create the logger for the database and connect to it
         #
         self.dbLogger = DatabaseLogger(host, int(port))
-        
+
         self.dbLogger.connect(user, password, self.database)
-        
-        
 
     def execute(self):
         # set to the name of the file to write to
@@ -99,7 +99,7 @@ class Logger(EventChecker):
 
         # initialize the message counter
         cnt = 0
-        
+
         #
         # main loop - attempt to get messages until either no messages are retrieved, or until
         # the highwater mark is reached.  If either of these happens, insert all current events
@@ -126,7 +126,7 @@ class Logger(EventChecker):
                     self.dbLogger.insertRecords("%s.Logs" % self.database, msgs, tmpFilename)
                     cnt = 0
                     msgs = []
-                    
+
 
 class Monitor(EventChecker):
 
@@ -145,7 +145,6 @@ class Monitor(EventChecker):
                 continue
             if self.finalMessageReceived(propSet):
                 sys.exit(10)
-
 
 
 if __name__ == "__main__":
@@ -173,4 +172,3 @@ if __name__ == "__main__":
     else:
         mon = Monitor(args.broker, args.runid)
         mon.execute()
-

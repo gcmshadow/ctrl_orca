@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,14 +11,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -35,6 +35,7 @@ import lsst.pex.policy as pexPolicy
 from lsst.daf.persistence import DbStorage, LogicalLocation
 from lsst.daf.base import DateTime
 
+
 class ProvenanceTestCase(unittest.TestCase):
     """A test case for Provenance."""
 
@@ -48,20 +49,20 @@ class ProvenanceTestCase(unittest.TestCase):
         db.setPersistLocation(LogicalLocation(self.dbLoc))
         globalDb.setPersistLocation(LogicalLocation(self.globalDbLoc))
         for table in ("prv_SoftwarePackage", "prv_cnf_SoftwarePackage",
-                "prv_PolicyFile", "prv_PolicyKey", "prv_cnf_PolicyKey"):
+                      "prv_PolicyFile", "prv_PolicyKey", "prv_cnf_PolicyKey"):
             db.truncateTable(table)
             globalDb.truncateTable(table)
         globalDb.truncateTable("prv_Run")
 
     def testConstruct(self):
         ps = orcaProv.Provenance(self.user, self.runId, self.dbLoc,
-                self.globalDbLoc)
+                                 self.globalDbLoc)
         self.assert_(ps is not None)
         self.assert_(ps.db is not None)
 
     def testEnvironment(self):
         ps = orcaProv.Provenance(self.user, self.runId, self.dbLoc,
-                self.globalDbLoc)
+                                 self.globalDbLoc)
         ps.recordEnvironment()
 
         db = DbStorage()
@@ -70,7 +71,7 @@ class ProvenanceTestCase(unittest.TestCase):
         db.startTransaction()
 
         db.setTableListForQuery(
-                ("prv_SoftwarePackage", "prv_cnf_SoftwarePackage"))
+            ("prv_SoftwarePackage", "prv_cnf_SoftwarePackage"))
         db.outColumn("prv_SoftwarePackage.packageId")
         db.outColumn("packageName")
         db.outColumn("version")
@@ -97,9 +98,9 @@ class ProvenanceTestCase(unittest.TestCase):
 
     def testPolicies(self):
         ps = orcaProv.Provenance(self.user, self.runId, self.dbLoc,
-                self.globalDbLoc)
+                                 self.globalDbLoc)
         paths = ("tests/policy/dc2pipe.paf",
-                "tests/policy/imageSubtractionDetection.paf")
+                 "tests/policy/imageSubtractionDetection.paf")
         for p in paths:
             ps.recordPolicy(p)
 
@@ -121,7 +122,7 @@ class ProvenanceTestCase(unittest.TestCase):
             db.startTransaction()
 
             db.setTableListForQuery(
-                    ("prv_PolicyFile", "prv_PolicyKey", "prv_cnf_PolicyKey"))
+                ("prv_PolicyFile", "prv_PolicyKey", "prv_cnf_PolicyKey"))
             db.outColumn("hashValue")
             db.outColumn("modifiedDate")
             db.outColumn("keyName")
@@ -147,7 +148,7 @@ class ProvenanceTestCase(unittest.TestCase):
                 self.assert_(key in names)
                 names.remove(key)
                 self.assertEqual(db.getColumnByPosString(3),
-                        pol.getTypeName(key))
+                                 pol.getTypeName(key))
                 correct = pol.str(key)
                 correct = re.sub(r'\0', r'', correct)
                 self.assertEqual(db.getColumnByPosString(4), correct)

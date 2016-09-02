@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -31,8 +31,11 @@ import lsst.log as log
 # @brief create a basic production run.
 # Note that all ProductionRunConfigurator subclasses must support this
 # constructor signature.
+
+
 class ProductionRunConfigurator:
     ## initialize
+
     def __init__(self, runid, configFile, repository=None, workflowVerbosity=None):
 
         log.debug("ProductionRunConfigurator:__init__")
@@ -56,7 +59,7 @@ class ProductionRunConfigurator:
         self.provenanceDict = {}
         self._wfnames = None
 
-        # cache the database configurators for checking the configuraiton.  
+        # cache the database configurators for checking the configuraiton.
         self._databaseConfigurators = []
 
         # logger managers
@@ -105,11 +108,11 @@ class ProductionRunConfigurator:
         #self._provSetup = ProvenanceSetup()
         #self._provSetup.addAllProductionConfigFiles(self._prodConfigFile, self.repository)
         # --------------
-            
+
         #
         # setup the database for each database listed in production config.
         # cache the configurators in case we want to check the configuration
-        # later. 
+        # later.
         #
         #databaseConfigNames = self.prodConfig.databaseConfigNames
         databaseConfigs = self.prodConfig.database
@@ -127,13 +130,13 @@ class ProductionRunConfigurator:
                     launch = loggerConfig.launch
                     loggerManager = None
                     if launch == True:
-                        loggerManager = LoggerManager(self.eventBrokerHost, self.runid, dbInfo["host"], dbInfo["port"], dbInfo["dbrun"])
+                        loggerManager = LoggerManager(self.eventBrokerHost, self.runid, dbInfo[
+                                                      "host"], dbInfo["port"], dbInfo["dbrun"])
                     else:
                         loggerManager = LoggerManager(self.eventBrokerHost, self.runid)
                     if loggerManager is not None:
                         self._loggerManagers.append(loggerManager)
             self._databaseConfigurators.append(cfg)
-
 
         #
         # do specialized production level configuration, if it exists
@@ -142,7 +145,6 @@ class ProductionRunConfigurator:
             specialConfigurationConfig = self.prodConfig.production.configuration
             # XXX - specialConfigurationConfig maybe?
             self.specializedConfigure(specialConfigurationConfig)
-        
 
         #workflowNames = self.prodConfig.workflowNames
         workflowConfigs = self.prodConfig.workflow
@@ -165,8 +167,8 @@ class ProductionRunConfigurator:
     ##
     # @brief carry out production-wide configuration checks.
     # @param care      the thoroughness of the checks.
-    # @param issueExc  an instance of MultiIssueConfigurationError to add 
-    #                   problems to.  If not None, this function will not 
+    # @param issueExc  an instance of MultiIssueConfigurationError to add
+    #                   problems to.  If not None, this function will not
     #                   raise an exception when problems are encountered; they
     #                   will merely be added to the instance.  It is assumed
     #                   that the caller will raise that exception is necessary.
@@ -178,9 +180,9 @@ class ProductionRunConfigurator:
             myProblems = MultiIssueConfigurationError("problems encountered while checking configuration")
 
         for dbconfig in self._databaseConfigurators:
-            print "-> dbconfig = ",dbconfig
+            print "-> dbconfig = ", dbconfig
             dbconfig.checkConfiguration(care, issueExc)
-        
+
         if not issueExc and myProblems.hasProblems():
             raise myProblems
 
@@ -200,7 +202,7 @@ class ProductionRunConfigurator:
     # databases or the individual workflows.
     #
     # This implementation does nothing.  Subclasses may override this method
-    # to provide specialized production-wide setup.  
+    # to provide specialized production-wide setup.
     #
     def _specializedConfigure(self, specialConfigurationConfig):
         pass

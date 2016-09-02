@@ -4,11 +4,13 @@ import PipelineDefinitionConfig as pipe
 import FakeTypeMap as fake
 
 ## script template
+
+
 class ScriptTemplateConfig(pexConfig.Config):
     ## input file
     inputFile = pexConfig.Field("input file", str)
     ## key value pars to substitute for the template
-    keywords = pexConfig.DictField("key value pairs",keytype=str, itemtype=str, default=dict())
+    keywords = pexConfig.DictField("key value pairs", keytype=str, itemtype=str, default=dict())
     ## output file for results of template substitution
     outputFile = pexConfig.Field("output file", str)
 
@@ -21,11 +23,15 @@ class JobTemplateConfig(pexConfig.Config):
     condor = pexConfig.ConfigField("template", ScriptTemplateConfig)
 
 ## script
+
+
 class ScriptConfig(pexConfig.Config):
     ## job script template
     script = pexConfig.ConfigField("job script", ScriptTemplateConfig)
 
 ## DAG generation script
+
+
 class DagGeneratorConfig(pexConfig.Config):
     ## DAG name
     dagName = pexConfig.Field("dag name", str)
@@ -37,9 +43,11 @@ class DagGeneratorConfig(pexConfig.Config):
     idsPerJob = pexConfig.Field("the number of ids that will be handled per job", int)
 
 ## task
+
+
 class TaskConfig(pexConfig.Config):
     ## script directory
-    scriptDir = pexConfig.Field("script directory",str)
+    scriptDir = pexConfig.Field("script directory", str)
     ## pre script  (run before any jobs)
     preScript = pexConfig.ConfigField("pre script", ScriptConfig)
     ## pre job script (run before each job)

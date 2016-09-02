@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,19 +9,23 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
 from __future__ import with_statement
-import os, sys, subprocess, threading, time
+import os
+import sys
+import subprocess
+import threading
+import time
 import lsst.ctrl.events as events
 import lsst.log as log
 
@@ -33,24 +37,27 @@ from lsst.ctrl.orca.multithreading import SharedData
 ##
 # @deprecated VanillaCondorWorkflowMonitor
 #
+
+
 class VanillaCondorWorkflowMonitor(WorkflowMonitor):
     ##
     # @brief in charge of monitoring and/or controlling the progress of a
     #        running workflow.
     #
+
     def __init__(self, eventBrokerHost, shutdownTopic, runid, pipelineNames, loggerManagers):
 
-        # _locked: a container for data to be shared across threads that 
+        # _locked: a container for data to be shared across threads that
         # have access to this object.
         self._locked = SharedData(False,
-                                            {"running": False, "done": False})
+                                  {"running": False, "done": False})
 
         log.debug("VanillaCondorWorkflowMonitor:__init__")
         self._statusListeners = []
         # make a copy of this liste, since we'll be removing things.
 
         ## named pipelines
-        self.pipelineNames = pipelineNames[:] 
+        self.pipelineNames = pipelineNames[:]
 
         ## PID of all logger processes
         self.loggerPIDs = []
@@ -77,13 +84,14 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
         self.bSentJobOfficeEvent = False
 
         with self._locked:
-            self._wfMonitorThread = VanillaCondorWorkflowMonitor._WorkflowMonitorThread(self, self._eventBrokerHost, self._shutdownTopic, self.orcaTopic, runid)
-
+            self._wfMonitorThread = VanillaCondorWorkflowMonitor._WorkflowMonitorThread(
+                self, self._eventBrokerHost, self._shutdownTopic, self.orcaTopic, runid)
 
     ## monitor thread which watches for job office events and shutdown events from logger
     class _WorkflowMonitorThread(threading.Thread):
         ##
         # initialize the workflow monitor thread object
+
         def __init__(self, parent, eventBrokerHost, shutdownTopic, eventTopic, runid):
             threading.Thread.__init__(self)
             self.setDaemon(True)
@@ -103,7 +111,8 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
             sleepInterval = 5
             # we don't decide when we finish, someone else does.
             while True:
-                # TODO:  this timeout value should go away when the GIL lock relinquish is implemented in events.
+                # TODO:  this timeout value should go away when the GIL lock relinquish is
+                # implemented in events.
                 if sleepInterval != 0:
                     time.sleep(sleepInterval)
                 event = self._receiver.receiveEvent(1)
@@ -129,7 +138,6 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                 else:
                     sleepInterval = 5
 
-
     ##
     # Start Monitor Thread running
     def startMonitorThread(self, runid):
@@ -146,12 +154,11 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
             ps = event.getPropertySet()
             status = ps.get("STATUS")
             print "STATUS = "+status
-            if status == "joboffice:done": 
+            if status == "joboffice:done":
                 log.debug("VanillaCondorWorkflowMonitor:handleJobOfficeEvent joboffice:done received")
                 self.stopWorkflow(1)
         log.debug("VanillaCondorWorkflowMonitor:handleJobOfficeEvent done")
         return
-
 
     ##
     # handle incoming events from the pipeline and loggers
@@ -167,10 +174,10 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
         if event.getType() == events.EventTypes.STATUS:
             ps = event.getPropertySet()
             #print ps.toString()
-    
+
             if ps.exists("pipeline"):
                 pipeline = ps.get("pipeline")
-                print "pipeline-->",pipeline
+                print "pipeline-->", pipeline
                 if pipeline in self.pipelineNames:
                     self.pipelineNames.remove(pipeline)
             elif ps.exists("logger.status"):
@@ -186,7 +193,7 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
             if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent == False:
                 self.stopWorkflow(1)
                 self.bSentJobOfficeEvent = True
-            
+
             if (cnt == 0) and (self.bSentLastLoggerEvent == False):
                 self.eventSystem.createTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
                 evtlog = events.EventLog(self.runid, -1)
@@ -196,8 +203,8 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
 
             # if both lists are empty we're finished.
             if (len(self.pipelineNames) == 0) and (len(self.loggerPIDs) == 0):
-               with self._locked:
-                   self._locked.running = False
+                with self._locked:
+                    self._locked.running = False
         elif event.getType() == events.EventTypes.COMMAND:
             with self._locked:
                 self._locked.running = False
@@ -206,13 +213,14 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
     ##
     # @brief stop the workflow
     #
+
     def stopWorkflow(self, urgency):
         log.debug("VanillaCondorWorkflowMonitor:stopWorkflow")
         transmit = events.EventTransmitter(self._eventBrokerHost, self._shutdownTopic)
-        
+
         root = PropertySet()
-        root.setInt("level",urgency)
-        root.setString("STATUS","shut things down")
+        root.setInt("level", urgency)
+        root.setString("STATUS", "shut things down")
 
         event = events.CommandEvent(self.runid, self.originatorId, 0, root)
         transmit.publishEvent(event)

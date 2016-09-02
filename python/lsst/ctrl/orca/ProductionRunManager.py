@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,20 +9,24 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
 from __future__ import with_statement
 
-import os, os.path, sets, threading, time
+import os
+import os.path
+import sets
+import threading
+import time
 import lsst.daf.base as base
 import lsst.pex.config as pexConfig
 import lsst.ctrl.events as events
@@ -42,6 +46,8 @@ from ProductionRunConfigurator import ProductionRunConfigurator
 # @brief A class in charge of launching, monitoring, managing, and stopping
 # a production run
 #
+
+
 class ProductionRunManager:
 
     ##
@@ -53,10 +59,10 @@ class ProductionRunManager:
     #
     def __init__(self, runid, configFileName, repository=None):
 
-        # _locked: a container for data to be shared across threads that 
+        # _locked: a container for data to be shared across threads that
         # have access to this object.
         self._locked = SharedData(False,
-                                            {"running": False, "done": False})
+                                  {"running": False, "done": False})
 
         ## the run id for this production
         self.runid = runid
@@ -86,7 +92,6 @@ class ProductionRunManager:
         # load the production config object
         self.config.load(self.fullConfigFilePath)
 
-
         ## the repository location
         self.repository = repository
 
@@ -97,11 +102,11 @@ class ProductionRunManager:
             self.repository = "."
         else:
             self.repository = EnvString.resolve(self.repository)
-            
+
         # XXX - Check to see if we need to do this still.
         # do a little sanity checking on the repository before we continue.
         #if not os.path.exists(self.repository):
-        #    raise RuntimeError("specified repository " + self.repository + ": directory not found");        
+        #    raise RuntimeError("specified repository " + self.repository + ": directory not found");
         #if not os.path.isdir(self.repository):
         #    raise RuntimeError("specified repository "+ self.repository + ": not a directory");
 
@@ -119,7 +124,7 @@ class ProductionRunManager:
     #
     # If the production was already configured, it will not be
     # reconfigured.
-    # 
+    #
     # @param workflowVerbosity  the verbosity to pass down to configured
     #                             workflows and the pipelines they run.
     # @throws ConfigurationError  raised if any error arises during configuration or
@@ -129,29 +134,28 @@ class ProductionRunManager:
         if self._productionRunConfigurator:
             log.info("production has already been configured.")
             return
-        
+
         # lock this branch of code
         try:
             self._locked.acquire()
 
             # TODO - SRP
             self._productionRunConfigurator = self.createConfigurator(self.runid,
-                                                                     self.fullConfigFilePath)
+                                                                      self.fullConfigFilePath)
             workflowManagers = self._productionRunConfigurator.configure(workflowVerbosity)
 
-            self._workflowManagers = { "__order": [] }
+            self._workflowManagers = {"__order": []}
             for wfm in workflowManagers:
                 self._workflowManagers["__order"].append(wfm)
                 self._workflowManagers[wfm.getName()] = wfm
 
-            
             loggerManagers = self._productionRunConfigurator.getLoggerManagers()
             for lm in loggerManagers:
                 self._loggerManagers.append(lm)
 
         finally:
             self._locked.release()
-            
+
     ##
     # @brief run the entire production
     # @param skipConfigCheck    skip the checks that ensures that configuration
@@ -182,7 +186,6 @@ class ProductionRunManager:
             checkCare = self.config.production.configCheckCare
         if checkCare < 0:
             skipConfigCheck = True
-        
 
         # lock this branch of code
         try:
@@ -197,7 +200,6 @@ class ProductionRunManager:
             if not self._workflowManagers:
                 raise ConfigurationError("Failed to obtain workflowManagers from configurator")
 
-
             if skipConfigCheck == False:
                 self.checkConfiguration(checkCare)
 
@@ -207,7 +209,7 @@ class ProductionRunManager:
 
             # TODO - Re-add when Provenance is complete
             #provSetup = self._productionRunConfigurator.getProvenanceSetup()
-            ## 
+            ##
             #provSetup.recordProduction()
 
             for workflow in self._workflowManagers["__order"]:
@@ -234,7 +236,6 @@ class ProductionRunManager:
         #    mgr.announceData()
         print "Production launched."
         print "Waiting for shutdown request."
-        
 
     ##
     # @brief determine whether production is currently running
@@ -286,8 +287,8 @@ class ProductionRunManager:
     ##
     # @brief
     # @param care      the thoroughness of the checks.
-    # @param issueExc  an instance of MultiIssueConfigurationError to add 
-    #                   problems to.  If not None, this function will not 
+    # @param issueExc  an instance of MultiIssueConfigurationError to add
+    #                   problems to.  If not None, this function will not
     #                   raise an exception when problems are encountered; they
     #                   will merely be added to the instance.  It is assumed
     #                   that the caller will raise that exception is necessary.
@@ -322,29 +323,28 @@ class ProductionRunManager:
             raise myProblems
 
     ##
-    # @brief  stops all workflows in this production run 
+    # @brief  stops all workflows in this production run
     #
     def stopProduction(self, urgency, timeout=1800):
-        # urgency - an indicator of how urgently to carry out the shutdown.  
+        # urgency - an indicator of how urgently to carry out the shutdown.
         #
-        # Recognized values are: 
-        #   FINISH_PENDING_DATA - end after all currently available data has 
-        #                         been processed 
-        #   END_ITERATION       - end after the current data ooping iteration 
-        #   CHECKPOINT          - end at next checkpoint opportunity 
-        #                         (typically between stages) 
-        #   NOW                 - end as soon as possible, forgoing any 
+        # Recognized values are:
+        #   FINISH_PENDING_DATA - end after all currently available data has
+        #                         been processed
+        #   END_ITERATION       - end after the current data ooping iteration
+        #   CHECKPOINT          - end at next checkpoint opportunity
+        #                         (typically between stages)
+        #   NOW                 - end as soon as possible, forgoing any
         #                         checkpointing
         if not self.isRunning():
             log.info("shutdown requested when production is not running")
             return
-        
+
         log.info("Shutting down production (urgency=%s)" % urgency)
 
         for workflow in self._workflowManagers["__order"]:
             workflowMgr = self._workflowManagers[workflow.getName()]
             workflowMgr.stopWorkflow(urgency)
-
 
         pollintv = 0.2
         running = self.isRunning()
@@ -353,7 +353,8 @@ class ProductionRunManager:
             time.sleep(pollintv)
             for workflow in self._workflowManagers["__order"]:
                 running = self._workflowManagers[workflow.getName()].isRunning()
-                if running:  break
+                if running:
+                    break
             timeout -= time.time() - lasttime
         if not running:
             with self._locked:
@@ -363,14 +364,12 @@ class ProductionRunManager:
             log.debug("Failed to shutdown pipelines within timeout: %ss" % timeout)
             return False
 
-
-
         # stop loggers after everything else has died
         for lm in self._loggerManagers:
             lm.stop()
 
         return True
-                
+
     ##
     # @brief  return the "short" name for each workflow in this
     # production.
@@ -400,6 +399,7 @@ class ProductionRunManager:
     ## shutdown thread
     class _ShutdownThread(threading.Thread):
         ## initialize the shutdown thread
+
         def __init__(self, parent, runid, pollingIntv=0.2, listenTimeout=10):
             threading.Thread.__init__(self)
             self.setDaemon(True)

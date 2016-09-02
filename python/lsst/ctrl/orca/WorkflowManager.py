@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -28,13 +28,16 @@ from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.DataAnnouncer import DataAnnouncer
 
 ## workflow manager base class
+
+
 class WorkflowManager:
     ##
     # @brief Manage lifecycle of this workflow
     #
+
     def __init__(self, name, runid, repository, prodConfig, wfConfig):
 
-        # _locked: a container for data to be shared across threads that 
+        # _locked: a container for data to be shared across threads that
         # have access to this object.
         self._locked = SharedData(False)
 
@@ -65,7 +68,7 @@ class WorkflowManager:
         self._monitor = None
 
     ##
-    # @deprecated return the name of this workflow 
+    # @deprecated return the name of this workflow
     #
     def getName(self):
         return self.name
@@ -90,7 +93,7 @@ class WorkflowManager:
             if self._workflowConfigurator == None:
                 self._workflowLauncher = self.configure()
             self._monitor = self._workflowLauncher.launch(statusListener, loggerManagers)
-            
+
             # self.cleanUp()
 
         finally:
@@ -115,12 +118,10 @@ class WorkflowManager:
     def cleanUp(self):
         log.debug("WorkflowManager:cleanUp")
 
-
-
     ##
     # @brief prepare a workflow for launching.
     # @param provSetup    a provenance setup object to pass to
-    #                        DatabaseConfigurator instances 
+    #                        DatabaseConfigurator instances
     # @param workflowVerbosity the log level at which to emit messages
     # @return WorkflowLauncher
     def configure(self, provSetup=None, workflowVerbosity=None):
@@ -128,12 +129,13 @@ class WorkflowManager:
         if self._workflowConfigurator:
             log.info("production has already been configured.")
             return
-        
+
         # lock this branch of code
         try:
             self._locked.acquire()
 
-            self._workflowConfigurator = self.createConfigurator(self.runid, self.repository, self.name, self.wfConfig, self.prodConfig)
+            self._workflowConfigurator = self.createConfigurator(
+                self.runid, self.repository, self.name, self.wfConfig, self.prodConfig)
             self._workflowLauncher = self._workflowConfigurator.configure(provSetup, workflowVerbosity)
         finally:
             self._locked.release()
@@ -145,19 +147,19 @@ class WorkflowManager:
     ##
     # @brief  create a Workflow configurator for this workflow.
     #
-    # @param runid       the production run id 
+    # @param runid       the production run id
     # @param repository  the directory location of the repository
     # @param wfName      the workflow name
     # @param wfConfig    the config describing the workflow
     # @param prodConfig  the config describing the overall production.  This
     #                       provides common data (e.g. event broker host)
-    #                       that needs to be shared with all pipelines. 
+    #                       that needs to be shared with all pipelines.
     def createConfigurator(self, runid, repository, wfName, wfConfig, prodConfig):
         log.debug("WorkflowManager:createConfigurator")
 
         className = wfConfig.configurationClass
         classFactory = NamedClassFactory()
-        
+
         configuratorClass = classFactory.createClass(className)
         configurator = configuratorClass(self.runid, repository, prodConfig, wfConfig, wfName)
         return configurator
@@ -193,8 +195,8 @@ class WorkflowManager:
     ##
     # @brief Runs checks that ensure that the Workflow has been properly set up.
     # @param care      the thoroughness of the checks.
-    # @param issueExc  an instance of MultiIssueConfigurationError to add 
-    #                   problems to.  If not None, this function will not 
+    # @param issueExc  an instance of MultiIssueConfigurationError to add
+    #                   problems to.  If not None, this function will not
     #                   raise an exception when problems are encountered; they
     #                   will merely be added to the instance.  It is assumed
     #                   that the caller will raise that exception is necessary.
@@ -213,7 +215,6 @@ class WorkflowManager:
         # raise exception if problems found
         if not issueExc and myProblems.hasProblems():
             raise myProblems
-
 
     ##
     # return the name of this workflow

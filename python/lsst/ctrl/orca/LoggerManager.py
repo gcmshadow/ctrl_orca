@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,14 +11,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -36,6 +36,7 @@ import lsst.log as log
 #
 class LoggerManager:
     ## initialize
+
     def __init__(self, broker, runid, dbHost=None, dbPort=None, dbName=None):
         log.debug("LoggerManager:__init__")
 
@@ -55,7 +56,6 @@ class LoggerManager:
         self.process = None
         return
 
-
     ## @return the id of the logger process
     def getPID(self):
         return self.process.pid
@@ -71,7 +71,8 @@ class LoggerManager:
         if self.dbHost is None:
             cmd = "%s/bin/Logger.py --broker %s --runid %s" % (directory, self.broker, self.runid)
         else:
-            cmd = "%s/bin/Logger.py --broker %s --host %s --port %s --runid %s --database %s" % (directory, self.broker, self.dbHost, self.dbPort, self.runid, self.dbName)
+            cmd = "%s/bin/Logger.py --broker %s --host %s --port %s --runid %s --database %s" % (
+                directory, self.broker, self.dbHost, self.dbPort, self.runid, self.dbName)
         log.debug("LoggerManager:cmd = %s " % cmd)
         self.process = subprocess.Popen(cmd, shell=True)
         return
@@ -82,12 +83,12 @@ class LoggerManager:
         if self.process == None:
             return
 
-        try :
+        try:
             os.kill(self.process.pid, signal.SIGKILL)
-            os.waitpid(self.process.pid,0)
+            os.waitpid(self.process.pid, 0)
             self.process = None
             log.debug("LoggerManager:stop: killed Logger process")
-        except Exception,e:
+        except Exception, e:
             log.debug("LoggerManager:stop: tried to kill Logger process, but it didn't exist")
-            
+
         return

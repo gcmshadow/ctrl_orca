@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,14 +9,14 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
@@ -33,14 +33,16 @@ from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 # Usually, _configureSpecialized() should also be overridden to carry
 # out the non-database setup, including deploying the workflow onto the
 # remote platform.
-# 
-class WorkflowConfigurator:
+#
 
+
+class WorkflowConfigurator:
 
     ## configuration group
     class ConfigGroup(object):
         ##
         # @brief configuration initializer
+
         def __init__(self, name, config, number, offset):
             ## name of this configuration
             self.configName = name
@@ -74,16 +76,16 @@ class WorkflowConfigurator:
         ##
         # @return a string describing this configuration group
         def __str__(self):
-            print "self.configName = ",self.configName,"self.config = ",self.config
+            print "self.configName = ", self.configName, "self.config = ", self.config
             return "configName ="+self.configName
-            
+
     ##
     # @brief create the configurator
     #
     # This constructor should only be called from a subclass's
     # constructor, in which case the fromSub parameter must be
     # set to True.
-    # 
+    #
     # @param runid       the run identifier for the production run
     # @param prodConfig  the production config for this workflow
     # @param wfConfig    the workflow config that describes the workflow
@@ -132,7 +134,7 @@ class WorkflowConfigurator:
         #print "self.wfConfig = "
         #print self.wfConfig
         #print "++++++++++++++++"
-        
+
         if self.wfConfig.database != None:
             databaseConfigs = self.wfConfig.database
 
@@ -152,12 +154,11 @@ class WorkflowConfigurator:
         workflowLauncher = self._createWorkflowLauncher()
         return workflowLauncher
 
-
     ##
     # @brief create the workflow launcher
     #
     # This "abstract" method must be overridden; otherwise an exception is raised
-    # 
+    #
     # @return workflowLauncher
     def _createWorkflowLauncher(self):
         msg = 'called "abstract" WorkflowConfigurator._createWorkflowLauncher'
@@ -176,48 +177,48 @@ class WorkflowConfigurator:
         return configurator
 
     ##
-    # @brief given a list of pipelinePolicies, number the section we're 
+    # @brief given a list of pipelinePolicies, number the section we're
     # interested in based on the order they are in, in the productionConfig
     # We use this number Provenance to uniquely identify this set of pipelines
     #
     def expandConfigs(self, wfShortName):
-        # Pipeline provenance requires that "activoffset" be unique and 
+        # Pipeline provenance requires that "activoffset" be unique and
         # sequential for each pipeline in the production.  Each workflow
         # in the production can have multiple pipelines, and even a call for
         # duplicates of the same pipeline within it.
         #
         # Since these aren't numbered within the production config file itself,
         # we need to do this ourselves. This is slightly tricky, since each
-        # workflow is handled individually by orca and had has no reference 
-        # to the other workflows or the number of pipelines within 
+        # workflow is handled individually by orca and had has no reference
+        # to the other workflows or the number of pipelines within
         # those workflows.
         #
-        # Therefore, what we have to do is go through and count all the 
+        # Therefore, what we have to do is go through and count all the
         # pipelines in the other workflows so we can enumerate the pipelines
         # in this particular workflow correctly. This needs to be reworked.
 
         #wfNames = self.prodConfig.workflowNames
-        print "expandConfigs wfShortName = ",wfShortName
+        print "expandConfigs wfShortName = ", wfShortName
         totalCount = 1
         for wfName in self.prodConfig.workflow:
             wfConfig = self.prodConfig.workflow[wfName]
             if wfName == wfShortName:
-               # we're in the config which needs to be numbered
-               expanded = []
+                # we're in the config which needs to be numbered
+                expanded = []
 
-               for pipelineName in wfConfig.pipeline:
-                   config = wfConfig.pipeline[pipelineName]
-                   # default to 1, if runCount doesn't exist
-                   runCount = 1
-                   if config.runCount != None:
-                       runCount = config.runCount
-                   for i in range(0,runCount):
-                       expanded.append(self.ConfigGroup(pipelineName, config,i+1, totalCount))
-                       totalCount = totalCount + 1
-       
-               return expanded
+                for pipelineName in wfConfig.pipeline:
+                    config = wfConfig.pipeline[pipelineName]
+                    # default to 1, if runCount doesn't exist
+                    runCount = 1
+                    if config.runCount != None:
+                        runCount = config.runCount
+                    for i in range(0, runCount):
+                        expanded.append(self.ConfigGroup(pipelineName, config, i+1, totalCount))
+                        totalCount = totalCount + 1
+
+                return expanded
             else:
-                
+
                 for pipelineName in wfConfig.pipeline:
                     pipelineConfig = wfConfig.pipeline[pipelineName]
                     if pipelineConfig.runCount != None:
