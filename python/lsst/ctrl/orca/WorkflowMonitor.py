@@ -30,8 +30,8 @@ from lsst.ctrl.orca.multithreading import SharedData
 
 
 class WorkflowMonitor:
-    ## initialize
 
+    # initialize
     def __init__(self):
 
         # _locked: a container for data to be shared across threads that

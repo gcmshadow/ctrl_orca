@@ -146,7 +146,7 @@ class JobKiller:
 
     def processGlideinJob(self, job):
         jobFile = job.getFileName()
-        if self.workflowName == None:
+        if self.workflowName is None:
             self.killJob(jobFile)
         elif self.workflowName == job.getWorkflowName():
             self.killJob(jobFile)
@@ -155,13 +155,13 @@ class JobKiller:
     def processPipelineJob(self, job):
         jobFile = job.getFileName()
 
-        if self.workflowName == None:
+        if self.workflowName is None:
             self.killJob(jobFile)
         elif self.workflowName == job.getWorkflowName():
-            if self.pipelineName == None:
+            if self.pipelineName is None:
                 self.killJob(jobFile)
             elif self.pipelineName == job.getPipelineName():
-                if self.pipelineNumber == None:
+                if self.pipelineNumber is None:
                     self.killJob(jobFile)
                 elif self.pipelineNumber == job.getPipelineNumber():
                     self.killJob(jobFile)
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     workflowArg = parser.opts.workflowArg
     pipelineArg = parser.opts.pipelineArg
     pipelineNumArg = None
-    if parser.opts.pipelineNumArg != None:
+    if parser.opts.pipelineNumArg is not None:
         pipelineNumArg = int(parser.opts.pipelineNumArg)
     killGlidein = parser.opts.killglidein
 
@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     killer = JobKiller(workflowArg, pipelineArg, pipelineNumArg)
 
-    if killGlidein == True:
+    if killGlidein is True:
         glideinJobs = jobInfo.getGlideinJobs()
         for job in glideinJobs:
             killer.processGlideinJob(job)

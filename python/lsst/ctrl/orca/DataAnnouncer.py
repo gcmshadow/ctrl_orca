@@ -32,17 +32,20 @@ from lsst.ctrl.orca.EnvString import EnvString
 
 class DataAnnouncer:
 
-    ## initialize
+    # initialize
     def __init__(self, runid, prodConfig, wfConfig, logger=None):
         log.debug("DataAnnouncer: __init__")
-        ## run id
+
+        # run id
         self.runid = runid
-        ## production configuration
+
+        # production configuration
         self.prodConfig = prodConfig
-        ## workflow configuration
+
+        # workflow configuration
         self.wfConfig = wfConfig
 
-    ## send events announcing data to consumers
+    # send events announcing data to consumers
     def announce(self):
         log.debug("DataAnnouncer: announce")
         broker = self.prodConfig.production.eventBrokerHost
@@ -50,11 +53,11 @@ class DataAnnouncer:
         configType = self.wfConfig.configurationType
         print("configType", configType)
         config = self.wfConfig.configuration[configType]
-        if config == None:
+        if config is None:
             print("configuration for workflow was not found")
             return False
 
-        if config.announceData != None:
+        if config.announceData is not None:
             annData = config.announceData
             script = annData.script
             script = EnvString.resolve(script)
@@ -69,7 +72,7 @@ class DataAnnouncer:
                 os.execvp(cmdSplit[0], cmdSplit)
             os.wait()[0]
 
-            if config.announceData.dataCompleted != None:
+            if config.announceData.dataCompleted is not None:
                 dataComp = config.announceData.dataCompleted
                 script = dataComp.script
                 script = EnvString.resolve(script)

@@ -40,8 +40,13 @@ r = PolicyReader(policyF)
 (globalDbName, dcVersion, dcDb,
  minPercDiskSpaceReq, userRunLife) = r.readGlobalSetup()
 
+# have to do this to be sure Python 2 uses raw_input
+try:
+    input = raw_input
+except NameError:
+    pass
 
-usr = raw_input("Enter mysql account name: ")
+usr = input("Enter mysql account name: ")
 pwd = getpass.getpass()
 
 
@@ -82,7 +87,6 @@ def startSomeRuns():
 
     r = x.prepareForNewRun('mySecondRun', usr, pwd)
     print(r)
-    #markRunFinished('%s_%s_u_mySecondRun' %(usr, dcVersion))
 
 
 ####################################################

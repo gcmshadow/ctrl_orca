@@ -21,33 +21,35 @@
 #
 
 import os
-import sys
-import subprocess
 import lsst.log as log
-from lsst.ctrl.orca.EnvString import EnvString
-from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
 from lsst.ctrl.orca.GenericPipelineWorkflowMonitor import GenericPipelineWorkflowMonitor
 
-## generic pipeline workflow launcher
+# generic pipeline workflow launcher
 
 
 class GenericPipelineWorkflowLauncher(WorkflowLauncher):
-    ## initializer
 
+    # initializer
     def __init__(self, cmds, prodConfig, wfConfig, runid, fileWaiter, pipelineNames):
         log.debug("GenericPipelineWorkflowLauncher:__init__")
-        ## list of commands to execute
+
+        # list of commands to execute
         self.cmds = cmds
-        ## workflow configuration
+
+        # workflow configuration
         self.wfConfig = wfConfig
-        ## production configuration
+
+        # production configuration
         self.prodConfig = prodConfig
-        ## run id for this workflow
+
+        # run id for this workflow
         self.runid = runid
-        ## object that waits for files to be created
+
+        # object that waits for files to be created
         self.fileWaiter = fileWaiter
-        ## list of pipeline names
+
+        # list of pipeline names
         self.pipelineNames = pipelineNames
 
     ##
@@ -70,11 +72,12 @@ class GenericPipelineWorkflowLauncher(WorkflowLauncher):
         # start the monitor first, because we want to catch any pipeline
         # events that might be sent from expiring pipelines.
 
-        ## Generic workflow monitor
+        # Generic workflow monitor
         self.workflowMonitor = GenericPipelineWorkflowMonitor(
             eventBrokerHost, shutdownTopic, self.runid, self.pipelineNames, loggerManagers)
-        if statusListener != None:
+        if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
+
         # start the thread
         self.workflowMonitor.startMonitorThread(self.runid)
 
@@ -85,12 +88,9 @@ class GenericPipelineWorkflowLauncher(WorkflowLauncher):
             pid = os.fork()
             if not pid:
                 os.execvp(cmd[0], cmd)
-            if firstJob == True:
+            if firstJob is True:
                 self.fileWaiter.waitForFirstFile()
                 firstJob = False
-
-            # commented out - don't wait for it to end
-            #os.wait()[0]
 
         # now wait for the rest of the files to be created
         self.fileWaiter.waitForAllFiles()

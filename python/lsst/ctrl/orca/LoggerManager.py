@@ -24,46 +24,49 @@
 
 
 import os
-import sys
-import re
-import time
 import signal
 import subprocess
 import lsst.log as log
 
 
-## Logger Manager base class
+##
+# @brief Logger Manager base class
 #
 class LoggerManager:
-    ## initialize
 
+    ##
+    # @brief initialize
     def __init__(self, broker, runid, dbHost=None, dbPort=None, dbName=None):
         log.debug("LoggerManager:__init__")
 
-        ## the event broker to listen on
+        # the event broker to listen on
         self.broker = broker
 
-        ## the run id of the logger messages to listen for
+        # the run id of the logger messages to listen for
         self.runid = runid
 
-        ## the database host to connect to
+        # the database host to connect to
         self.dbHost = dbHost
-        ## the database port to connect to
+
+        # the database port to connect to
         self.dbPort = dbPort
-        ## the database name
+
+        # the database name
         self.dbName = dbName
-        ## the logger process
+
+        # the logger process
         self.process = None
+
         return
 
-    ## @return the id of the logger process
+    # @return the id of the logger process
     def getPID(self):
         return self.process.pid
 
-    ## start the logger daemon process
+    # start the logger daemon process
     def start(self):
         log.debug("LoggerManager:start")
-        if self.process != None:
+        if self.process is not None:
             return
 
         directory = os.getenv("CTRL_ORCA_DIR")
@@ -77,10 +80,10 @@ class LoggerManager:
         self.process = subprocess.Popen(cmd, shell=True)
         return
 
-    ## halt the logger daemon process
+    # halt the logger daemon process
     def stop(self):
         log.debug("LoggerManager:stop")
-        if self.process == None:
+        if self.process is None:
             return
 
         try:

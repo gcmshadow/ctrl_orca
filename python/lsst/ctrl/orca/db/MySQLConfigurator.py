@@ -25,8 +25,6 @@
 
 from lsst.cat.MySQLBase import MySQLBase
 import os
-import subprocess
-import sys
 
 
 """This file contains a set of utilities to manage runs"""
@@ -37,26 +35,31 @@ class MySQLConfigurator(MySQLBase):
     Class MySQLConfigurator contains a set of utils to administer LSST-specific
     contents of the database which do not require mysql superuser access.
     In particular, it helps to setup verify  status of global database(s)
-    and user-specific database settings prior to starting a run, and 
+    and user-specific database settings prior to starting a run, and
     allows to register run in global database.
     """
 
-    ## initializer
+    # initializer
     def __init__(self, dbHostName, portNo, globalDbName,
                  dcVersion, dcDb, minPercDiskSpaceReq, userRunLife):
         MySQLBase.__init__(self, dbHostName, portNo)
 
-        ## the global database
+        # the global database
         self.globalDbName = globalDbName
-        ## data challenge version
+
+        # data challenge version
         self.dcVersion = dcVersion
-        ## data challenge database name
+
+        # data challenge database name
         self.dcDbName = dcDb
-        ## the $CAT_DIR/sql directory
+
+        # the $CAT_DIR/sql directory
         self.sqlDir = os.path.join(os.environ["CAT_DIR"], "sql")
-        ## minimum percent disk space required
+
+        # minimum percent disk space required
         self.minPercDiskSpaceReq = minPercDiskSpaceReq
-        ## @deprecated user run lifetime
+
+        # @deprecated user run lifetime
         self.userRunLife = userRunLife
 
         if self.globalDbName == "":
@@ -68,8 +71,8 @@ class MySQLConfigurator(MySQLBase):
 
     def checkStatus(self, userName, userPassword, clientMachine):
         """
-        checkStatus checks status of global database and user-specific 
-        database settings such as authorizations. It should be called 
+        checkStatus checks status of global database and user-specific
+        database settings such as authorizations. It should be called
         prior to starting a run.
         """
 
@@ -110,7 +113,7 @@ class MySQLConfigurator(MySQLBase):
         """
         prepareForNewRun prepares database for a new run. This includes
         creating appropriate database(s) and tables(s) as well as preloading
-        some static database contents and registering the run in the 
+        some static database contents and registering the run in the
         global database. It returns a database name corresponding to the
         run that is starting.
         Returns the entire database logical location string in the form:
@@ -149,7 +152,7 @@ class MySQLConfigurator(MySQLBase):
         #        (self.minPercDiskSpaceReq, percDiskSpaceAvail))
 
         if runType == 'p':
-            runLife = 1000 # ensure this run "never expire"
+            runLife = 1000  # ensure this run "never expire"
             # TODO: check if userName is authorized to start production run
         else:
             runLife = self.userRunLife
@@ -164,9 +167,9 @@ class MySQLConfigurator(MySQLBase):
             self.loadSqlScript(fP, userName, userPassword, runDbName)
 
         # Register this run in the global database
-        cmd = """INSERT INTO RunInfo 
+        cmd = """INSERT INTO RunInfo
                  (runName, dcVersion, dbName, startDate, expDate, initiator)
-                 VALUES ('%s', '%s', '%s', NOW(), 
+                 VALUES ('%s', '%s', '%s', NOW(),
                      DATE_ADD(NOW(), INTERVAL %i WEEK), '%s')""" % \
             (runName, self.dcVersion, runDbName, runLife, userName)
         self.execCommand0(cmd)
@@ -177,11 +180,12 @@ class MySQLConfigurator(MySQLBase):
 
     def runFinished(self, dbName):
         """
-        Should be called after the run finished. This 
+        Should be called after the run finished. This
         function records in the GlobalDB the fact that
         the run finished (date, maybe status, etc).
         It take an argument: databaseName"
         """
 
-        #self.connect(userName, userPassword, self.globalDbName)
-        #self.disconnect()
+        # self.connect(userName, userPassword, self.globalDbName)
+        # fill in with data from finished run
+        # self.disconnect()

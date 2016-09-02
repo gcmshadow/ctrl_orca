@@ -108,10 +108,10 @@ class Logger(EventChecker):
         #
         while True:
             event = self.receiver.receiveEvent(50)
-            if event != None:
+            if event is not None:
                 propSet = event.getPropertySet()
                 log = propSet.get("LOGGER")
-                if log == None:
+                if log is None:
                     continue
                 if self.finalMessageReceived(propSet):
                     self.dbLogger.disconnect()
@@ -122,7 +122,7 @@ class Logger(EventChecker):
                     self.dbLogger.insertRecords("%s.Logs" % self.database, msgs, tmpFilename)
                     cnt = 0
                     msgs = []
-            elif event == None:
+            elif event is None:
                 if len(msgs) > 0:
                     self.dbLogger.insertRecords("%s.Logs" % self.database, msgs, tmpFilename)
                     cnt = 0
@@ -138,11 +138,11 @@ class Monitor(EventChecker):
     def execute(self):
         while True:
             event = self.receiver.receiveEvent(50)
-            if event == None:
+            if event is None:
                 continue
             propSet = event.getPropertySet()
             log = propSet.get("LOGGER")
-            if log == None:
+            if log is None:
                 continue
             if self.finalMessageReceived(propSet):
                 sys.exit(10)

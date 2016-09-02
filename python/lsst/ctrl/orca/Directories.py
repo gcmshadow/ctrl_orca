@@ -26,7 +26,6 @@
 import lsst.pex.exceptions as pexExcept
 
 import lsst.daf.base as dafBase
-from lsst.daf.base import *
 
 import os
 
@@ -78,15 +77,19 @@ class Directories(object):
     # @param shortName   the short name of the pipeline
     # @param runId       the run ID for the pipeline run (default: "no-id")
     def __init__(self, dirConfig, shortName, runId="no-id"):
-        ## directory config
+        # directory config
         self.config = dirConfig
-        ## run id
+
+        # run id
         self.runid = runId
-        ## alias for this pipeline
+
+        # alias for this pipeline
         self.shortname = shortName
-        ## data pattern
+
+        # data pattern
         self.patdata = {"runid": self.runid, "shortname": self.shortname}
-        ## default root directory
+
+        # default root directory
         self.defroot = None
 
     ##
@@ -152,7 +155,7 @@ class Directories(object):
     # PropertySet.  The keys will include "work", "input", "output",
     # "update", and "scratch".
     def getDirs(self):
-        out = lsst.daf.base.PropertySet()
+        out = dafBase.PropertySet()
         for name in "workDir inputDir outputDir updateDir scratchDir".split():
             out.set(name, self.getNamedDirectory(name))
         return out

@@ -26,24 +26,26 @@
 from __future__ import print_function
 import os
 import subprocess
-import sys
 import re
 import time
 import lsst.log as log
 
 
-## CondorJobs - handles interaction with HTCondor
+##
+# @brief CondorJobs - handles interaction with HTCondor
 # This class is highly dependent on the output of the condor commands
 # condor_submit and condor_q
 #
 class CondorJobs:
-    ## initializer
+    ##
+    # @brief initializer
 
     def __init__(self):
         log.debug("CondorJobs:__init__")
         return
 
-    ## submit a condor file, and return the job number associated with it.
+    ##
+    # @brief submit a condor file, and return the job number associated with it.
     # expected output:
     # Submitting job(s).
     # Logging submit event(s).
@@ -58,7 +60,6 @@ class CondorJobs:
         pop = os.popen(submitRequest, "r")
 
         line = pop.readline()
-        #line = pop.readline()
         line = pop.readline()
         num = clusterexp.findall(line)
         if len(num) == 0:
@@ -66,12 +67,13 @@ class CondorJobs:
         print("submitted job # %s as file %s" % (num[0], condorFile))
         return num[0]
 
-    ## wait for a condor job to reach it's run state.
+    #
+    # @brief wait for a condor job to reach it's run state.
     # expected output:
-    #-- Submitter: srp@lsst6.ncsa.uiuc.edu : <141.142.15.103:40900> : lsst6.ncsa.uiuc.edu
-    # ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
-    #1016.0   srp             5/24 09:17   0+00:00:00 I  0   0.0  launch_joboffices_
-    #1017.0   srp             5/24 09:18   0+00:00:00 R  0   0.0  launch_joboffices_
+    # -- Submitter: srp@lsst6.ncsa.uiuc.edu : <141.142.15.103:40900> : lsst6.ncsa.uiuc.edu
+    #  ID      OWNER            SUBMITTED     RUN_TIME ST PRI SIZE CMD
+    # 1016.0   srp             5/24 09:17   0+00:00:00 I  0   0.0  launch_joboffices_
+    # 1017.0   srp             5/24 09:18   0+00:00:00 R  0   0.0  launch_joboffices_
 
     def waitForJobToRun(self, num, extramsg=None):
         log.debug("CondorJobs:waitForJobToRun")
@@ -79,7 +81,7 @@ class CondorJobs:
         queueExp = re.compile("\S+")
         cJobSeen = 0
         print("waiting for job %s to run." % num)
-        if extramsg != None:
+        if extramsg is not None:
             print(extramsg)
         secondsWaited = 0
         while 1:
@@ -87,7 +89,8 @@ class CondorJobs:
             bJobSeenNow = False
             if (secondsWaited > 0) and ((secondsWaited % 60) == 0):
                 minutes = secondsWaited/60
-                print("waited %d minute%s so far. still waiting for job %s to run." % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num))
+                msg = "waited %d minute%s so far. still waiting for job %s to run."
+                print(msg % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num))
             while 1:
                 line = pop.readline()
                 if not line:
@@ -121,7 +124,7 @@ class CondorJobs:
                     return runstate
             # check to see if we've seen the job before, but that
             # it disappeared
-            if (cJobSeen > 0) and (bJobSeenNow == False):
+            if (cJobSeen > 0) and (bJobSeenNow is False):
                 pop.close()
                 print("Was monitoring job %s, but it exitted." % num)
                 # throw exception
@@ -130,7 +133,8 @@ class CondorJobs:
             time.sleep(1)
             secondsWaited = secondsWaited + 1
 
-    ## waits for all jobs to enter the run state
+    ##
+    # @brief waits for all jobs to enter the run state
     def waitForAllJobsToRun(self, numList):
         log.debug("CondorJobs:waitForAllJobsToRun")
         queueExp = re.compile("\S+")
@@ -162,7 +166,8 @@ class CondorJobs:
             pop.close()
             time.sleep(1)
 
-    ## submit a condor dag and return its cluster number
+    ##
+    # @brief submit a condor dag and return its cluster number
     def condorSubmitDag(self, filename):
         log.debug("CondorJobs: submitCondorDag "+filename)
         # Just a note about why this was done this way...
@@ -196,7 +201,8 @@ class CondorJobs:
         stdoutdata, stderrdata = process.communicate()
         return -1
 
-    ## kill the HTCondor job with a this id
+    ##
+    # @brief  kill the HTCondor job with a this id
     def killCondorId(self, cid):
         log.debug("CondorJobs: killCondorId"+str(cid))
         cmd = "condor_rm "+str(cid)
@@ -209,7 +215,8 @@ class CondorJobs:
         # read the rest (if any) and terminate
         stdoutdata, stderrdata = process.communicate()
 
-    ## check to see if the job with id "cid" is still alive
+    ##
+    # @brief check to see if the job with id "cid" is still alive
     def isJobAlive(self, cid):
         jobNum = "%s.0" % cid
         queueExp = re.compile("\S+")

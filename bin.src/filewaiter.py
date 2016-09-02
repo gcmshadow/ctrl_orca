@@ -63,14 +63,14 @@ if __name__ == "__main__":
     for line in lines:
         list.append(line.split('\n')[0])
 
-    if bFirst == True:
+    if bFirst is True:
         item = list[0]
-        while os.path.exists(item) == False:
+        while os.path.exists(item) is False:
             time.sleep(1)
         sys.exit(0)
 
     while len(list) > 0:
-        newlist = [item for item in list if (os.path.exists(item) == False)]
+        newlist = [item for item in list if (os.path.exists(item) is False)]
         list = newlist
         time.sleep(1)
     sys.exit(0)

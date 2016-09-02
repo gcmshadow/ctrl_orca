@@ -23,16 +23,9 @@
 #
 
 from __future__ import print_function
-import math
 import argparse
-import os
-import subprocess
 import sys
-import time
-
-from textwrap import dedent
-import glob
-import re
+import shlex
 
 
 def _line_to_args(self, line):
@@ -81,7 +74,7 @@ def makeArgumentParser(description, inRootsRequired=True, addRegistryOption=True
 
 def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid, idsPerJob):
     """
-    Write Condor Dag Submission files. 
+    Write Condor Dag Submission files.
     """
 
     print("Writing DAG file ")
@@ -102,7 +95,7 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
 
     print("First Input File loop ")
 
-    ## Loop over input entries
+    # Loop over input entries
     fileObj = open(infile, "r")
     count = 0
     for aline in fileObj:
@@ -113,7 +106,7 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
 
     print("Second Input File loop ")
 
-    ## Loop over input entries
+    # Loop over input entries
     fileObj = open(infile, "r")
     count = 0
     for aline in fileObj:
@@ -183,8 +176,6 @@ def main():
 
     #   processCcdLsstSim
     pipeline = "S2012Pipe"
-    #templateFile = "W2012Pipe-template.condor"
-    #infile   = "9429-CCDs.input"
 
     writeDagFile(pipeline, ns.template, ns.source, ns.workerdir, ns.prescript, ns.runid, ns.idsPerJob)
 

@@ -27,11 +27,7 @@ Tests of the SharedData class
 """
 from __future__ import with_statement
 
-import pdb                              # we may want to say pdb.set_trace()
-import os
-import sys
 import unittest
-import time
 import threading
 
 from lsst.ctrl.orca.multithreading import SharedData
@@ -61,8 +57,7 @@ class ShareDataTestCase(unittest.TestCase):
 
     def testNoData(self):
         attrs = self.sd.dir()
-        self.assertEqual(len(attrs), 0,
-                          "Non-empty protected dir: " + str(attrs))
+        self.assertEqual(len(attrs), 0, "Non-empty protected dir: " + str(attrs))
         self.sd.acquire()
         self.assertTrue(self.sd.__, "__ not set")
         self.sd.release()
@@ -145,8 +140,7 @@ class ReadableShareDataTestCase(unittest.TestCase):
 
     def testNoData(self):
         attrs = self.sd.dir()
-        self.assertEqual(len(attrs), 0,
-                          "Non-empty protected dir: " + str(attrs))
+        self.assertEqual(len(attrs), 0, "Non-empty protected dir: " + str(attrs))
         self.assertTrue(self.sd.__, "__ not set")
 
     def _initData(self):

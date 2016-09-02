@@ -22,66 +22,64 @@
 
 import os
 import stat
-import lsst.ctrl.orca as orca
-import lsst.ctrl.provenance.dc3 as dc3
 import lsst.log as log
 from lsst.ctrl.orca.db.MySQLConfigurator import MySQLConfigurator
 from lsst.ctrl.orca.config.AuthConfig import AuthConfig
 
-## @deprecated DC3Configurator
+# @deprecated DC3Configurator
 
 
 class DC3Configurator:
 
     def __init__(self, runid, dbConfig, prodConfig=None, wfConfig=None):
         """
-        create a generic 
+        create a generic
         @param type      the category of configurator
         @param dbConfig  the database config
         """
         log.debug("DC3Configurator:__init__")
-        ## schema type
+        # schema type
         self.type = "mysql"
-        ## run id
+        # run id
         self.runid = runid
-        ## database configuraition
+        # database configuraition
         self.dbConfig = dbConfig
-        ## delegate method to call at end of run
+        # delegate method to call at end of run
         self.delegate = None
-        ## the per-Production database
+        # the per-Production database
         self.perProductionRunDatabase = None
 
-        ## the name of the platform list in the database provenance
+        # the name of the platform list in the database provenance
         self.platformName = ""
-        ## production configuration
+        # production configuration
         self.prodConfig = prodConfig
-        if self.prodConfig == None:
+        if self.prodConfig is None:
             self.platformName = "production"
-        ## workflow configuration
+        # workflow configuration
         self.wfConfig = wfConfig
 
         #
         # extract the databaseConfig.database policy to get required
         # parameters from it.
 
-        ## the database host name
+        # the database host name
         self.dbHostName = dbConfig.system.authInfo.host
-        ## the database port number
+        # the database port number
         self.dbPort = dbConfig.system.authInfo.port
-        ## global database name
+        # global database name
         globalDbName = dbConfig.configuration["production"].globalDbName
-        ## data challenge version
+        # data challenge version
         dcVersion = dbConfig.configuration["production"].dcVersion
-        ## data challenge database name
+        # data challenge database name
         dcDbName = dbConfig.configuration["production"].dcDbName
-        ## minimum percent database space required
+        # minimum percent database space required
         minPercDiskSpaceReq = dbConfig.configuration["production"].minPercDiskSpaceReq
         userRunLife = dbConfig.configuration["production"].userRunLife
 
         self.delegate = MySQLConfigurator(self.dbHostName, self.dbPort,
                                           globalDbName, dcVersion, dcDbName, minPercDiskSpaceReq, userRunLife)
 
-    ## setup for a new run
+    # setup for a new run
     def setup(self, provSetup):
         log.debug("DC3Configurator:setup")
 
@@ -91,24 +89,25 @@ class DC3Configurator:
 
         # construct dbRun and dbGlobal URLs here
 
-        dbBaseURL = self.getHostURL()
         self.perProductionRunDatabase = dbNames[0]
-        dbRun = dbBaseURL+"/"+dbNames[0]
-        dbGlobal = dbBaseURL+"/"+dbNames[1]
 
         # TODO - Provenance
-        #recorder = dc3.Recorder(self.runid, self.prodConfig.shortName, self.platformName, dbRun, dbGlobal, 0, None)
-        #provSetup.addProductionRecorder(recorder)
+        # dbBaseURL = self.getHostURL()
+        # dbRun = dbBaseURL+"/"+dbNames[0]
+        # dbGlobal = dbBaseURL+"/"+dbNames[1]
+        # recorder = dc3.Recorder(self.runid, self.prodConfig.shortName, self.platformName,
+        #                         dbRun, dbGlobal, 0, None)
+        # provSetup.addProductionRecorder(recorder)
 
-        #arglist = []
-        #arglist.append("--runid=%s" % self.runid)
-        #arglist.append("--dbrun=%s" % dbRun)
-        #arglist.append("--dbglobal=%s" % dbGlobal)
-        #arglist.append("--runoffset=%s" % recorder.getRunOffset())
-        #provSetup.addWorkflowRecordCmd("PipelineProvenanceRecorder.py", arglist)
+        # arglist = []
+        # arglist.append("--runid=%s" % self.runid)
+        # arglist.append("--dbrun=%s" % dbRun)
+        # arglist.append("--dbglobal=%s" % dbGlobal)
+        # arglist.append("--runoffset=%s" % recorder.getRunOffset())
+        # provSetup.addWorkflowRecordCmd("PipelineProvenanceRecorder.py", arglist)
         # end TODO
 
-    ## @return a dictory containing the "host", "port", "runid" and "dbrun" (database)
+    # @return a dictory containing the "host", "port", "runid" and "dbrun" (database)
     def getDBInfo(self):
         dbInfo = {}
         dbInfo["host"] = self.dbHostName
@@ -117,7 +116,7 @@ class DC3Configurator:
         dbInfo["dbrun"] = self.perProductionRunDatabase
         return dbInfo
 
-    ## internal configuration
+    # internal configuration
     def setupInternal(self):
         log.debug("DC3Configurator:setupInternal")
 
@@ -125,13 +124,13 @@ class DC3Configurator:
         dbNames = self.prepareForNewRun(self.runid)
         return dbNames
 
-    ## validate configuration
+    # validate configuration
     def checkConfiguration(self, val):
         log.debug("DC3Configurator:checkConfiguration")
         # TODO: use val when implemented
         self.checkConfigurationInternal()
 
-    ## validate configuration
+    # validate configuration
     def checkConfigurationInternal(self):
         log.debug("DC3Configurator:checkConfigurationInternal")
         #
@@ -151,39 +150,38 @@ class DC3Configurator:
         #
         self.initAuthInfo(self.dbConfig)
 
-    ## return a URL to the database host, including port number
+    # return a URL to the database host, including port number
     def getHostURL(self):
         schema = self.type.lower()
         retVal = schema+"://"+self.dbHost+":"+str(self.dbPort)
         return retVal
 
-    ## get database user
+    # get database user
     def getUser(self):
         return self.dbUser
 
-    ## check to see that the file is accessible only to the user
+    # check to see that the file is accessible only to the user
     def checkUserOnlyPermissions(self, checkFile):
         mode = os.stat(checkFile)[stat.ST_MODE]
 
-        permissions = stat.S_IMODE(mode)
-
-        errorText = "File permissions on "+checkFile + \
-            " should not be readable, writable, or executable  by 'group' or 'other'.  Use chmod to fix this. (chmod 700 ~/.lsst)"
+        errorText = ("File permissions on ", checkFile,
+                     " should not be readable, writable, or executable  by 'group' or 'other'.",
+                     " Use chmod to fix this. (chmod 700 ~/.lsst)")
 
         if (mode & getattr(stat, "S_IRWXG")) != 0:
             raise RuntimeError(errorText)
         if (mode & getattr(stat, "S_IRWXO")) != 0:
             raise RuntimeError(errorText)
 
-    ## prepare the database for a new run
+    # prepare the database for a new run
     def prepareForNewRun(self, runName, runType='u'):
         return self.delegate.prepareForNewRun(runName, self.dbUser, self.dbPassword, runType)
 
-    ## call the delegate
+    # call the delegate
     def runFinished(self, dbName):
         self.delegate(dbName)
 
-    ##
+    #
     # initAuthInfo - given a Config object with specifies "database.host" and
     # "database.port", match it against the credential Config
     # file $HOME/.lsst/db-auth.paf
@@ -210,33 +208,27 @@ class DC3Configurator:
     #
     def initAuthInfo(self, dbConfig):
         host = dbConfig.system.authInfo.host
-        if host == None:
+        if host is None:
             raise RuntimeError("database host must be specified in config")
         port = dbConfig.system.authInfo.port
-        if port == None:
+        if port is None:
             raise RuntimeError("database port must be specified in config")
         dbAuthFile = os.path.join(os.environ["HOME"], ".lsst/db-auth.py")
 
         authConfig = AuthConfig()
         authConfig.load(dbAuthFile)
 
-        #authInfo = authConfig.database.authInfo
-        #print "authInfo = ",authInfo
-        #authNames = authConfig.database.authInfo.active
-
         for authName in authConfig.database.authInfo:
             auth = authConfig.database.authInfo[authName]
-            #print "authName = ",authName
-            #print "auth = ",auth
             if (auth.host == host) and (auth.port == port):
                 log.debug("using host %s at port %d" % (host, port))
-                ## database host name
+                # database host name
                 self.dbHost = auth.host
-                ## database server port number
+                # database server port number
                 self.dbPort = auth.port
-                ## database user name
+                # database user name
                 self.dbUser = auth.user
-                ## database authentication
+                # database authentication
                 self.dbPassword = auth.password
                 return
         raise RuntimeError("couldn't find any matching authorization for host %s and port %d " % (host, port))

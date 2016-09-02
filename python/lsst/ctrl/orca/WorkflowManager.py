@@ -22,13 +22,14 @@ from __future__ import print_function
 #
 
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
-from lsst.ctrl.orca.StatusListener import StatusListener
 import lsst.log as log
-import lsst.pex.config as pexConfig
 from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.DataAnnouncer import DataAnnouncer
+from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 
-## workflow manager base class
+##
+# @brief workflow manager base class
+#
 
 
 class WorkflowManager:
@@ -42,28 +43,28 @@ class WorkflowManager:
         # have access to this object.
         self._locked = SharedData(False)
 
-        ##  workflow name
+        #  workflow name
         self.name = "unnamed"
-        if name != None:
+        if name is not None:
             self.name = name
 
-        ## run id of this workflow
+        # run id of this workflow
         self.runid = runid
 
-        ## repository where the configuration is kept
+        # repository where the configuration is kept
         self.repository = repository
 
-        ## workflow configuration
+        # workflow configuration
         self.wfConfig = wfConfig
 
-        ## production configuration
+        # production configuration
         self.prodConfig = prodConfig
 
         self._workflowConfigurator = None
 
         log.debug("WorkflowManager:__init__")
 
-        ## the urgency level of how fast to stop the workflow
+        # the urgency level of how fast to stop the workflow
         self.urgency = 0
         self._launcher = None
         self._monitor = None
@@ -91,7 +92,7 @@ class WorkflowManager:
         try:
             self._locked.acquire()
 
-            if self._workflowConfigurator == None:
+            if self._workflowConfigurator is None:
                 self._workflowLauncher = self.configure()
             self._monitor = self._workflowLauncher.launch(statusListener, loggerManagers)
 

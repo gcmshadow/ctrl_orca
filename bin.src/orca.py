@@ -99,7 +99,6 @@ else:
 log.configure(configPath)
 
 orca.verbosity = parser.opts.verbosity
-#orca.logger.setThreshold(-10 * parser.opts.verbosity)
 
 # set the dryrun singleton to the value set on the command line.
 # we reference this in other classes
@@ -110,8 +109,6 @@ log.debug("pipelineConfigFile = "+pipelineConfigFile)
 log.debug("runId = "+runId)
 
 # create the ProductionRunManager, configure it, and launch it
-#productionRunManager = ProductionRunManager(runId, pipelineConfigFile, orca.logger, pipelineVerbosity=parser.opts.pipeverb)
-#productionRunManager = ProductionRunManager(runId, pipelineConfigFile, orca.logger, orca.repository)
 productionRunManager = ProductionRunManager(runId, pipelineConfigFile, orca.repository)
 
 

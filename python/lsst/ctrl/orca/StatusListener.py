@@ -20,7 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import subprocess
 import lsst.log as log
 
 ##
@@ -30,8 +29,8 @@ import lsst.log as log
 
 
 class StatusListener:
-    ## initializer
 
+    # initializer
     def __init__(self):
         log.debug("StatusListener:__init__")
 

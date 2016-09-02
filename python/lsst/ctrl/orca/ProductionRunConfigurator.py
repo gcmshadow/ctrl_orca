@@ -35,28 +35,31 @@ import lsst.log as log
 
 
 class ProductionRunConfigurator:
-    ## initialize
-
+    ##
+    # @brief initialize
+    #
     def __init__(self, runid, configFile, repository=None, workflowVerbosity=None):
 
         log.debug("ProductionRunConfigurator:__init__")
 
-        ## run id for this production
+        # run id for this production
         self.runid = runid
 
         self._prodConfigFile = configFile
 
-        ## production configuration
+        # production configuration
         self.prodConfig = ProductionConfig()
         self.prodConfig.load(configFile)
 
-        ## location of the repostiry
+        # location of the repository
         self.repository = repository
-        ## verbosity level for this workflow
+
+        # verbosity level for this workflow
         self.workflowVerbosity = workflowVerbosity
+
         self._provSetup = None
 
-        ## provenance dictionary
+        # provenance dictionary
         self.provenanceDict = {}
         self._wfnames = None
 
@@ -66,21 +69,22 @@ class ProductionRunConfigurator:
         # logger managers
         self._loggerManagers = []
 
-        ## hostname of the event broker
+        # hostname of the event broker
         self.eventBrokerHost = None
 
         # these are config settings which can be overriden from what they
         # are in the workflow policies.
 
-        ## dictionary of configuration override values
+        # dictionary of configuration override values
         self.configOverrides = dict()
+
         production = self.prodConfig.production
-        if production.eventBrokerHost != None:
+        if production.eventBrokerHost is not None:
             self.eventBrokerHost = production.eventBrokerHost
             self.configOverrides["execute.eventBrokerHost"] = production.eventBrokerHost
-        if production.logThreshold != None:
+        if production.logThreshold is not None:
             self.configOverrides["execute.logThreshold"] = production.logThreshold
-        if production.productionShutdownTopic != None:
+        if production.productionShutdownTopic is not None:
             self.configOverrides["execute.shutdownTopic"] = production.productionShutdownTopic
 
     ##
@@ -106,8 +110,8 @@ class ProductionRunConfigurator:
 
         # TODO - IMPORTANT - NEXT TWO LINES ARE FOR PROVENANCE
         # --------------
-        #self._provSetup = ProvenanceSetup()
-        #self._provSetup.addAllProductionConfigFiles(self._prodConfigFile, self.repository)
+        # self._provSetup = ProvenanceSetup()
+        # self._provSetup.addAllProductionConfigFiles(self._prodConfigFile, self.repository)
         # --------------
 
         #
@@ -115,22 +119,20 @@ class ProductionRunConfigurator:
         # cache the configurators in case we want to check the configuration
         # later.
         #
-        #databaseConfigNames = self.prodConfig.databaseConfigNames
         databaseConfigs = self.prodConfig.database
 
-        #for databaseName in databaseConfigNames:
         for databaseName in databaseConfigs:
             databaseConfig = databaseConfigs[databaseName]
             cfg = self.createDatabaseConfigurator(databaseConfig)
             cfg.setup(self._provSetup)
             dbInfo = cfg.getDBInfo()
             # check to see if we're supposed to launch a logging daemon
-            if databaseConfig.logger != None:
+            if databaseConfig.logger is not None:
                 loggerConfig = databaseConfig.logger
-                if loggerConfig.launch != None:
+                if loggerConfig.launch is not None:
                     launch = loggerConfig.launch
                     loggerManager = None
-                    if launch == True:
+                    if launch is True:
                         loggerManager = LoggerManager(self.eventBrokerHost, self.runid, dbInfo[
                                                       "host"], dbInfo["port"], dbInfo["dbrun"])
                     else:
@@ -142,12 +144,11 @@ class ProductionRunConfigurator:
         #
         # do specialized production level configuration, if it exists
         #
-        if self.prodConfig.production.configuration.configurationClass != None:
+        if self.prodConfig.production.configuration.configurationClass is not None:
             specialConfigurationConfig = self.prodConfig.production.configuration
             # XXX - specialConfigurationConfig maybe?
             self.specializedConfigure(specialConfigurationConfig)
 
-        #workflowNames = self.prodConfig.workflowNames
         workflowConfigs = self.prodConfig.workflow
         workflowManagers = []
         for wfName in workflowConfigs:
@@ -156,6 +157,9 @@ class ProductionRunConfigurator:
 
             workflowManager = self.createWorkflowManager(self.prodConfig, wfName, wfConfig)
             workflowLauncher = workflowManager.configure(self._provSetup, workflowVerbosity)
+            if workflowLauncher is None:
+                    raise MultiIssueConfigurationError("error configuring workflowLauncher")
+
             workflowManagers.append(workflowManager)
 
         return workflowManagers

@@ -26,11 +26,8 @@ from __future__ import absolute_import
 
 import os
 import os.path
-import sets
 import threading
 import time
-import lsst.daf.base as base
-import lsst.pex.config as pexConfig
 import lsst.ctrl.events as events
 from lsst.ctrl.orca.config.ProductionConfig import ProductionConfig
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
@@ -42,7 +39,6 @@ from .exceptions import ConfigurationError
 from .exceptions import MultiIssueConfigurationError
 from .multithreading import SharedData
 from .ProductionRunConfigurator import ProductionRunConfigurator
-#from threading import SharedData
 
 ##
 # @brief A class in charge of launching, monitoring, managing, and stopping
@@ -66,7 +62,7 @@ class ProductionRunManager:
         self._locked = SharedData(False,
                                   {"running": False, "done": False})
 
-        ## the run id for this production
+        # the run id for this production
         self.runid = runid
 
         # once the workflows that make up this production is created we will
@@ -82,19 +78,19 @@ class ProductionRunManager:
         # the cached ProductionRunConfigurator instance
         self._productionRunConfigurator = None
 
-        ## the full path the configuration
+        # the full path the configuration
         self.fullConfigFilePath = ""
-        if os.path.isabs(configFileName) == True:
+        if os.path.isabs(configFileName) is True:
             self.fullConfigFilePath = configFileName
         else:
             self.fullConfigFilePath = os.path.join(os.path.realpath('.'), configFileName)
 
-        ## create Production configuration
+        # create Production configuration
         self.config = ProductionConfig()
         # load the production config object
         self.config.load(self.fullConfigFilePath)
 
-        ## the repository location
+        # the repository location
         self.repository = repository
 
         # determine repository location
@@ -104,13 +100,6 @@ class ProductionRunManager:
             self.repository = "."
         else:
             self.repository = EnvString.resolve(self.repository)
-
-        # XXX - Check to see if we need to do this still.
-        # do a little sanity checking on the repository before we continue.
-        #if not os.path.exists(self.repository):
-        #    raise RuntimeError("specified repository " + self.repository + ": directory not found");
-        #if not os.path.isdir(self.repository):
-        #    raise RuntimeError("specified repository "+ self.repository + ": not a directory");
 
         # shutdown thread
         self._sdthread = None
@@ -202,7 +191,7 @@ class ProductionRunManager:
             if not self._workflowManagers:
                 raise ConfigurationError("Failed to obtain workflowManagers from configurator")
 
-            if skipConfigCheck == False:
+            if skipConfigCheck is False:
                 self.checkConfiguration(checkCare)
 
             # launch the logger daemon
@@ -210,9 +199,9 @@ class ProductionRunManager:
                 lm.start()
 
             # TODO - Re-add when Provenance is complete
-            #provSetup = self._productionRunConfigurator.getProvenanceSetup()
-            ##
-            #provSetup.recordProduction()
+            # provSetup = self._productionRunConfigurator.getProvenanceSetup()
+            #
+            # provSetup.recordProduction()
 
             for workflow in self._workflowManagers["__order"]:
                 mgr = self._workflowManagers[workflow.getName()]
@@ -226,16 +215,9 @@ class ProductionRunManager:
             self._locked.release()
 
         # start the thread that will listen for shutdown events
-        if self.config.production.productionShutdownTopic != None:
+        if self.config.production.productionShutdownTopic is not None:
             self._startShutdownThread()
 
-        # announce data, if it's available
-        #print "waiting for startup"
-        #time.sleep(5)
-        #for workflow in self._workflowManagers["__order"]:
-        #    mgr = self._workflowManagers[workflow.getName()]
-        #    print "mgr = ",mgr
-        #    mgr.announceData()
         print("Production launched.")
         print("Waiting for shutdown request.")
 
@@ -248,7 +230,7 @@ class ProductionRunManager:
         # the production is still running.
         #
         for monitor in self._workflowMonitors:
-            if monitor.isRunning() == True:
+            if monitor.isRunning() is True:
                 return True
 
         with self._locked:
@@ -278,9 +260,9 @@ class ProductionRunManager:
 
         configuratorClass = ProductionRunConfigurator
         configuratorClassName = None
-        if self.config.configurationClass != None:
-            configuratorClassname = self.config.configurationClass
-        if configuratorClassName != None:
+        if self.config.configurationClass is not None:
+            configuratorClassName = self.config.configurationClass
+        if configuratorClassName is not None:
             classFactory = NamedClassFactory()
             configuratorClass = classFactory.createClass(configuratorClassName)
 
@@ -398,10 +380,9 @@ class ProductionRunManager:
             return None
         return self._workflowManagers[name]
 
-    ## shutdown thread
+    # shutdown thread
     class _ShutdownThread(threading.Thread):
-        ## initialize the shutdown thread
-
+        # @brief initialize the shutdown thread
         def __init__(self, parent, runid, pollingIntv=0.2, listenTimeout=10):
             threading.Thread.__init__(self)
             self.setDaemon(True)
@@ -417,8 +398,10 @@ class ProductionRunManager:
             selector = "RUNID = '%s'" % self._runid
             self._evsys.createReceiver(brokerhost, self._topic, selector)
 
-        ## listen for the shutdown event at regular intervals, and shutdown
+        ##
+        # @brief listen for the shutdown event at regular intervals, and shutdown
         # when the event is received.
+        #
         def run(self):
             log.debug("listening for shutdown event at %s s intervals" % self._pollintv)
 
@@ -428,8 +411,6 @@ class ProductionRunManager:
             while self._parent.isRunning() and shutdownEvent is None:
                 time.sleep(self._pollintv)
                 shutdownEvent = self._evsys.receiveEvent(self._topic, self._timeout)
-                #time.sleep(1)
-                #shutdownData = self._evsys.receiveEvent(self._topic, 10)
             log.debug("DONE!")
 
             if shutdownEvent:

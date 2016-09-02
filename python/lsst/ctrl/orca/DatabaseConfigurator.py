@@ -26,25 +26,30 @@
 
 
 class DatabaseConfigurator:
-    ## initialize
 
+    ##
+    # @brief initialize
+    #
     def __init__(self, runid, config):
-        ## run id
+
+        # run id
         self.runid = runid
-        ## database configuration
+
+        # database configuration
         self.config = config
         return
 
     ##
-    # set the database configurator up
+    # @brief set the database configurator up
     #
     def setDatabase(self, provSetup):
 
-        # setup the database - using Dc3aDatabaseConfigurator as a placeholder
-        dbConfigurator = Dc3aDatabaseConfigurator(self.runid, self.config)
-        dbConfigurator.setup()
+        # steps to implement for configurators:
+        # call configurator constructor using the runid and config
+        # call setup on the configurator object
 
-        if provSetup is not None:
-            # may call provSetup.addProductionRecorder(ProvenanceRecorder)
-            # may call provSetup.addWorkflowRecordCmd(string)
-            return
+        # if provSetup is not None:
+        #     may call provSetup.addProductionRecorder(ProvenanceRecorder)
+        #     may call provSetup.addWorkflowRecordCmd(string)
+
+        return

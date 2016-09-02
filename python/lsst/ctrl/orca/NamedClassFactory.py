@@ -34,7 +34,7 @@ class NamedClassFactory:
         modname = name[dot+1:]
         module = __import__(name, globals(), locals(), [modname], -1)
         classobj = getattr(module, modname)
-        if classobj == None:
+        if classobj is None:
             raise RuntimeError("Attempt to instantiate class \"" + name +
                                "\" failed. Could not find that class.")
 

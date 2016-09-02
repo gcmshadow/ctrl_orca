@@ -2,28 +2,28 @@ from __future__ import absolute_import
 import lsst.pex.config as pexConfig
 from . import FakeTypeMap as fake
 
-## authorization
+# authorization
 
 
 class AuthInfoConfig(pexConfig.Config):
-    ## host name
+    # host name
     host = pexConfig.Field("host", str)
-    ## user name
+    # user name
     user = pexConfig.Field("user", str)
-    ## password
+    # password
     password = pexConfig.Field("password", str)
-    ## port number
+    # port number
     port = pexConfig.Field("port", int)
 
-## database authorization
+# database authorization
 
 
 class AuthDatabaseConfig(pexConfig.Config):
-    ## authorization configuration
+    # authorization configuration
     authInfo = pexConfig.ConfigChoiceField("auth info", fake.FakeTypeMap(AuthInfoConfig))
 
 
-## general authorization
+# general authorization
 class AuthConfig(pexConfig.Config):
-    ## authorization database configuration
+    # authorization database configuration
     database = pexConfig.ConfigField("root", AuthDatabaseConfig)

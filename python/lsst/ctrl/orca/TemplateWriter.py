@@ -20,9 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import os
-import sys
-import re
 import socket
 
 ##
@@ -32,10 +29,10 @@ import socket
 
 
 class TemplateWriter:
-    ## initializer
 
+    # initializer
     def __init__(self):
-        ## local values that are always set
+        # local values that are always set
         self.orcaValues = dict()
         self.orcaValues["ORCA_LOCAL_HOSTNAME"] = socket.gethostname()
         return

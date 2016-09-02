@@ -20,8 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-#from .version import *
-
 dryrun = False
 verbosity = 0
 repository = None

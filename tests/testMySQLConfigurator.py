@@ -29,7 +29,6 @@ from lsst.cat.MySQLBase import MySQLBase
 from lsst.cat.policyReader import PolicyReader
 from lsst.daf.persistence import DbAuth
 
-import getpass
 import os
 import subprocess
 
@@ -86,7 +85,6 @@ def startSomeRuns():
 
     r = x.prepareForNewRun('mySecondRun', usr, pwd)
     print(r)
-    #markRunFinished('%s_%s_u_mySecondRun' %(usr, dcVersion))
 
 
 ####################################################
@@ -96,10 +94,7 @@ if DbAuth.available(host, str(port)):
     pwd = DbAuth.password(host, str(port))
 else:
     print("Authorization unavailable for %s:%s" % (host, port))
-    usr = raw_input("Enter mysql account name: ")
-    pwd = getpass.getpass()
 
-#authUser(usr, pwd)
 
 resetGlobalDb()
 dropDB(usr, pwd)

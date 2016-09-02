@@ -42,8 +42,9 @@ config.workflow["association"].task["isr"].scriptDir = "workers"
 # this is used if we're running a script that runs LOCALLY before the
 # preJob condor job is submitted.
 # commented out for now
-#config.workflow["association"].task["isr"].preScript.template = "$CTRL_ORCA_DIR/etc/condor/templates/preScript.template"
-#config.workflow["association"].task["isr"].preScript.outputFile = "pre.sh"
+# config.workflow["association"].task["isr"].preScript.template =
+#        "$CTRL_ORCA_DIR/etc/condor/templates/preScript.template"
+# config.workflow["association"].task["isr"].preScript.outputFile = "pre.sh"
 
 #
 # There are two stages of templating.

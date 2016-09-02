@@ -44,10 +44,11 @@ config.workflow["workflow1"].configuration["condor"].glidein.template.outputFile
 config.workflow["workflow1"].task["task1"].scriptDir = "workers"
 # this is used if we're running a script that runs LOCALLY before the
 # preJob condor job is submitted.
-#config.workflow["workflow1"].task["task1"].preScript.script.inputFile = "$CTRL_ORCA_DIR/etc/condor/templates/preScript.template"
-#config.workflow["workflow1"].task["task1"].preScript.script.keywords["A"] = "A"
-#config.workflow["workflow1"].task["task1"].preScript.script.keywords["B"] = "B"
-#config.workflow["workflow1"].task["task1"].preScript.script.outputFile = "pre.sh"
+# config.workflow["workflow1"].task["task1"].preScript.script.inputFile =
+#    "$CTRL_ORCA_DIR/etc/condor/templates/preScript.template"
+# config.workflow["workflow1"].task["task1"].preScript.script.keywords["A"] = "A"
+# config.workflow["workflow1"].task["task1"].preScript.script.keywords["B"] = "B"
+# config.workflow["workflow1"].task["task1"].preScript.script.outputFile = "pre.sh"
 
 #
 # There are two stages of templating.

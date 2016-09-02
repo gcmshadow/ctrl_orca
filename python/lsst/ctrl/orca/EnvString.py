@@ -22,7 +22,10 @@
 
 import re
 import os
-## replace $variables within a string
+
+##
+# @brief replace $variables within a string
+#
 
 
 class EnvString:
@@ -41,9 +44,9 @@ class EnvString:
         for i in exprs:
             var = i[1:]
             val = os.getenv(var, None)
-            if val == None:
+            if val is None:
                 raise RuntimeError("couldn't find "+i+" environment variable")
             retVal = p.sub(val, retVal, 1)
         return retVal
-    ## static method to resolve string
+    # static method to resolve string
     resolve = staticmethod(resolve)

@@ -22,35 +22,36 @@ from __future__ import print_function
 #
 
 import os
-import sys
-import subprocess
-import lsst.ctrl.orca as orca
 import lsst.log as log
-from lsst.ctrl.orca.EnvString import EnvString
-from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
 from lsst.ctrl.orca.CondorJobs import CondorJobs
 from lsst.ctrl.orca.CondorWorkflowMonitor import CondorWorkflowMonitor
 
-## launches condor workflows using DAGman files
+# @brief launches condor workflows using DAGman files
 
 
 class CondorWorkflowLauncher(WorkflowLauncher):
-    ## initialize
+    # @brief initialize
 
     def __init__(self, prodConfig, wfConfig, runid, localStagingDir, dagFile, monitorConfig):
         log.debug("CondorWorkflowLauncher:__init__")
-        ## production configuration
+
+        # production configuration
         self.prodConfig = prodConfig
-        ## workflow configuration
+
+        # workflow configuration
         self.wfConfig = wfConfig
-        ## run id
+
+        # run id
         self.runid = runid
-        ## local directory where staging occurs
+
+        # local directory where staging occurs
         self.localStagingDir = localStagingDir
-        ## DAGman file
+
+        # DAGman file
         self.dagFile = dagFile
-        ## monitor configuration
+
+        # monitor configuration
         self.monitorConfig = monitorConfig
 
     ##
@@ -79,10 +80,12 @@ class CondorWorkflowLauncher(WorkflowLauncher):
         print("Condor dag submitted as job ", condorDagId)
         os.chdir(startDir)
 
-        ## workflow monitor for HTCondor jobs
+        # workflow monitor for HTCondor jobs
         self.workflowMonitor = CondorWorkflowMonitor(
-            eventBrokerHost, shutdownTopic, self.runid, condorDagId, loggerManagers, self.monitorConfig)
-        if statusListener != None:
+            eventBrokerHost, shutdownTopic, self.runid, condorDagId,
+            loggerManagers, self.monitorConfig)
+
+        if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
         self.workflowMonitor.startMonitorThread(self.runid)
 

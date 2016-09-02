@@ -47,7 +47,7 @@ class MultiIssueConfigurationError(ConfigurationError):
                           been encountered.  If only one problem is added to this
                           exception, that problem message will be displayed.
                           If None, a generic message is set.
-        @param problem  the first problem to add to this exception.  
+        @param problem  the first problem to add to this exception.
         """
         if msg is None:
             msg = "Multiple configuration problems encountered"
@@ -74,7 +74,7 @@ class MultiIssueConfigurationError(ConfigurationError):
         """
         return list(self._probs)
 
-    ## overrides __str__ for custom message
+    # overrides __str__ for custom message
     def __str__(self):
         if len(self._probs) < 1:
             return "Unspecified configuration problems encountered"
@@ -83,6 +83,6 @@ class MultiIssueConfigurationError(ConfigurationError):
         else:
             return ConfigurationError.__str__(self)
 
-    ## overrides __repr__ for custom message
+    # overrides __repr__ for custom message
     def __repr__(self):
         return "MultiIssueConfigurationError: " + str(self)

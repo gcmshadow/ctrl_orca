@@ -1,78 +1,78 @@
 from __future__ import absolute_import
-import sys
+# import sys
 import lsst.pex.config as pexConfig
-from . import FakeTypeMap as fake
-from . import WorkflowConfig as work
+# from . import FakeTypeMap as fake
+# from . import WorkflowConfig as work
 
-## authorization information
+# authorization information
 
 
 class AuthInfo(pexConfig.Config):
-    ## host name
+    # host name
     host = pexConfig.Field("hostname", str)
-    ## port number
+    # port number
     port = pexConfig.Field("database port", int)
 
-## run cleanup configuration
+# run cleanup configuration
 
 
 class RunCleanup(pexConfig.Config):
-    ## days until first notice is sent
+    # days until first notice is sent
     daysFirstNotice = pexConfig.Field("first notice", int)
-    ## days until final notice is sent
+    # days until final notice is sent
     daysFinalNotice = pexConfig.Field("last notice", int)
 
-## database system configuration
+# database system configuration
 
 
 class DatabaseSystem(pexConfig.Config):
-    ## authorization configuration
+    # authorization configuration
     authInfo = pexConfig.ConfigField("database authorization information", AuthInfo)
-    ## run clean up configuration
+    # run clean up configuration
     runCleanup = pexConfig.ConfigField("runCleanup ", RunCleanup)
 
-## database logger configuration
+# database logger configuration
 
 
 class DBLogger(pexConfig.Config):
-    ## should a database logger be launched?
+    # should a database logger be launched?
     launch = pexConfig.Field("launch", bool)
 
-## production database configuration
+# production database configuration
 
 
 class ProductionDatabaseConfig(pexConfig.Config):
-    ## global database name
+    # global database name
     globalDbName = pexConfig.Field("global db name", str)
-    ## data challenge version
+    # data challenge version
     dcVersion = pexConfig.Field("data challenge version", str)
-    ## data challenge database name
+    # data challenge database name
     dcDbName = pexConfig.Field("data challenge database name", str)
-    ## minimum percent free disk space required
+    # minimum percent free disk space required
     minPercDiskSpaceReq = pexConfig.Field("minimum percent disk space required", int)
-    ## user run life
+    # user run life
     userRunLife = pexConfig.Field("user run life", int)
 
-## workflow database configuration
+# workflow database configuration
 
 
 class WorkflowDatabaseConfig(pexConfig.Config):
-    ## workflow database name
+    # workflow database name
     dbName = pexConfig.Field("database name", str)
 
 dbTypemap = {"production": ProductionDatabaseConfig, "workflow": WorkflowDatabaseConfig}
 
-## database configuration
+# database configuration
 
 
 class DatabaseConfig(pexConfig.Config):
-    ## database name
+    # database name
     name = pexConfig.Field("database name", str)
-    ## database system configuration
+    # database system configuration
     system = pexConfig.ConfigField("database system info", DatabaseSystem)
-    ## class used to configure database
+    # class used to configure database
     configurationClass = pexConfig.Field("database configuration class", str)
-    ## type of database configuration
+    # type of database configuration
     configuration = pexConfig.ConfigChoiceField("configuration", dbTypemap)
-    ## database logger configuration
+    # database logger configuration
     logger = pexConfig.ConfigField("logger to database", DBLogger)

@@ -25,13 +25,9 @@
 """
 Tests of orca exceptions
 """
-import pdb                              # we may want to say pdb.set_trace()
-import os
-import sys
 import unittest
-import time
 
-from lsst.ctrl.orca.exceptions import *
+from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 
 
 class MultiIssueTestCase(unittest.TestCase):

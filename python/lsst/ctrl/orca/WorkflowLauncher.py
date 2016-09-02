@@ -20,9 +20,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import subprocess
 import lsst.log as log
-from lsst.ctrl.orca.EnvString import EnvString
 from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 
 ##
@@ -47,7 +45,7 @@ class WorkflowLauncher:
     def __init__(self, wfConfig):
         log.debug("WorkflowLauncher:__init__")
 
-        ## workflow configuration
+        # workflow configuration
         self.wfConfig = wfConfig
 
     ##
@@ -62,8 +60,10 @@ class WorkflowLauncher:
     def launch(self, statusListener):
         log.debug("WorkflowLauncher:launch")
 
-        ## monitors status of the workflow
+        # monitors status of the workflow
         self.workflowMonitor = WorkflowMonitor()
-        if statusListener != None:
+        if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
-        return self.workflowMonitor # returns WorkflowMonitor
+
+        # returns WorkflowMonitor
+        return self.workflowMonitor

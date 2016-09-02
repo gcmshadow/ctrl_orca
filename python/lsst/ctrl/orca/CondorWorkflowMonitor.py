@@ -22,28 +22,24 @@
 
 from __future__ import with_statement
 from __future__ import print_function
-import os
-import sys
-import subprocess
 import threading
 import time
 import lsst.ctrl.events as events
 import lsst.log as log
 
 from lsst.daf.base import PropertySet
-from lsst.ctrl.orca.EnvString import EnvString
 from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.CondorJobs import CondorJobs
 
 
-## HTCondor workflow monitor
+# HTCondor workflow monitor
 class CondorWorkflowMonitor(WorkflowMonitor):
+
     ##
     # @brief in charge of monitoring and/or controlling the progress of a
     #        running workflow.
     #
-
     def __init__(self, eventBrokerHost, shutdownTopic, runid, condorDagId, loggerManagers, monitorConfig):
 
         # _locked: a container for data to be shared across threads that
@@ -53,43 +49,55 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
         log.debug("CondorWorkflowMonitor:__init__")
         self._statusListeners = []
+
         # make a copy of this liste, since we'll be removing things.
 
-        ## list of logger process ids
+        # list of logger process ids
         self.loggerPIDs = []
         for lm in loggerManagers:
             self.loggerPIDs.append(lm.getPID())
-        ## list of logger process managers
+
+        # list of logger process managers
         self.loggerManagers = loggerManagers
 
         self._eventBrokerHost = eventBrokerHost
         self._shutdownTopic = shutdownTopic
-        ## the topic that orca uses to monitor events
+
+        # the topic that orca uses to monitor events
         self.orcaTopic = "orca.monitor"
-        ## run id for this workflow
+
+        # run id for this workflow
         self.runid = runid
-        ## HTCondor DAG id assigned to this workflow
+
+        # HTCondor DAG id assigned to this workflow
         self.condorDagId = condorDagId
-        ## monitor configuration
+
+        # monitor configuration
         self.monitorConfig = monitorConfig
 
         self._wfMonitorThread = None
 
-        ## registry for event transmitters and receivers
+        # registry for event transmitters and receivers
         self.eventSystem = events.EventSystem.getDefaultEventSystem()
-        ## create event identifier for this process
+
+        # create event identifier for this process
         self.originatorId = self.eventSystem.createOriginatorId()
+
         self.bSentLastLoggerEvent = False
 
         with self._locked:
             self._wfMonitorThread = CondorWorkflowMonitor._WorkflowMonitorThread(
-                self, self._eventBrokerHost, self._shutdownTopic, self.orcaTopic, runid, self.condorDagId, self.monitorConfig)
+                    self, self._eventBrokerHost, self._shutdownTopic,
+                    self.orcaTopic, runid, self.condorDagId, self.monitorConfig)
 
-    ## workflow thread that watches for shutdown
+    ##
+    # @brief workflow thread that watches for shutdown
+    #
     class _WorkflowMonitorThread(threading.Thread):
-        ## initialize
-
-        def __init__(self, parent, eventBrokerHost, shutdownTopic, eventTopic, runid, condorDagId, monitorConfig):
+        ##
+        # @brief initialize
+        def __init__(self, parent, eventBrokerHost, shutdownTopic,
+                     eventTopic, runid, condorDagId, monitorConfig):
             threading.Thread.__init__(self)
             self.setDaemon(True)
             self._parent = parent
@@ -100,12 +108,16 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             selector = "RUNID = '%s'" % runid
             self._receiver = events.EventReceiver(self._eventBrokerHost, self._eventTopic, selector)
             self._Logreceiver = events.EventReceiver(self._eventBrokerHost, "LoggerStatus", selector)
-            ## the dag id assigned to this workflow
+
+            # the dag id assigned to this workflow
             self.condorDagId = condorDagId
-            ## monitor configuration
+
+            # monitor configuration
             self.monitorConfig = monitorConfig
 
-        ## continously monitor incoming events for shutdown sequence
+        ##
+        # @brief continously monitor incoming events for shutdown sequence
+        #
         def run(self):
             cj = CondorJobs()
             log.debug("CondorWorkflowMonitor Thread started")
@@ -116,7 +128,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                 # TODO:  this timeout value should go away when the GIL lock relinquish is
                 # implemented in events.
                 if sleepInterval != 0:
-                    #print "sleep interval =",sleepInterval
                     time.sleep(sleepInterval)
                 event = self._receiver.receiveEvent(1)
 
@@ -124,46 +135,51 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
                 if event is not None:
                     val = self._parent.handleEvent(event)
-                    if self._parent._locked.running == False:
+                    if self._parent._locked.running is False:
                         print("and...done!")
                         return
                 elif logEvent is not None:
                     val = self._parent.handleEvent(logEvent)
-                    if self._parent._locked.running == False:
+
+                    if val is None:
+                        raise Exception("error receiving event")
+
+                    if self._parent._locked.running is False:
                         print("logger handled... and... done!")
                         return
+
                 if (event is not None) or (logEvent is not None):
                     sleepInterval = 0
                 else:
                     sleepInterval = statusCheckInterval
                 # if the dag is no longer running, send the logger an event
                 # telling it to clean up.
-                if cj.isJobAlive(self.condorDagId) == False:
+                if cj.isJobAlive(self.condorDagId) is False:
                     self._parent.sendLastLoggerEvent()
 
-    ## begin one monitor thread
+    ##
+    # @brief begin one monitor thread
+    #
     def startMonitorThread(self, runid):
         with self._locked:
             self._wfMonitorThread.start()
             self._locked.running = True
 
-    ## wait for final shutdown events from the production processes
+    ##
+    # @brief wait for final shutdown events from the production processes
+    #
     def handleEvent(self, event):
         log.debug("CondorWorkflowMonitor:handleEvent called")
 
         # make sure this is really for us.
 
         ps = event.getPropertySet()
-        #print ps.toString()
-        #print "==="
 
         # check for Logger event status
         if event.getType() == events.EventTypes.STATUS:
             ps = event.getPropertySet()
-            #print ps.toString()
 
             if ps.exists("logger.status"):
-                loggerStatus = ps.get("logger.status")
                 pid = ps.getInt("logger.pid")
                 print("logger.pid = ", pid)
                 if pid in self.loggerPIDs:
@@ -181,14 +197,12 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         else:
             print("didn't handle anything")
 
-    ## send a message to the logger that we're done
+    # send a message to the logger that we're done
     def sendLastLoggerEvent(self):
-        ## only do this one time
-        if self.bSentLastLoggerEvent == False:
+        # only do this one time
+        if self.bSentLastLoggerEvent is False:
             print("sending last Logger Event")
             transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
-
-            #self.eventSystem.createTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
 
             props = PropertySet()
             props.set("LOGGER", "orca.control")
@@ -197,9 +211,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             e = events.Event(self.runid, props)
             transmitter.publishEvent(e)
 
-            #evtlog = events.EventLog(self.runid, -1)
-            #tlog = logging.Log(evtlog, "orca.control")
-            #logging.LogRec(tlog, 1) << logging.Prop("STATUS", "eol") << logging.LogRec.endr
             self.bSentLastLoggerEvent = True
 
     ##

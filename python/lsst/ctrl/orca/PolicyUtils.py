@@ -21,12 +21,13 @@ from __future__ import print_function
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import sys
 import sets
 import os.path
 import lsst.pex.policy as pol
 
-## @deprecated policy file utilities
+##
+# @brief policy file utilities
+# @deprecated policy file utilities
 
 
 class PolicyUtils:
@@ -51,7 +52,7 @@ class PolicyUtils:
                         if type(val) is pol.PolicyFile:
                             filename = val.getPath()
                             filename = os.path.join(repos, filename)
-                            if (filename in policySet) == False:
+                            if (filename in policySet) is False:
                                 policySet.add(filename)
                             newPolicy = pol.Policy.createPolicy(filename, False)
                             PolicyUtils.getAllFilenames(repos, newPolicy, policySet)
@@ -65,14 +66,13 @@ class PolicyUtils:
                         # name is a File value
                         filename = policy.getFile(name).getPath()
                         filename = os.path.join(repos, filename)
-                        if (filename in policySet) == False:
+                        if (filename in policySet) is False:
                             policySet.add(filename)
                         newPolicy = pol.Policy.createPolicy(filename, False)
                         PolicyUtils.getAllFilenames(repos, newPolicy, policySet)
-                    #else:
-                    #  name is a regular value
+                    # else name is a regular value
 
-    ## return all file names from a policy set
+    # return all file names from a policy set
     getAllFilenames = staticmethod(getAllFilenames)
 
 if __name__ == "__main__":

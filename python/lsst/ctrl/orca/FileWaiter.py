@@ -25,27 +25,27 @@
 
 from __future__ import print_function
 import os
-import sys
-import time
 import lsst.log as log
 
 
 ##
-# waits for files to come into existence on a remote resource
+# @brief waits for files to come into existence on a remote resource
 #
 class FileWaiter:
-    ## initializer
-
+    # @brief initializer
     def __init__(self, remoteNode, remoteFileWaiter, fileListName, logger=None):
         log.debug("FileWaiter:__init__")
-        ## name of the remote node to execute on
+
+        # name of the remote node to execute on
         self.remoteNode = remoteNode
-        ## name of the remote file list file
+
+        # name of the remote file list file
         self.fileListName = fileListName
-        ## name of the remote file waiter script
+
+        # name of the remote file waiter script
         self.remoteFileWaiter = remoteFileWaiter
 
-    ## waits for first file in the list to come into existence
+    # @brief waits for first file in the list to come into existence
     def waitForFirstFile(self):
         log.debug("FileWaiter:waitForFirstFile")
         print("waiting for log file to be created to confirm launch.")
@@ -55,7 +55,7 @@ class FileWaiter:
             os.execvp("gsissh", cmd.split())
         os.wait()[0]
 
-    ## waits for all files in the list to come into existence
+    # @brief waits for all files in the list to come into existence
     def waitForAllFiles(self):
         log.debug("FileWaiter:waitForAllFiles")
 

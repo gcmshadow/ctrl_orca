@@ -22,7 +22,6 @@ from __future__ import print_function
 #
 
 import lsst.log as log
-import lsst.pex.exceptions as pexEx
 
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 
@@ -39,19 +38,22 @@ from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 
 class WorkflowConfigurator:
 
-    ## configuration group
+    # configuration group
     class ConfigGroup(object):
         ##
         # @brief configuration initializer
 
         def __init__(self, name, config, number, offset):
-            ## name of this configuration
+            # name of this configuration
             self.configName = name
-            ## the configuration itself
+
+            # the configuration itself
             self.config = config
-            ## the value assigned to this particular configuration
+
+            # the value assigned to this particular configuration
             self.configNumber = number
-            ## @deprecated global offset
+
+            # @deprecated global offset
             self.globalOffset = offset
 
         ##
@@ -95,17 +97,19 @@ class WorkflowConfigurator:
     #                       an exception will be raised under the assumption
     #                       that one is trying instantiate it directly.
     def __init__(self, runid, prodConfig, wfConfig, fromSub=False):
-        ## the run id associated with this workflow
+        # the run id associated with this workflow
         self.runid = runid
 
         log.debug("WorkflowConfigurator:__init__")
 
-        ## the production configuration
+        # the production configuration
         self.prodConfig = prodConfig
-        ## the workflow configuration
+
+        # the workflow configuration
         self.wfConfig = wfConfig
-        ## the repository location
-        self.repository = repository
+
+        # the repository location
+        # self.repository = repository
 
         if fromSub:
             raise RuntimeError("Attempt to instantiate abstract class, " +
@@ -132,11 +136,8 @@ class WorkflowConfigurator:
         #
         # setup the database for each database listed in workflow config
         #
-        #print "self.wfConfig = "
-        #print self.wfConfig
-        #print "++++++++++++++++"
 
-        if self.wfConfig.database != None:
+        if self.wfConfig.database is not None:
             databaseConfigs = self.wfConfig.database
 
             for databaseConfig in databaseConfigs:
@@ -198,7 +199,6 @@ class WorkflowConfigurator:
         # pipelines in the other workflows so we can enumerate the pipelines
         # in this particular workflow correctly. This needs to be reworked.
 
-        #wfNames = self.prodConfig.workflowNames
         print("expandConfigs wfShortName = ", wfShortName)
         totalCount = 1
         for wfName in self.prodConfig.workflow:
@@ -211,7 +211,7 @@ class WorkflowConfigurator:
                     config = wfConfig.pipeline[pipelineName]
                     # default to 1, if runCount doesn't exist
                     runCount = 1
-                    if config.runCount != None:
+                    if config.runCount is not None:
                         runCount = config.runCount
                     for i in range(0, runCount):
                         expanded.append(self.ConfigGroup(pipelineName, config, i+1, totalCount))
@@ -222,8 +222,9 @@ class WorkflowConfigurator:
 
                 for pipelineName in wfConfig.pipeline:
                     pipelineConfig = wfConfig.pipeline[pipelineName]
-                    if pipelineConfig.runCount != None:
+                    if pipelineConfig.runCount is not None:
                         totalCount = totalCount + pipelineConfig.runCount
                     else:
                         totalCount = totalCount + 1
-        return None # should never reach here - this is an error
+        # should never reach here - this is an error
+        return None

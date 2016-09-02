@@ -22,16 +22,12 @@
 
 from __future__ import with_statement
 from __future__ import print_function
-import os
-import sys
-import subprocess
 import threading
 import time
 import lsst.ctrl.events as events
 import lsst.log as log
 
 from lsst.daf.base import PropertySet
-from lsst.ctrl.orca.EnvString import EnvString
 from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.multithreading import SharedData
 
@@ -57,38 +53,45 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
         self._statusListeners = []
         # make a copy of this liste, since we'll be removing things.
 
-        ## named pipelines
+        # named pipelines
         self.pipelineNames = pipelineNames[:]
 
-        ## PID of all logger processes
+        # PID of all logger processes
         self.loggerPIDs = []
         for lm in loggerManagers:
             self.loggerPIDs.append(lm.getPID())
-        ## all logger manager objects
+
+        # all logger manager objects
         self.loggerManagers = loggerManagers
 
         self._eventBrokerHost = eventBrokerHost
         self._shutdownTopic = shutdownTopic
-        ## ctrl_events monitoring topic
+
+        # ctrl_events monitoring topic
         self.orcaTopic = "orca.monitor"
-        ## run id for this workflow
+
+        # run id for this workflow
         self.runid = runid
 
         self._wfMonitorThread = None
-        ## event system object where all transmitters & receivers are registered
+
+        # event system object where all transmitters & receivers are registered
         self.eventSystem = events.EventSystem.getDefaultEventSystem()
-        ## the id of where the events originate.
+
+        # the id of where the events originate.
         self.originatorId = self.eventSystem.createOriginatorId()
-        ## indicates whether the last logger event been seen
+
+        # indicates whether the last logger event been seen
         self.bSentLastLoggerEvent = False
-        ## indicates whether a job office event has been sent
+
+        # indicates whether a job office event has been sent
         self.bSentJobOfficeEvent = False
 
         with self._locked:
             self._wfMonitorThread = VanillaCondorWorkflowMonitor._WorkflowMonitorThread(
                 self, self._eventBrokerHost, self._shutdownTopic, self.orcaTopic, runid)
 
-    ## monitor thread which watches for job office events and shutdown events from logger
+    # monitor thread which watches for job office events and shutdown events from logger
     class _WorkflowMonitorThread(threading.Thread):
         ##
         # initialize the workflow monitor thread object
@@ -126,15 +129,19 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                     val = self._parent.handleJobOfficeEvent(jobOfficeEvent)
                 if event is not None:
                     val = self._parent.handleEvent(event)
-                    if self._parent._locked.running == False:
+                    if self._parent._locked.running is False:
                         print("and...done!")
                         return
                 elif logEvent is not None:
                     val = self._parent.handleEvent(logEvent)
-                    if self._parent._locked.running == False:
+                    if val is None:
+                        print("error receiving last log event")
+                        return
+                    if self._parent._locked.running is False:
                         print("logger handled... and... done!")
                         return
-                if (jobOfficeEvent is not None) or (jobOfficeEvent is not None) or (jobOfficeEvent is not None):
+                if (jobOfficeEvent is not None) or (jobOfficeEvent is not None) \
+                        or (jobOfficeEvent is not None):
                     sleepInterval = 0
                 else:
                     sleepInterval = 5
@@ -169,12 +176,9 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
         # make sure this is really for us.
 
         ps = event.getPropertySet()
-        #print ps.toString()
-        #print "==="
 
         if event.getType() == events.EventTypes.STATUS:
             ps = event.getPropertySet()
-            #print ps.toString()
 
             if ps.exists("pipeline"):
                 pipeline = ps.get("pipeline")
@@ -182,7 +186,6 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                 if pipeline in self.pipelineNames:
                     self.pipelineNames.remove(pipeline)
             elif ps.exists("logger.status"):
-                loggerStatus = ps.get("logger.status")
                 pid = ps.getInt("logger.pid")
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
@@ -191,11 +194,11 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
             print("pipelineNames: ")
             print(self.pipelineNames)
             # TODO: clean up to not specifically name "joboffices_1"
-            if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent == False:
+            if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent is False:
                 self.stopWorkflow(1)
                 self.bSentJobOfficeEvent = True
 
-            if (cnt == 0) and (self.bSentLastLoggerEvent == False):
+            if (cnt == 0) and (self.bSentLastLoggerEvent is False):
                 self.eventSystem.createTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
                 evtlog = events.EventLog(self.runid, -1)
                 tlog = logging.Log(evtlog, "orca.control")

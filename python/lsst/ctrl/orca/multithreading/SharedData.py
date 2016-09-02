@@ -34,9 +34,9 @@ class SharedData(object):
     threads.  In order to update or (optionally) examine the data, one must
     first aquire the lock associated with the container.
 
-    This container also behaves like a threading.Container, via its 
-    wait(), notify(), and notifyAll() functions.  Also like Condition, 
-    acquire() is reentrant.  
+    This container also behaves like a threading.Container, via its
+    wait(), notify(), and notifyAll() functions.  Also like Condition,
+    acquire() is reentrant.
 
     SharedData instances may be used with the with statement:
     @code
@@ -45,17 +45,17 @@ class SharedData(object):
           sd.blah = 1
     @endcode
     The with statement will acquire the lock and ensure that it is released
-    when its block is exited.  
+    when its block is exited.
     """
 
     def __init__(self, needLockOnRead=True, data=None, cond=None):
         """
         create and initialize the shared data
-        @param needLockOnRead   if true (default), acquiring the lock will 
+        @param needLockOnRead   if true (default), acquiring the lock will
                       be needed when reading the data.  This is recommended
                       if the data items are anything but primitive types;
                       otherwise, a compound data item (e.g. of type dict)
-                      could be updated without acquiring a lock.  
+                      could be updated without acquiring a lock.
         @param data   a dictionary of data to initialize the container with.
                       This is done by calling initData().  Set this value to
                       False when calling from a subclass constructor; this
@@ -73,15 +73,19 @@ class SharedData(object):
 
         # behave like a Condition
 
-        ## acquire method
+        # acquire method
         self.acquire = cond.acquire
-        ## release method
+
+        # release method
         self.release = cond.release
-        ## notify method
+
+        # notify method
         self.notify = cond.notify
-        ## notifyall method
+
+        # notifyall method
         self.notifyAll = cond.notifyAll
-        ## wait method
+
+        # wait method
         self.wait = cond.wait
         self._is_owned = cond._is_owned
 
@@ -92,15 +96,15 @@ class SharedData(object):
         if data is None:
             self._d["__"] = True
 
-    ## overrides __enter__
+    # overrides __enter__
     def __enter__(self, *args, **kwds):
         return self._cond.__enter__(*args, **kwds)
 
-    ## overrides __exit__
+    # overrides __exit__
     def __exit__(self, *args, **kwds):
         return self._cond.__exit__(*args, **kwds)
 
-    ## overrides __getattribute__
+    # overrides __getattribute__
     def __getattribute__(self, name):
         if name == "_d" or len(self._d) == 0 or name not in self._d:
             return object.__getattribute__(self, name)
@@ -109,7 +113,7 @@ class SharedData(object):
             raise AttributeError("%s: lock required for read access" % name)
         return self._d[name]
 
-    ## overrides __setattr__
+    # overrides __setattr__
     def __setattr__(self, name, value):
         if name == "_d" or len(self._d) == 0 or name in self.__dict__.keys():
             object.__setattr__(self, name, value)
@@ -122,7 +126,7 @@ class SharedData(object):
 
     def initData(self, data):
         """
-        initialize the container with the data from a dictionary.  
+        initialize the container with the data from a dictionary.
         @param data   a dictionary of data to initialize the container with.
                       Attributes will be added to this container with names
                       matching the given the dictionary's key names and
@@ -130,7 +134,7 @@ class SharedData(object):
                       cannot match an existing function (or internal attribute)
                       name.
         @throws ValueError   if the dictionary has a key that conflicts with
-                      an existing function or internal attribute name.  
+                      an existing function or internal attribute name.
         """
         with self._cond:
             bad = []
@@ -148,6 +152,6 @@ class SharedData(object):
             if len(self._d) == 0:
                 self._d["__"] = True
 
-    ## overrides dir() method
+    # overrides dir() method
     def dir(self):
         return list(filter(lambda k: k != "__", self._d.keys()))
