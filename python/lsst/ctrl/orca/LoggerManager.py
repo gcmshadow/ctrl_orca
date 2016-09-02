@@ -88,7 +88,7 @@ class LoggerManager:
             os.waitpid(self.process.pid, 0)
             self.process = None
             log.debug("LoggerManager:stop: killed Logger process")
-        except Exception, e:
+        except Exception as e:
             log.debug("LoggerManager:stop: tried to kill Logger process, but it didn't exist")
 
         return

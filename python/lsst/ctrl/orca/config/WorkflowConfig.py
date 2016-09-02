@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 import sys
 import lsst.pex.config as pexConfig
-import PipelineConfig as pipe
-import CondorWorkflowConfig as condor
-import VanillaCondorWorkflowConfig as van
-import GenericWorkflowConfig as gen
-import FakeTypeMap as fake
-import DatabaseConfig as data
-import PlatformConfig as plat
-import MonitorConfig as mon
-import TaskConfig as task
+from . import PipelineConfig as pipe
+from . import CondorWorkflowConfig as condor
+from . import VanillaCondorWorkflowConfig as van
+from . import GenericWorkflowConfig as gen
+from . import FakeTypeMap as fake
+from . import DatabaseConfig as data
+from . import PlatformConfig as plat
+from . import MonitorConfig as mon
+from . import TaskConfig as task
 
 typemap = {"generic": gen.GenericWorkflowConfig,
            "vanilla": van.VanillaCondorWorkflowConfig, "condor": condor.CondorWorkflowConfig}

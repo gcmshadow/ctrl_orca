@@ -102,7 +102,7 @@ class SharedData(object):
 
     ## overrides __getattribute__
     def __getattribute__(self, name):
-        if name == "_d" or len(self._d) == 0 or not self._d.has_key(name):
+        if name == "_d" or len(self._d) == 0 or name not in self._d:
             return object.__getattribute__(self, name)
 
         if self._lockOnRead and not self._is_owned():
@@ -150,4 +150,4 @@ class SharedData(object):
 
     ## overrides dir() method
     def dir(self):
-        return filter(lambda k: k != "__", self._d.keys())
+        return list(filter(lambda k: k != "__", self._d.keys()))

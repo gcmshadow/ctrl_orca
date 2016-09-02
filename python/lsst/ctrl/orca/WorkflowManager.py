@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -234,6 +235,6 @@ class WorkflowManager:
     def announceData(self):
         announcer = DataAnnouncer(self.runid, self.prodConfig, self.wfConfig)
         if announcer.announce():
-            print "Data announced via config for %s" % self.name
+            print("Data announced via config for %s" % self.name)
         else:
-            print "No data announced for %s.  Waiting for events from external source" % self.name
+            print("No data announced for %s.  Waiting for events from external source" % self.name)

@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 import sys
 import lsst.pex.config as pexConfig
-import FakeTypeMap as fake
-import WorkflowConfig as work
+from . import FakeTypeMap as fake
+from . import WorkflowConfig as work
 
 ## authorization information
 

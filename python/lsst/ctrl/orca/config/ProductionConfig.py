@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import sys
 import lsst.pex.config as pexConfig
-import FakeTypeMap as fake
-import WorkflowConfig as work
-import DatabaseConfig as db
+from . import FakeTypeMap as fake
+from . import WorkflowConfig as work
+from . import DatabaseConfig as db
 
 ## production level configuration
 

@@ -21,6 +21,7 @@
 #
 
 from __future__ import with_statement
+from __future__ import print_function
 import os
 import sys
 import subprocess
@@ -124,12 +125,12 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                 if event is not None:
                     val = self._parent.handleEvent(event)
                     if self._parent._locked.running == False:
-                        print "and...done!"
+                        print("and...done!")
                         return
                 elif logEvent is not None:
                     val = self._parent.handleEvent(logEvent)
                     if self._parent._locked.running == False:
-                        print "logger handled... and... done!"
+                        print("logger handled... and... done!")
                         return
                 if (event is not None) or (logEvent is not None):
                     sleepInterval = 0
@@ -164,7 +165,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             if ps.exists("logger.status"):
                 loggerStatus = ps.get("logger.status")
                 pid = ps.getInt("logger.pid")
-                print "logger.pid = ", pid
+                print("logger.pid = ", pid)
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
 
@@ -178,13 +179,13 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             with self._locked:
                 self._locked.running = False
         else:
-            print "didn't handle anything"
+            print("didn't handle anything")
 
     ## send a message to the logger that we're done
     def sendLastLoggerEvent(self):
         ## only do this one time
         if self.bSentLastLoggerEvent == False:
-            print "sending last Logger Event"
+            print("sending last Logger Event")
             transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
 
             #self.eventSystem.createTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)

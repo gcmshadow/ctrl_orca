@@ -24,6 +24,7 @@
 
 
 from __future__ import with_statement
+from __future__ import print_function
 import os
 import os.path
 import optparse
@@ -74,7 +75,7 @@ parser.args = []
 # parse and check command line arguments
 (parser.opts, parser.args) = parser.parse_args()
 if len(parser.args) < 2:
-    print usage
+    print(usage)
     raise RuntimeError("Missing args: pipelineConfigFile runId")
 
 pipelineConfigFile = parser.args[0]

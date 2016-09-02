@@ -22,6 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import os
 import os.path
 import sys
@@ -44,6 +45,6 @@ nodelist = open(os.path.join(work, "nodelist.scr"), "w")
 
 for x in range(0, num):
     val = p.get("node%d" % x)
-    print >> nodelist, val
+    print(val, file=nodelist)
 
 nodelist.close()

@@ -22,6 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import os
 import os.path
 import sys
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     # parse and check command line arguments
     (parser.opts, parser.args) = parser.parse_args()
     if len(parser.args) < 1:
-        print usage
+        print(usage)
         raise RuntimeError("Missing args: pipelinePolicyFile runId")
 
     filename = parser.args[0]

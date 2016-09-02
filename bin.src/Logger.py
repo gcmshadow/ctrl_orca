@@ -22,6 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import argparse
 import os
 import sys
@@ -163,7 +164,7 @@ if __name__ == "__main__":
     num_args = len([x for x in (args.host, args.port, args.database) if x is not None])
 
     if num_args == 1 or num_args == 2:
-        print "if used, --host --port and --database must be given together"
+        print("if used, --host --port and --database must be given together")
         sys.exit(10)
 
     if num_args == 3:

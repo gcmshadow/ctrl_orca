@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -114,7 +115,7 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
             # now wait for it to show up.
             condor.waitForJobToRun(glideinJobNumber, "this might take a few minutes.")
         else:
-            print "Command line request to skip condor glidein.  Skipping."
+            print("Command line request to skip condor glidein.  Skipping.")
 
         # for now, make sure joboffice is the first job, launch and wait for it
         firstJob = True

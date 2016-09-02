@@ -23,6 +23,7 @@
 #
 
 
+from __future__ import print_function
 import os
 import sys
 import time
@@ -47,7 +48,7 @@ class FileWaiter:
     ## waits for first file in the list to come into existence
     def waitForFirstFile(self):
         log.debug("FileWaiter:waitForFirstFile")
-        print "waiting for log file to be created to confirm launch."
+        print("waiting for log file to be created to confirm launch.")
         cmd = "gsissh %s %s -f %s" % (self.remoteNode, self.remoteFileWaiter, self.fileListName)
         pid = os.fork()
         if not pid:
@@ -58,7 +59,7 @@ class FileWaiter:
     def waitForAllFiles(self):
         log.debug("FileWaiter:waitForAllFiles")
 
-        print "waiting for all log files to be created to confirm launch"
+        print("waiting for all log files to be created to confirm launch")
         cmd = "gsissh %s %s -l %s" % (self.remoteNode, self.remoteFileWaiter, self.fileListName)
         pid = os.fork()
         if not pid:

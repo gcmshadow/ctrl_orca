@@ -23,6 +23,7 @@
 #
 
 
+from __future__ import print_function
 import os
 import subprocess
 import sys
@@ -62,7 +63,7 @@ class CondorJobs:
         num = clusterexp.findall(line)
         if len(num) == 0:
             return None
-        print "submitted job # %s as file %s" % (num[0], condorFile)
+        print("submitted job # %s as file %s" % (num[0], condorFile))
         return num[0]
 
     ## wait for a condor job to reach it's run state.
@@ -77,16 +78,16 @@ class CondorJobs:
         jobNum = "%s.0" % num
         queueExp = re.compile("\S+")
         cJobSeen = 0
-        print "waiting for job %s to run." % num
+        print("waiting for job %s to run." % num)
         if extramsg != None:
-            print extramsg
+            print(extramsg)
         secondsWaited = 0
         while 1:
             pop = os.popen("condor_q", "r")
             bJobSeenNow = False
             if (secondsWaited > 0) and ((secondsWaited % 60) == 0):
                 minutes = secondsWaited/60
-                print "waited %d minute%s so far. still waiting for job %s to run." % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num)
+                print("waited %d minute%s so far. still waiting for job %s to run." % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num))
             while 1:
                 line = pop.readline()
                 if not line:
@@ -100,29 +101,29 @@ class CondorJobs:
                     bJobSeenNow = True
                 if (values[0] == jobNum) and (runstate == 'R'):
                     pop.close()
-                    print "Job %s is now being run." % num
+                    print("Job %s is now being run." % num)
                     return runstate
                 if (values[0] == jobNum) and (runstate == 'H'):
                     pop.close()
                     # throw exception here
-                    print "Job %s is being held.  Please review the logs." % num
+                    print("Job %s is being held.  Please review the logs." % num)
                     return runstate
                 if (values[0] == jobNum) and (runstate == 'X'):
-                    print values
+                    print(values)
                     pop.close()
                     # throw exception here
-                    print "Saw job %s, but it was being aborted" % num
+                    print("Saw job %s, but it was being aborted" % num)
                     return runstate
                 if (values[0] == jobNum) and (runstate == 'C'):
                     pop.close()
                     # throw exception here
-                    print "Job %s is being cancelled." % num
+                    print("Job %s is being cancelled." % num)
                     return runstate
             # check to see if we've seen the job before, but that
             # it disappeared
             if (cJobSeen > 0) and (bJobSeenNow == False):
                 pop.close()
-                print "Was monitoring job %s, but it exitted." % num
+                print("Was monitoring job %s, but it exitted." % num)
                 # throw exception
                 return None
             pop.close()
@@ -175,7 +176,7 @@ class CondorJobs:
         # and if we find, it, we grab the cluster id out of that line.
         clusterexp = re.compile("1 job\(s\) submitted to cluster (\d+).")
         cmd = "condor_submit_dag %s" % filename
-        print cmd
+        print(cmd)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         output = []
         line = process.stdout.readline()
@@ -203,7 +204,7 @@ class CondorJobs:
         line = process.stdout.readline()
         while line != "":
             line = line.strip()
-            print line
+            print(line)
             line = process.stdout.readline()
         # read the rest (if any) and terminate
         stdoutdata, stderrdata = process.communicate()

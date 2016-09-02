@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -180,7 +181,7 @@ class ProductionRunConfigurator:
             myProblems = MultiIssueConfigurationError("problems encountered while checking configuration")
 
         for dbconfig in self._databaseConfigurators:
-            print "-> dbconfig = ", dbconfig
+            print("-> dbconfig = ", dbconfig)
             dbconfig.checkConfiguration(care, issueExc)
 
         if not issueExc and myProblems.hasProblems():

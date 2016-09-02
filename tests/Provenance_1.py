@@ -82,7 +82,7 @@ class ProvenanceTestCase(unittest.TestCase):
 
         i = 1
         pkgs = eups.Eups().listProducts(setup=True)
-        while db.next():
+        while next(db):
             self.assert_(not db.columnIsNull(0))
             self.assert_(not db.columnIsNull(1))
             self.assert_(not db.columnIsNull(2))
@@ -114,7 +114,7 @@ class ProvenanceTestCase(unittest.TestCase):
                 md5.update(line)
             f.close()
             hash = md5.hexdigest()
-            mod = DateTime(os.stat(p)[8] * 1000000000L, DateTime.UTC)
+            mod = DateTime(os.stat(p)[8] * 1000000000, DateTime.UTC)
 
             pol = pexPolicy.Policy(p)
             names = pol.paramNames()
@@ -135,7 +135,7 @@ class ProvenanceTestCase(unittest.TestCase):
                 """ % (p))
             db.query()
 
-            while db.next():
+            while next(db):
                 self.assert_(not db.columnIsNull(0))
                 self.assert_(not db.columnIsNull(1))
                 self.assert_(not db.columnIsNull(2))

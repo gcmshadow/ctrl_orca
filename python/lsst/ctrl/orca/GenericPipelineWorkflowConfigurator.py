@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -104,17 +105,17 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         ## default domain to which we're deploying
         self.defaultDomain = platformConfig.deploy.defaultDomain
         pipelineConfig = wfConfig.pipeline
-        print "pipelineConfig = ", pipelineConfig
+        print("pipelineConfig = ", pipelineConfig)
 
-        print ">self.wfName = ", self.wfName
+        print(">self.wfName = ", self.wfName)
         expandedPipelineConfigs = self.expandConfigs(self.wfName)
-        print "expandedPipelineConfig = ", expandedPipelineConfigs
+        print("expandedPipelineConfig = ", expandedPipelineConfigs)
         launchCmd = []
         for pipelineConfigGroup in expandedPipelineConfigs:
             pipelineConfig = pipelineConfigGroup.getConfigName()
             num = pipelineConfigGroup.getConfigNumber()
 
-            print "pipelineConfigGroup = ", pipelineConfigGroup
+            print("pipelineConfigGroup = ", pipelineConfigGroup)
             # TODO - no longer used, remote this, and the method
             self.nodes = self.createNodeList(pipelineConfigGroup.getConfig())
             self.createDirs(platformConfig, pipelineConfig)
@@ -137,12 +138,12 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
     #
     def createNodeList(self, pipelineConfig):
         log.debug("GenericPipelineWorkflowConfigurator:createNodeList")
-        print "pipelineConfig = ", pipelineConfig
-        print "pipelineConfig.deploy = ", pipelineConfig.deploy
+        print("pipelineConfig = ", pipelineConfig)
+        print("pipelineConfig.deploy = ", pipelineConfig.deploy)
         node = pipelineConfig.deploy.processesOnNode
 
-        print "self.expandNodeHost", self.expandNodeHost
-        print "node", node
+        print("self.expandNodeHost", self.expandNodeHost)
+        print("node", node)
         nodes = map(self.expandNodeHost, node)
         ## by convention, the master node is the first node in the list
         # we use this later to launch things, so strip out the info past ":", if it's there.
@@ -179,7 +180,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
                 if os.path.isfile(deployScript) == True:
                     runDir = self.directories.getDefaultRunDir()
                     deployCmd = [deployScript, runDir, dataRepository, collection]
-                    print ">>> ", deployCmd
+                    print(">>> ", deployCmd)
                     pid = os.fork()
                     if not pid:
                         os.execvp(deployCmd[0], deployCmd)
@@ -230,7 +231,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         definitionConfig = wfConfig.pipeline[shortName].definition
         if pipelineConfigNumber == 1:
             if platformConfig.dir != None:
-                print "platformConfig.dir ", platformConfig.dir
+                print("platformConfig.dir ", platformConfig.dir)
                 definitionConfig.execute.dir = platformConfig.dir
             if self.prodConfig.production.eventBrokerHost != None:
                 self.eventBrokerHost = self.prodConfig.production.eventBrokerHost
@@ -370,7 +371,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
     def createDirs(self, platformConfig, pipelineConfig):
         log.debug("GenericPipelineWorkflowConfigurator:createDirs")
 
-        print "pipelineConfig = ", pipelineConfig
+        print("pipelineConfig = ", pipelineConfig)
         dirConfig = platformConfig.dir
         dirName = pipelineConfig
         self.directories = Directories(dirConfig, dirName, self.runid)

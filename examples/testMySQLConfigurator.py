@@ -23,6 +23,7 @@
 #
 
 
+from __future__ import print_function
 from lsst.ctrl.orca.dbservers.MySQLConfigurator import MySQLConfigurator
 from lsst.cat.MySQLBase import MySQLBase
 from lsst.cat.policyReader import PolicyReader
@@ -66,7 +67,7 @@ def markRunFinished(dbName):
     admin = MySQLBase(host, port)
     admin.connect(usr, pwd, globalDbName)
     r = admin.execCommand1("SELECT setRunFinished('%s')" % dbName)
-    print r
+    print(r)
 
 
 def startSomeRuns():
@@ -76,11 +77,11 @@ def startSomeRuns():
     x.checkStatus(usr, pwd, host)
 
     r = x.prepareForNewRun('myFirstRun', usr, pwd)
-    print r
+    print(r)
     markRunFinished('%s_%s_u_myFirstRun' % (usr, dcVersion))
 
     r = x.prepareForNewRun('mySecondRun', usr, pwd)
-    print r
+    print(r)
     #markRunFinished('%s_%s_u_mySecondRun' %(usr, dcVersion))
 
 

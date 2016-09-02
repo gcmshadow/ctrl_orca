@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -133,12 +134,12 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
         # This avoids needlessly making connections to Abe for directories
         # that already exist.
         dirSet = Set()
-        print "expandedPipelineConfigs = ", expandedPipelineConfigs
+        print("expandedPipelineConfigs = ", expandedPipelineConfigs)
         for pipelineConfigGroup in expandedPipelineConfigs:
-            print "pipelineConfigGroup = ", str(pipelineConfigGroup)
+            print("pipelineConfigGroup = ", str(pipelineConfigGroup))
             pipelineConfig = pipelineConfigGroup.getConfigName()
             num = pipelineConfigGroup.getConfigNumber()
-            print "pipelineConfig = "+pipelineConfig
+            print("pipelineConfig = "+pipelineConfig)
             self.collectDirNames(dirSet, platformConfig, pipelineConfig, num)
 
         # create all the directories we've collected, plus any local
@@ -159,7 +160,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
             pipelineConfig = pipelineConfigGroup.getConfigName()
             num = pipelineConfigGroup.getConfigNumber()
 
-            print "_configureSpecial = ", pipelineConfig
+            print("_configureSpecial = ", pipelineConfig)
             pipelineShortName = pipelineConfig
 
             # set this pipeline's self.directories and self.dirs
@@ -304,12 +305,12 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
     def stageLocally(self, localName, remoteName):
         log.debug("VanillaCondorWorkflowConfigurator:stageLocally")
 
-        print "local name  = "+localName
-        print "remote name  = "+remoteName
+        print("local name  = "+localName)
+        print("remote name  = "+remoteName)
 
         localStageName = os.path.join(self.localStagingDir, remoteName)
 
-        print "localName = %s, localStageName = %s\n", (localName, localStageName)
+        print("localName = %s, localStageName = %s\n", (localName, localStageName))
         if os.path.exists(os.path.dirname(localStageName)) == False:
             os.makedirs(os.path.dirname(localStageName))
         shutil.copyfile(localName, localStageName)
@@ -323,7 +324,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
         remoteNameURL = "%s%s" % (self.transferProtocolPrefix, remoteName)
 
         cmd = "globus-url-copy -r -vb -cd %s %s " % (localNameURL, remoteNameURL)
-        print cmd
+        print(cmd)
 
         # perform this copy from the local machine to the remote machine
         pid = os.fork()
@@ -349,7 +350,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
     def remoteMakeDirs(self, remoteName):
         log.debug("VanillaCondorWorkflowConfigurator:remoteMakeDirs")
         cmd = "gsissh %s mkdir -p %s" % (self.remoteLoginName, remoteName)
-        print cmd
+        print(cmd)
         pid = os.fork()
         if not pid:
             os.execvp("gsissh", cmd.split())
@@ -371,7 +372,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
     def remoteMkdir(self, remoteDir):
         log.debug("VanillaCondorWorkflowConfigurator:remoteMkdir")
         cmd = "gsissh %s mkdir -p %s" % (self.remoteLoginName, remoteDir)
-        print "running: "+cmd
+        print("running: "+cmd)
         pid = os.fork()
         if not pid:
             os.execvp("gsissh", cmd.split())
@@ -404,10 +405,10 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
         logFile = os.path.join(self.dirs.get("workDir"), logFile)
         self.logFileNames.append(logFile)
 
-        print "self.prodConfig = ", self.prodConfig
+        print("self.prodConfig = ", self.prodConfig)
         eventBrokerHost = self.prodConfig.production.eventBrokerHost
         if eventBrokerHost == None:
-            print "warning: eventBrokerHost is not set"
+            print("warning: eventBrokerHost is not set")
 
         # only write out the config file once
 # TODO - XXX - K-T says this is obsoleted, since we won't copy config info anymore
@@ -437,10 +438,10 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
 
         # copy /bin/sh script responsible for environment setting
 
-        print "shortName = ", shortName
+        print("shortName = ", shortName)
         pipelineDefinitionConfig = wfConfig.pipeline[shortName].definition
         setupPath = pipelineDefinitionConfig.framework.environment
-        print "setupPath = ", setupPath
+        print("setupPath = ", setupPath)
         if setupPath:
             setupPath = EnvString.resolve(setupPath)
         ## path to the setup script
@@ -567,8 +568,8 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
 
         dirConfig = platformConfig.dir
         dirName = pipelineConfig
-        print "collectDirNames dirConfig = ", dirConfig
-        print "collectDirNames dirName = ", dirName
+        print("collectDirNames dirConfig = ", dirConfig)
+        print("collectDirNames dirName = ", dirName)
 
         directories = Directories(dirConfig, dirName, self.runid)
         dirs = directories.getDirs()

@@ -23,6 +23,7 @@
 #
 
 
+from __future__ import print_function
 from lsst.ctrl.orca.dbservers.MySQLConfigurator import MySQLConfigurator
 from lsst.cat.MySQLBase import MySQLBase
 from lsst.cat.policyReader import PolicyReader
@@ -60,7 +61,7 @@ def dropDB(usr, pwd):
 
 
 def authUser(usr, pwd):
-    print 'authorizing user...'
+    print('authorizing user...')
     x = os.path.join(catDir, 'bin/addMySqlUser.py')
     cmd = '%s -f %s -u %s -p %s' % (x, policyF, usr, pwd)
     subprocess.call(cmd.split())
@@ -70,7 +71,7 @@ def markRunFinished(dbName):
     admin = MySQLBase(host, port)
     admin.connect(usr, pwd, globalDbName)
     r = admin.execCommand1("SELECT setRunFinished('%s')" % dbName)
-    print r
+    print(r)
 
 
 def startSomeRuns():
@@ -80,11 +81,11 @@ def startSomeRuns():
     x.checkStatus(usr, pwd, host)
 
     r = x.prepareForNewRun('myFirstRun', usr, pwd)
-    print r
+    print(r)
     markRunFinished('%s_%s_u_myFirstRun' % (usr, dcVersion))
 
     r = x.prepareForNewRun('mySecondRun', usr, pwd)
-    print r
+    print(r)
     #markRunFinished('%s_%s_u_mySecondRun' %(usr, dcVersion))
 
 
@@ -94,7 +95,7 @@ if DbAuth.available(host, str(port)):
     usr = DbAuth.username(host, str(port))
     pwd = DbAuth.password(host, str(port))
 else:
-    print "Authorization unavailable for %s:%s" % (host, port)
+    print("Authorization unavailable for %s:%s" % (host, port))
     usr = raw_input("Enter mysql account name: ")
     pwd = getpass.getpass()
 

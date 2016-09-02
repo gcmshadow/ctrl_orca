@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -47,10 +48,10 @@ class DataAnnouncer:
         broker = self.prodConfig.production.eventBrokerHost
 
         configType = self.wfConfig.configurationType
-        print "configType", configType
+        print("configType", configType)
         config = self.wfConfig.configuration[configType]
         if config == None:
-            print "configuration for workflow was not found"
+            print("configuration for workflow was not found")
             return False
 
         if config.announceData != None:
@@ -61,7 +62,7 @@ class DataAnnouncer:
             inputdata = annData.inputdata
             inputdata = EnvString.resolve(inputdata)
             cmd = "%s -r %s -b %s -t %s %s" % (script, self.runid, broker, topic, inputdata)
-            print cmd
+            print(cmd)
             cmdSplit = cmd.split()
             pid = os.fork()
             if not pid:
@@ -75,14 +76,14 @@ class DataAnnouncer:
                 topic = dataComp.topic
                 status = dataComp.status
                 cmd = "%s %s %s %s %s" % (script, broker, topic, self.runid, status)
-                print cmd
+                print(cmd)
                 cmdSplit = cmd.split()
                 pid = os.fork()
                 if not pid:
                     os.execvp(cmdSplit[0], cmdSplit)
                 os.wait()[0]
             else:
-                print "not announcing that data has been completing sent; automatic shutdown will not occur"
+                print("not announcing that data has been completing sent; automatic shutdown will not occur")
 
             return True
         else:

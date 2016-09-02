@@ -21,6 +21,7 @@
 #
 
 from __future__ import with_statement
+from __future__ import print_function
 import os
 import sys
 import subprocess
@@ -126,12 +127,12 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                 if event is not None:
                     val = self._parent.handleEvent(event)
                     if self._parent._locked.running == False:
-                        print "and...done!"
+                        print("and...done!")
                         return
                 elif logEvent is not None:
                     val = self._parent.handleEvent(logEvent)
                     if self._parent._locked.running == False:
-                        print "logger handled... and... done!"
+                        print("logger handled... and... done!")
                         return
                 if (jobOfficeEvent is not None) or (jobOfficeEvent is not None) or (jobOfficeEvent is not None):
                     sleepInterval = 0
@@ -153,7 +154,7 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
         if event.getType() == events.EventTypes.STATUS:
             ps = event.getPropertySet()
             status = ps.get("STATUS")
-            print "STATUS = "+status
+            print("STATUS = "+status)
             if status == "joboffice:done":
                 log.debug("VanillaCondorWorkflowMonitor:handleJobOfficeEvent joboffice:done received")
                 self.stopWorkflow(1)
@@ -177,7 +178,7 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("pipeline"):
                 pipeline = ps.get("pipeline")
-                print "pipeline-->", pipeline
+                print("pipeline-->", pipeline)
                 if pipeline in self.pipelineNames:
                     self.pipelineNames.remove(pipeline)
             elif ps.exists("logger.status"):
@@ -187,8 +188,8 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                     self.loggerPIDs.remove(pid)
 
             cnt = len(self.pipelineNames)
-            print "pipelineNames: "
-            print self.pipelineNames
+            print("pipelineNames: ")
+            print(self.pipelineNames)
             # TODO: clean up to not specifically name "joboffices_1"
             if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent == False:
                 self.stopWorkflow(1)
@@ -209,7 +210,7 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
             with self._locked:
                 self._locked.running = False
         else:
-            print "didn't handle anything"
+            print("didn't handle anything")
     ##
     # @brief stop the workflow
     #

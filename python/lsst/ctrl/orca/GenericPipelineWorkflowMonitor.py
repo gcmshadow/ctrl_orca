@@ -21,6 +21,7 @@
 #
 
 from __future__ import with_statement
+from __future__ import print_function
 import os
 import sys
 import subprocess
@@ -118,12 +119,12 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
                 if event is not None:
                     val = self._parent.handleEvent(event)
                     if self._parent._locked.running == False:
-                        print "and...done!"
+                        print("and...done!")
                         return
                 elif logEvent is not None:
                     val = self._parent.handleEvent(logEvent)
                     if self._parent._locked.running == False:
-                        print "logger handled...and...done!"
+                        print("logger handled...and...done!")
                         return
 
     ## start the monitor therad
@@ -159,7 +160,7 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("pipeline"):
                 pipeline = ps.get("pipeline")
-                print "this pipeline exited -->", pipeline
+                print("this pipeline exited -->", pipeline)
                 if pipeline in self.pipelineNames:
                     self.pipelineNames.remove(pipeline)
             elif ps.exists("logger.status"):
@@ -169,8 +170,8 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
                     self.loggerPIDs.remove(pid)
 
             cnt = len(self.pipelineNames)
-            print "pipelineNames: "
-            print self.pipelineNames
+            print("pipelineNames: ")
+            print(self.pipelineNames)
             # TODO:  clean up to not specifically name "joboffices_1"
             if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent == False:
                 self.stopWorkflow(1)
@@ -191,7 +192,7 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
             with self._locked:
                 self._locked.running = False
         else:
-            print "didn't handle anything"
+            print("didn't handle anything")
 
     ##
     # @brief stop the workflow

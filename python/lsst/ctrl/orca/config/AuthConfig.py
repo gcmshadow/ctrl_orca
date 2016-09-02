@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 import lsst.pex.config as pexConfig
-import FakeTypeMap as fake
+from . import FakeTypeMap as fake
 
 ## authorization
 

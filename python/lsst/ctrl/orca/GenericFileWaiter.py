@@ -23,6 +23,7 @@
 #
 
 
+from __future__ import print_function
 import os
 import sys
 import time
@@ -43,7 +44,7 @@ class GenericFileWaiter:
     ## wait for the first file in the list to come into existence
     def waitForFirstFile(self):
         log.debug("GenericFileWaiter:waitForFirstFile")
-        print "waiting for log file to be created to confirm launch."
+        print("waiting for log file to be created to confirm launch.")
 
         while os.path.exists(self.fileNames[0]) == False:
             time.sleep(1)
@@ -53,7 +54,7 @@ class GenericFileWaiter:
     def waitForAllFiles(self):
         log.debug("GenericFileWaiter:waitForAllFiles")
 
-        print "waiting for all log files to be created to confirm launch"
+        print("waiting for all log files to be created to confirm launch")
 
         list = self.fileNames
         while len(list):

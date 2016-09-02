@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -81,4 +82,4 @@ if __name__ == "__main__":
     PolicyUtils.getAllFilenames("/home/srp/temp_merge/datarel/trunk/pipeline", myPolicy, pset)
 
     for i in pset:
-        print i
+        print(i)

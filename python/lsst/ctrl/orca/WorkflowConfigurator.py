@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -76,7 +77,7 @@ class WorkflowConfigurator:
         ##
         # @return a string describing this configuration group
         def __str__(self):
-            print "self.configName = ", self.configName, "self.config = ", self.config
+            print("self.configName = ", self.configName, "self.config = ", self.config)
             return "configName ="+self.configName
 
     ##
@@ -198,7 +199,7 @@ class WorkflowConfigurator:
         # in this particular workflow correctly. This needs to be reworked.
 
         #wfNames = self.prodConfig.workflowNames
-        print "expandConfigs wfShortName = ", wfShortName
+        print("expandConfigs wfShortName = ", wfShortName)
         totalCount = 1
         for wfName in self.prodConfig.workflow:
             wfConfig = self.prodConfig.workflow[wfName]

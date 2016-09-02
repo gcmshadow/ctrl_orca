@@ -22,6 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import os
 import sys
 import optparse
@@ -127,7 +128,7 @@ class JobKiller:
 
     # TODO: make this read multiple lines
     def killJob(self, filename):
-        print "killJob: ", filename
+        print("killJob: ", filename)
         try:
             input = open(filename, 'r')
         except Exception:
@@ -194,7 +195,7 @@ if __name__ == "__main__":
     killGlidein = parser.opts.killglidein
 
     if len(parser.args) < 2:
-        print usage
+        print(usage)
         raise RuntimeError("Missing args: productionPolicyFile runId")
 
     prodPolicyFile = parser.args[0]

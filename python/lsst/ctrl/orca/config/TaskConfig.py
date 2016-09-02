@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 import sys
 import lsst.pex.config as pexConfig
-import PipelineDefinitionConfig as pipe
-import FakeTypeMap as fake
+from . import PipelineDefinitionConfig as pipe
+from . import FakeTypeMap as fake
 
 ## script template
 

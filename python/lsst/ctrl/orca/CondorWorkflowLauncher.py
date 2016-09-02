@@ -1,3 +1,4 @@
+from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -75,7 +76,7 @@ class CondorWorkflowLauncher(WorkflowLauncher):
 
         cj = CondorJobs()
         condorDagId = cj.condorSubmitDag(self.dagFile)
-        print "Condor dag submitted as job ", condorDagId
+        print("Condor dag submitted as job ", condorDagId)
         os.chdir(startDir)
 
         ## workflow monitor for HTCondor jobs

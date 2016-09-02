@@ -21,6 +21,8 @@
 #
 
 from __future__ import with_statement
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import os.path
@@ -35,11 +37,11 @@ from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.StatusListener import StatusListener
 import lsst.log as log
 
-from EnvString import EnvString
-from exceptions import ConfigurationError
-from exceptions import MultiIssueConfigurationError
-from multithreading import SharedData
-from ProductionRunConfigurator import ProductionRunConfigurator
+from .EnvString import EnvString
+from .exceptions import ConfigurationError
+from .exceptions import MultiIssueConfigurationError
+from .multithreading import SharedData
+from .ProductionRunConfigurator import ProductionRunConfigurator
 #from threading import SharedData
 
 ##
@@ -234,8 +236,8 @@ class ProductionRunManager:
         #    mgr = self._workflowManagers[workflow.getName()]
         #    print "mgr = ",mgr
         #    mgr.announceData()
-        print "Production launched."
-        print "Waiting for shutdown request."
+        print("Production launched.")
+        print("Waiting for shutdown request.")
 
     ##
     # @brief determine whether production is currently running
@@ -392,7 +394,7 @@ class ProductionRunManager:
     #             created yet or name is not one of the names returned
     #             by getWorkflowNames()
     def getWorkflowManager(self, name):
-        if not self._workflowManagers or not self._workflowManagers.has_key(name):
+        if not self._workflowManagers or name not in self._workflowManagers:
             return None
         return self._workflowManagers[name]
 

@@ -22,6 +22,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import math
 import argparse
 import os
@@ -83,11 +84,11 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
     Write Condor Dag Submission files. 
     """
 
-    print "Writing DAG file "
+    print("Writing DAG file ")
 
     outname = pipeline + ".diamond.dag"
 
-    print outname
+    print(outname)
 
     outObj = open(outname, "w")
 
@@ -95,11 +96,11 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
     outObj.write("JOB B "+workerdir+"/" + pipeline + ".post\n")
     outObj.write(" \n")
 
-    print "prescriptFile = ", prescriptFile
+    print("prescriptFile = ", prescriptFile)
     if prescriptFile is not None:
         outObj.write("SCRIPT PRE A "+prescriptFile+"\n")
 
-    print "First Input File loop "
+    print("First Input File loop ")
 
     ## Loop over input entries
     fileObj = open(infile, "r")
@@ -110,7 +111,7 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
 
     outObj.write(" \n")
 
-    print "Second Input File loop "
+    print("Second Input File loop ")
 
     ## Loop over input entries
     fileObj = open(infile, "r")
@@ -147,7 +148,7 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
         outObj.write("VARS A" + str(count) + " runid=\"" + runid + "\" \n")
         outObj.write("VARS A" + str(count) + " workerid=\"" + str(count) + "\" \n")
 
-    print "Third Input File loop "
+    print("Third Input File loop ")
 
     fileObj = open(infile, "r")
     count = 0
@@ -162,13 +163,13 @@ def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid
 
 
 def main():
-    print 'Starting generateDag.py'
+    print('Starting generateDag.py')
     parser = makeArgumentParser(description="generateDag.py write a Condor DAG for job submission"
                                 "by reading input list and writing the attribute as an argument.")
-    print 'Created parser'
+    print('Created parser')
     ns = parser.parse_args()
-    print 'Parsed Arguments'
-    print ns
+    print('Parsed Arguments')
+    print(ns)
 
     # SA
     # templateFile = "SourceAssoc-template.condor"

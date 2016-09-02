@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import lsst.pex.config as pexConfig
-import PipelineConfig as pipe
-import FakeTypeMap as fake
+from . import PipelineConfig as pipe
+from . import FakeTypeMap as fake
 
 ## condor data configuration
 
