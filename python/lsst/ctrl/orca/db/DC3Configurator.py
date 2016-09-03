@@ -190,12 +190,12 @@ class DC3Configurator:
     #
     # config.database.authInfo.names = ["cred1", "cred2]
     #
-    # config.database.authInfo["cred1"].host = "lsst10.ncsa.illinois.edu"
+    # config.database.authInfo["cred1"].host = "lsst-db.ncsa.illinois.edu"
     # config.database.authInfo["cred1"].user = "moose"
     # config.database.authInfo["cred1"].password = "squirrel"
     # config.database.authInfo["cred1"].port = 3306
     #
-    # config.database.authInfo["cred2"].host = "lsst10.ncsa.illinois.edu"
+    # config.database.authInfo["cred2"].host = "lsst-db.ncsa.illinois.edu"
     # config.database.authInfo["cred2"].user = "boris"
     # config.database.authInfo["cred2"].password = "natasha"
     # config.database.authInfo["cred2"].port = 3306

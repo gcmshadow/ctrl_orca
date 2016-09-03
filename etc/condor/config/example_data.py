@@ -7,7 +7,7 @@ config.production.repositoryDirectory = "/home/srp/working/pipeline_new"
 config.production.productionShutdownTopic = "productionShutdown"
 
 config.database["db1"].name = "dc3bGlobal"
-config.database["db1"].system.authInfo.host = "lsst10.ncsa.uiuc.edu"
+config.database["db1"].system.authInfo.host = "lsst-db.ncsa.illinois.edu"
 config.database["db1"].system.authInfo.port = 3306
 config.database["db1"].system.runCleanup.daysFirstNotice = 7
 config.database["db1"].system.runCleanup.daysFinalNotice = 1
