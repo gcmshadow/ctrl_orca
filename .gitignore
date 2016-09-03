@@ -8,6 +8,8 @@ config.log
 *.pyc
 *_wrap.cc
 *Lib.py
+_build.*
+doc/xml
 doc/html
 doc/*.tag
 doc/*.inc
