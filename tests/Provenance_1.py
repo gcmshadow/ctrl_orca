@@ -41,8 +41,8 @@ class ProvenanceTestCase(unittest.TestCase):
     def setUp(self):
         self.user = "test"
         self.runId = "test_" + repr(time.time())
-        self.dbLoc = "mysql://lsst10.ncsa.uiuc.edu:3306/provenance"
-        self.globalDbLoc = "mysql://lsst10.ncsa.uiuc.edu:3306/provglobal"
+        self.dbLoc = "mysql://lsst-db.ncsa.illinois.edu:3306/provenance"
+        self.globalDbLoc = "mysql://lsst-db.ncsa.illinois.edu:3306/provglobal"
         db = DbStorage()
         globalDb = DbStorage()
         db.setPersistLocation(LogicalLocation(self.dbLoc))
