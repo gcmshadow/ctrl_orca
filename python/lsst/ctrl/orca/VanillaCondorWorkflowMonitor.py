@@ -199,10 +199,14 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                 self.bSentJobOfficeEvent = True
 
             if (cnt == 0) and (self.bSentLastLoggerEvent is False):
-                self.eventSystem.createTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
-                evtlog = events.EventLog(self.runid, -1)
-                tlog = logging.Log(evtlog, "orca.control")
-                logging.LogRec(tlog, 1) << logging.Prop("STATUS", "eol") << logging.LogRec.endr
+                transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
+
+                props = PropertySet()
+                props.set("LOGGER", "orca.control")
+                props.set("STATUS", "eol")
+                e = events.Event(self.runid, props)
+                transmitter.publishEvent(e)
+
                 self.bSentLastLoggerEvent = True
 
             # if both lists are empty we're finished.

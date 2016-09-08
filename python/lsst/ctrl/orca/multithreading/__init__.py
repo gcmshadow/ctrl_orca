@@ -21,4 +21,5 @@ from __future__ import absolute_import
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from .SharedData import SharedData
+# XXX
+# from .SharedData import SharedData

@@ -93,7 +93,7 @@ orca.envscript = parser.opts.envscript
 configPath = None
 if parser.opts.logconfig is None:
     package = lsst.utils.getPackageDir("ctrl_orca")
-    configPath = os.path.join(package, "etc", "logging.py")
+    configPath = os.path.join(package, "etc", "log4j.properties")
 else:
     configPath = parser.opts.logconfig
 log.configure(configPath)

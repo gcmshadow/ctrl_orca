@@ -29,14 +29,17 @@ from __future__ import with_statement
 
 import unittest
 import threading
+import lsst.utils.tests
 
 from lsst.ctrl.orca.multithreading import SharedData
 
+def setup_module(module):
+    lsst.utils.tests.init()
 
-class ShareDataTestCase(unittest.TestCase):
+class ShareDataTestCase(lsst.utils.tests.TestCase):
 
     def setUp(self):
-        self.sd = SharedData()
+        self.sd = SharedData.SharedData()
 
     def tearDown(self):
         pass
@@ -118,11 +121,10 @@ class ShareDataTestCase(unittest.TestCase):
             self.assertEqual(len(attrs), 4, "Wrong number of items: "+str(attrs))
             self.assertEqual(self.sd.lname, "Plante")
 
-
-class ReadableShareDataTestCase(unittest.TestCase):
+class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
 
     def setUp(self):
-        self.sd = SharedData(False)
+        self.sd = SharedData.SharedData(False)
 
     def tearDown(self):
         pass
@@ -194,11 +196,10 @@ class ReadableShareDataTestCase(unittest.TestCase):
             self.assertEqual(len(attrs), 4, "Wrong number of items: "+str(attrs))
             self.assertEqual(self.sd.lname, "Plante")
 
-
-class MultiThreadTestCase(unittest.TestCase):
+class MultiThreadTestCase(lsst.utils.tests.TestCase):
 
     def setUp(self):
-        self.sd = SharedData(False, {"c": 0})
+        self.sd = SharedData.SharedData(False, {"c": 0})
 
     def tearDown(self):
         pass
@@ -249,5 +250,9 @@ class TstThread(threading.Thread):
 
 __all__ = "SharedDataTestCase ReadableShareDataTestCase MultiThreadTestCase".split()
 
+class SharedDataMemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
+
 if __name__ == "__main__":
+    lsst.utils.tests.init()
     unittest.main()

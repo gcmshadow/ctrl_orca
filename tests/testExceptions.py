@@ -26,11 +26,14 @@
 Tests of orca exceptions
 """
 import unittest
+import lsst.utils.tests
 
 from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 
+def setup_module(module):
+    lsst.utils.tests.init()
 
-class MultiIssueTestCase(unittest.TestCase):
+class MultiIssueTestCase(lsst.utils.tests.TestCase):
     unspecified = "Unspecified configuration problems encountered"
     generic = "Multiple configuration problems encountered"
 
@@ -42,48 +45,52 @@ class MultiIssueTestCase(unittest.TestCase):
 
     def testNoProb(self):
         err = MultiIssueConfigurationError()
-        self.assert_(not err.hasProblems(), "no problems added yet")
-        self.assertEquals(str(err), self.unspecified)
+        self.assertTrue(not err.hasProblems(), "no problems added yet")
+        self.assertEqual(str(err), self.unspecified)
 
         probs = err.getProblems()
-        self.assertEquals(len(probs), 0)
+        self.assertEqual(len(probs), 0)
 
     def testOneProb(self):
         msg = "first problem"
         err = MultiIssueConfigurationError(problem=msg)
-        self.assertEquals(str(err), msg)
+        self.assertEqual(str(err), msg)
 
         probs = err.getProblems()
-        self.assertEquals(len(probs), 1)
-        self.assertEquals(probs[0], msg)
+        self.assertEqual(len(probs), 1)
+        self.assertEqual(probs[0], msg)
 
     def testTwoProbs(self):
         msg = "first problem"
         err = MultiIssueConfigurationError(problem=msg)
-        self.assertEquals(str(err), msg)
+        self.assertEqual(str(err), msg)
         msg2 = "second problem"
         err.addProblem(msg2)
-        self.assertEquals(str(err), self.generic)
+        self.assertEqual(str(err), self.generic)
 
         probs = err.getProblems()
-        self.assertEquals(len(probs), 2)
-        self.assertEquals(probs[0], msg)
-        self.assertEquals(probs[1], msg2)
+        self.assertEqual(len(probs), 2)
+        self.assertEqual(probs[0], msg)
+        self.assertEqual(probs[1], msg2)
 
     def testGenericMsg(self):
         msg = "problems encountered while checking configuration"
         err = MultiIssueConfigurationError(msg)
-        self.assertEquals(str(err), self.unspecified)
+        self.assertEqual(str(err), self.unspecified)
 
         msg1 = "first problem"
         err.addProblem(msg1)
-        self.assertEquals(str(err), msg1)
+        self.assertEqual(str(err), msg1)
 
         err.addProblem("2nd problem")
-        self.assertEquals(str(err), msg)
+        self.assertEqual(str(err), msg)
 
+
+class ExceptionsMemoryTester(lsst.utils.tests.MemoryTestCase):
+    pass
 
 __all__ = "MultiIssueTestCase".split()
 
 if __name__ == "__main__":
+    lsst.utils.tests.init()
     unittest.main()

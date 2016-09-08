@@ -22,12 +22,8 @@ from __future__ import print_function
 #
 
 import os
-import sys
-import subprocess
 import lsst.ctrl.orca as orca
 import lsst.log as log
-from lsst.ctrl.orca.EnvString import EnvString
-from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
 from lsst.ctrl.orca.CondorJobs import CondorJobs
 from lsst.ctrl.orca.VanillaCondorWorkflowMonitor import VanillaCondorWorkflowMonitor
@@ -42,23 +38,31 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
     # initializes the workflow launcher for HTCondor Vanilla Universe
     #
 
-    def __init__(self, jobs, localScratch, condorGlideinFile, prodConfig, wfConfig, runid, filewaiter, pipelineNames):
+    def __init__(self, jobs, localScratch, condorGlideinFile, prodConfig,
+                 wfConfig, runid, filewaiter, pipelineNames):
         log.debug("VanillaCondorWorkflowLauncher:__init__")
-        ## list of jobs being run
+        # list of jobs being run
         self.jobs = jobs
-        ## location of local scratch directory
+
+        # location of local scratch directory
         self.localScratch = localScratch
-        ## location of condor glide in file
+
+        # location of condor glide in file
         self.condorGlideinFile = condorGlideinFile
-        ## production configuration
+
+        # production configuration
         self.prodConfig = prodConfig
-        ## workflow configuration
+
+        # workflow configuration
         self.wfConfig = wfConfig
-        ## run id for this workflow
+
+        # run id for this workflow
         self.runid = runid
-        ## object which watches files to show up
+
+        # object which watches files to show up
         self.filewaiter = filewaiter
-        ## named pipelines
+
+        # named pipelines
         self.pipelineNames = pipelineNames
 
     ##
@@ -78,10 +82,10 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
         eventBrokerHost = self.prodConfig.production.eventBrokerHost
         shutdownTopic = self.wfConfig.shutdownTopic
 
-        ## the specialized monitor this workflow
+        # the specialized monitor this workflow
         self.workflowMonitor = VanillaCondorWorkflowMonitor(
             eventBrokerHost, shutdownTopic, self.runid, self.pipelineNames, loggerManagers)
-        if statusListener != None:
+        if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
         self.workflowMonitor.startMonitorThread(self.runid)
 
@@ -97,7 +101,7 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
         condor = CondorJobs()
 
         # if we've set the "skipglidein", just don't do that.
-        if orca.skipglidein == False:
+        if orca.skipglidein is False:
             curDir = os.getcwd()
 
             # switch to this directory to make condor happy
@@ -121,7 +125,7 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
         firstJob = True
         jobNumbers = []
         for job in self.jobs:
-            if firstJob == True:
+            if firstJob is True:
                 jobNumber = condor.submitJob(job)
                 jobDir = os.path.dirname(job)
                 jobFileName = os.path.join(jobDir, "%s.job" % os.path.basename(jobDir))
