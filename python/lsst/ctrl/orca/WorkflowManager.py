@@ -41,7 +41,7 @@ class WorkflowManager:
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
-        self._locked = SharedData(False)
+        self._locked = SharedData.SharedData(False)
 
         #  workflow name
         self.name = "unnamed"

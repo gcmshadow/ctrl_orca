@@ -32,7 +32,9 @@ class NamedClassFactory:
         dot = name.rindex('.')
         pack = name[0:dot]
         modname = name[dot+1:]
-        module = __import__(name, globals(), locals(), [modname], -1)
+        # -1 is no longer accepted in python 3
+        # module = __import__(name, globals(), locals(), [modname], -1)
+        module = __import__(name, globals(), locals(), [modname], 0)
         classobj = getattr(module, modname)
         if classobj is None:
             raise RuntimeError("Attempt to instantiate class \"" + name +

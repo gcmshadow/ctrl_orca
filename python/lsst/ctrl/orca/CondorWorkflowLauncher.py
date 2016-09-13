@@ -77,7 +77,7 @@ class CondorWorkflowLauncher(WorkflowLauncher):
 
         cj = CondorJobs()
         condorDagId = cj.condorSubmitDag(self.dagFile)
-        print("Condor dag submitted as job ", condorDagId)
+        log.debug("Condor dag submitted as job "+condorDagId)
         os.chdir(startDir)
 
         # workflow monitor for HTCondor jobs

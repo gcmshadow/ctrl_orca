@@ -59,7 +59,7 @@ class ProductionRunManager:
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
-        self._locked = SharedData(False,
+        self._locked = SharedData.SharedData(False,
                                   {"running": False, "done": False})
 
         # the run id for this production

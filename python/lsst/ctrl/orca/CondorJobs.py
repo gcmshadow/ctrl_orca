@@ -61,6 +61,7 @@ class CondorJobs:
 
         line = pop.readline()
         line = pop.readline()
+        line = line.decode('utf-8')
         num = clusterexp.findall(line)
         if len(num) == 0:
             return None
@@ -93,6 +94,7 @@ class CondorJobs:
                 print(msg % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num))
             while 1:
                 line = pop.readline()
+                line = line.decode('utf-8')
                 if not line:
                     break
                 values = queueExp.findall(line)
@@ -143,6 +145,7 @@ class CondorJobs:
             pop = os.popen("condor_q", "r")
             while 1:
                 line = pop.readline()
+                line = line.decode('utf-8')
                 if not line:
                     break
                 values = queueExp.findall(line)
@@ -169,7 +172,7 @@ class CondorJobs:
     ##
     # @brief submit a condor dag and return its cluster number
     def condorSubmitDag(self, filename):
-        log.debug("CondorJobs: submitCondorDag "+filename)
+        log.debug("CondorJobs: condorSubmitDag "+filename)
         # Just a note about why this was done this way...
         # There's something wierd about how "condor_submit_dag" prints it's output.
         # If you run it on the command line, it'll print the "1 job(s) submitted"
@@ -181,15 +184,17 @@ class CondorJobs:
         # and if we find, it, we grab the cluster id out of that line.
         clusterexp = re.compile("1 job\(s\) submitted to cluster (\d+).")
         cmd = "condor_submit_dag %s" % filename
-        print(cmd)
+        log.debug(cmd)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         output = []
         line = process.stdout.readline()
+        line = line.decode('utf-8')
         i = 0
         while line != "":
             line = line.strip()
             output.append(line)
             line = process.stdout.readline()
+            line = line.decode('utf-8')
             i += 1
         for line in output:
             num = clusterexp.findall(line)
@@ -208,10 +213,12 @@ class CondorJobs:
         cmd = "condor_rm "+str(cid)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         line = process.stdout.readline()
+        line = line.decode('utf-8')
         while line != "":
             line = line.strip()
             print(line)
             line = process.stdout.readline()
+            line = line.decode('utf-8')
         # read the rest (if any) and terminate
         stdoutdata, stderrdata = process.communicate()
 
@@ -223,6 +230,7 @@ class CondorJobs:
         process = subprocess.Popen("condor_q", shell=False, stdout=subprocess.PIPE)
         while 1:
             line = process.stdout.readline()
+            line = line.decode('utf-8')
             if not line:
                 break
             values = queueExp.findall(line)

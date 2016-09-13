@@ -44,7 +44,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
-        self._locked = SharedData(False,
+        self._locked = SharedData.SharedData(False,
                                   {"running": False, "done": False})
 
         log.debug("CondorWorkflowMonitor:__init__")
@@ -134,15 +134,14 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                 logEvent = self._Logreceiver.receiveEvent(1)
 
                 if event is not None:
-                    val = self._parent.handleEvent(event)
+                    # val = self._parent.handleEvent(event)
+                    self._parent.handleEvent(event)
                     if self._parent._locked.running is False:
                         print("and...done!")
                         return
                 elif logEvent is not None:
-                    val = self._parent.handleEvent(logEvent)
-
-                    if val is None:
-                        raise Exception("error receiving event")
+                    self._parent.handleEvent(logEvent)
+                    # val = self._parent.handleEvent(logEvent)
 
                     if self._parent._locked.running is False:
                         print("logger handled... and... done!")
@@ -181,7 +180,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("logger.status"):
                 pid = ps.getInt("logger.pid")
-                print("logger.pid = ", pid)
+                log.debug("logger.pid = "+ str(pid))
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
 
