@@ -23,23 +23,36 @@
 #
 
 
+from builtins import str
 from lsst.cat.MySQLBase import MySQLBase
 import os
 
 
-"""This file contains a set of utilities to manage runs"""
-
-
 class MySQLConfigurator(MySQLBase):
-    """
-    Class MySQLConfigurator contains a set of utils to administer LSST-specific
+    """Class MySQLConfigurator contains a set of utils to administer LSST-specific
     contents of the database which do not require mysql superuser access.
     In particular, it helps to setup verify  status of global database(s)
     and user-specific database settings prior to starting a run, and
     allows to register run in global database.
+
+    Parameters
+    ----------
+    dbHostName : `str`
+        database host name
+    portNo : `int`
+        database port number
+    globalDbName : `str`
+        global database name
+    dcVersion : `str`
+        data challenge version
+    dcDb : `str
+        data challenge database name
+    minPercDiskSpaceReq
+        minimum precent disk space required
+    userRunLife: `int`
+        data run lifetime (listed in database)
     """
 
-    # initializer
     def __init__(self, dbHostName, portNo, globalDbName,
                  dcVersion, dcDb, minPercDiskSpaceReq, userRunLife):
         MySQLBase.__init__(self, dbHostName, portNo)
@@ -59,7 +72,7 @@ class MySQLConfigurator(MySQLBase):
         # minimum percent disk space required
         self.minPercDiskSpaceReq = minPercDiskSpaceReq
 
-        # @deprecated user run lifetime
+        # user run lifetime
         self.userRunLife = userRunLife
 
         if self.globalDbName == "":
@@ -70,10 +83,21 @@ class MySQLConfigurator(MySQLBase):
             raise RuntimeError("Directory '%s' not found" % self.sqlDir)
 
     def checkStatus(self, userName, userPassword, clientMachine):
-        """
-        checkStatus checks status of global database and user-specific
+        """Checks status of global database and user-specific
         database settings such as authorizations. It should be called
         prior to starting a run.
+
+        Raises
+        RuntimeError if database authorization fails.
+
+        Parameters
+        ----------
+        userName : `str`
+            user name to use to connect to the database
+        userPassword : `str`
+            user password to use to connect to the database
+        clientMachine : `str`
+            deprecated
         """
 
         # Check if Global database and its tables exist
@@ -110,14 +134,27 @@ class MySQLConfigurator(MySQLBase):
         raise RuntimeError("Database authorization failure for %s" % uc)
 
     def prepareForNewRun(self, runName, userName, userPassword, runType='u'):
-        """
-        prepareForNewRun prepares database for a new run. This includes
-        creating appropriate database(s) and tables(s) as well as preloading
-        some static database contents and registering the run in the
-        global database. It returns a database name corresponding to the
-        run that is starting.
-        Returns the entire database logical location string in the form:
-        "mysql://hostName:port/databaseName"
+        """Prepares database for a new run.
+
+        Parameters
+        ----------
+        runName : `str`
+            user name to use to connect to the database
+        userPassword : `str`
+            user password to use to connect to the database
+        runType: `str`
+            should be 'p' or 'u'; 'p' indicates indefinite lifetime, 'u' indicates user specified time.
+
+        Notes
+        -----
+        This includes creating appropriate database(s) and tables(s) as well as pre-loading
+        some static database contents and registering the run in the global database. It
+        returns a database name corresponding to the run that is starting.
+
+        Returns
+        -------
+        info : tuple
+            run database name, data challenge database name
         """
         if (runType != 'p' and runType != 'u'):
             raise RuntimeError("Invalid runType '%c', expected 'u' or 'p'" %
@@ -179,11 +216,16 @@ class MySQLConfigurator(MySQLBase):
         return (runDbName, self.dcDbName)
 
     def runFinished(self, dbName):
-        """
-        Should be called after the run finished. This
-        function records in the GlobalDB the fact that
-        the run finished (date, maybe status, etc).
-        It take an argument: databaseName"
+        """Should be called after the run finished.
+
+        Parameters
+        ----------
+        dbName : `str`
+            database name
+
+        Notes
+        -----
+        This function records in the GlobalDB the fact that the run finished (date, maybe status, etc).
         """
 
         # self.connect(userName, userPassword, self.globalDbName)

@@ -1,4 +1,6 @@
 from __future__ import print_function
+from builtins import range
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -28,20 +30,49 @@ from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 ##
 # @brief an abstract class for configuring a workflow
 #
-# This class should not be used directly but rather must be subclassed,
-# providing an implementation for at least _configureWorkflowLauncher.
-# Usually, _configureSpecialized() should also be overridden to carry
-# out the non-database setup, including deploying the workflow onto the
-# remote platform.
 #
 
 
-class WorkflowConfigurator:
+class WorkflowConfigurator(object):
+    """Abstract class for configuring a workflow
+
+    Parameters
+    ----------
+    runid : `str`
+        run id
+    prodConfig : `Config`
+        production Config object
+    wfConfig : `Config`
+        workflow Config object
+
+    Notes
+    -----
+    This class should not be used directly but rather must be subclassed,
+    providing an implementation for at least _configureWorkflowLauncher.
+    Usually, _configureSpecialized() should also be overridden to carry
+    out the non-database setup, including deploying the workflow onto the
+    remote platform.
+    """
 
     # configuration group
     class ConfigGroup(object):
-        ##
-        # @brief configuration initializer
+        """Configuration group
+
+        Parameters
+        ----------
+        name : `str`
+            Name of this Config
+        config: `Config`
+            The Config object itself
+        number : `int`
+            The number assigned to this ConfigGroup
+        offset : `int`
+            global offset (deprecated)
+
+        Notes
+        -----
+        Names and numbers are assigned to ConfigGroups in order to address them either way.
+        """
 
         def __init__(self, name, config, number, offset):
             # name of this configuration
@@ -56,47 +87,45 @@ class WorkflowConfigurator:
             # @deprecated global offset
             self.globalOffset = offset
 
-        ##
-        # @return the configuration
         def getConfig(self):
+            """Accessor to the Config object
+
+            Returns
+            -------
+            The config object
+            """
             return self.config
 
-        ##
-        # @return the configuration name
         def getConfigName(self):
+            """Accessor to the Config name
+
+            Returns
+            -------
+            The config name
+            """
+
             return self.configName
 
-        ##
-        # @return the number of this configuration
         def getConfigNumber(self):
+            """Accessor to the Config number
+
+            Returns
+            -------
+            This Config's number
+            """
+
             return self.configNumber
 
-        ##
         # @deprecated the offset to use
         def getGlobalOffset(self):
             return self.globalOffset
 
-        ##
         # @return a string describing this configuration group
         def __str__(self):
             print("self.configName = ", self.configName, "self.config = ", self.config)
             return "configName ="+self.configName
 
-    ##
-    # @brief create the configurator
-    #
-    # This constructor should only be called from a subclass's
-    # constructor, in which case the fromSub parameter must be
-    # set to True.
-    #
-    # @param runid       the run identifier for the production run
-    # @param prodConfig  the production config for this workflow
-    # @param wfConfig    the workflow config that describes the workflow
-    # @param fromSub     set this to True to indicate that it is being called
-    #                       from a subclass constructor.  If False (default),
-    #                       an exception will be raised under the assumption
-    #                       that one is trying instantiate it directly.
-    def __init__(self, runid, prodConfig, wfConfig, fromSub=False):
+    def __init__(self, runid, prodConfig, wfConfig):
         # the run id associated with this workflow
         self.runid = runid
 
@@ -108,17 +137,22 @@ class WorkflowConfigurator:
         # the workflow configuration
         self.wfConfig = wfConfig
 
-        # the repository location
-        # self.repository = repository
+        raise RuntimeError("Attempt to instantiate abstract class: WorkflowConfigurator; see class docs")
 
-        if fromSub:
-            raise RuntimeError("Attempt to instantiate abstract class, " +
-                               "WorkflowConfigurator; see class docs")
-
-    ###
-    # @brief Configure the databases, and call an specialization required
-    #
     def configure(self, provSetup, workflowVerbosity=None):
+        """ Configure the workflow (including database, and any specialized required setup)
+
+        Parameters
+        ----------
+        provSetup : `Config`
+            provenance Configuration
+        workflowVerbosity : `int`
+            verbosity level to set for workflow
+
+        Returns
+        -------
+        WorkflowLauncher object to launch the workflow
+        """
         log.debug("WorkflowConfigurator:configure")
         self._configureDatabases(provSetup)
         return self._configureSpecialized(self.wfConfig, workflowVerbosity)
@@ -131,6 +165,13 @@ class WorkflowConfigurator:
     # @param provSetup
     #
     def _configureDatabases(self, provSetup):
+        """Configure database in preparation to execute the workflow
+
+        Parameters
+        ----------
+        provSetup : `Config`
+            provenance Configuration
+        """
         log.debug("WorkflowConfigurator:_configureDatabases")
 
         #
@@ -145,32 +186,46 @@ class WorkflowConfigurator:
                 databaseConfigurator.setup(provSetup)
         return
 
-    ##
-    # @brief complete non-database setup, including deploying the workflow and its
-    # piplines onto the remote platform.
-    #
-    # This normally should be overriden.
-    #
-    # @return workflowLauncher
     def _configureSpecialized(self, wfConfig):
+        """Complete non-database setup, including deploying the workfow and it's pipelines
+
+        Notes
+        -----
+        Normally, this method should be overridden.
+
+        Returns
+        -------
+        WorkflowLauncher object
+        """
+
         workflowLauncher = self._createWorkflowLauncher()
         return workflowLauncher
 
-    ##
-    # @brief create the workflow launcher
-    #
-    # This "abstract" method must be overridden; otherwise an exception is raised
-    #
-    # @return workflowLauncher
     def _createWorkflowLauncher(self):
+        """Create the workflow launcher
+
+        Notes
+        -----
+        This abstract method must be overridden; otherwise an exception is raised
+        """
+
         msg = 'called "abstract" WorkflowConfigurator._createWorkflowLauncher'
         log.info(msg)
         raise RuntimeError(msg)
 
-    ##
-    # @brief lookup and create the configurator for database operations
-    #
     def createDatabaseConfigurator(self, databaseConfig):
+        """Lookup and create the configurator for database operations
+
+        Parameters
+        ----------
+        databaseConfig : `Config`
+            Config object containing database configuration information.
+
+        Returns
+        -------
+        Initialized DatabaseConfigurator object
+        """
+
         log.debug("WorkflowConfigurator:createDatabaseConfigurator")
         className = databaseConfig.configurationClass
         classFactory = NamedClassFactory()
@@ -179,7 +234,7 @@ class WorkflowConfigurator:
         return configurator
 
     ##
-    # @brief given a list of pipelinePolicies, number the section we're
+    # @brief given a list of pipelineConfigs, number the section we're
     # interested in based on the order they are in, in the productionConfig
     # We use this number Provenance to uniquely identify this set of pipelines
     #

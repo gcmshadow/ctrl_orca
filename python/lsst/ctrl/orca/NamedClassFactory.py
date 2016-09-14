@@ -20,13 +20,22 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-##
-# @brief create a new class object
+from builtins import object
 
 
-class NamedClassFactory:
-    ##
-    # @brief create a new "name" class object
+class NamedClassFactory(object):
+    """Create a new "name" class object
+
+    Parameters
+    ----------
+    name : `str`
+        the fully qualified nname of an object
+
+    Returns
+    -------
+    classobj : `object`
+        an object of the specified name
+    """
 
     def createClass(self, name):
         dot = name.rindex('.')

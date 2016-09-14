@@ -25,13 +25,16 @@
 """
 Tests of orca exceptions
 """
+from builtins import str
 import unittest
 import lsst.utils.tests
 
 from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 
+
 def setup_module(module):
     lsst.utils.tests.init()
+
 
 class MultiIssueTestCase(lsst.utils.tests.TestCase):
     unspecified = "Unspecified configuration problems encountered"

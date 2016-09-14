@@ -20,6 +20,7 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from builtins import str
 import stat
 import sys
 import os
@@ -40,24 +41,29 @@ from lsst.ctrl.orca.TemplateWriter import TemplateWriter
 
 
 class CondorWorkflowConfigurator(WorkflowConfigurator):
-    # initialize
+    """Condor specialized workflow configurator
+
+    Parameters
+    ----------
+    runid : str
+        run id
+    repository : str
+        repository directory
+    prodConfig : Config
+        production config object
+    wfConfig : Config
+        workflow config object
+    wfName : str
+        workflow name
+    """
 
     def __init__(self, runid, repository, prodConfig, wfConfig, wfName):
         log.debug("CondorWorkflowConfigurator:__init__")
 
-        # run id
         self.runid = runid
-
-        # repository directory
         self.repository = repository
-
-        # production configuration
         self.prodConfig = prodConfig
-
-        # workflow configuration
         self.wfConfig = wfConfig
-
-        # workflow name
         self.wfName = wfName
 
         # logging verbosity of workflow
@@ -93,25 +99,27 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
         # default root for the production
         self.defaultRoot = wfConfig.platform.dir.defaultRoot
 
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup
-    # @param wfVerbosity
-    #
     def configure(self, provSetup, wfVerbosity):
+        """Setup as much as possible in preparation to execute the workflow
+           and return a WorkflowLauncher object that will launch the
+           configured workflow.
+
+        Parameters
+        ----------
+        provSetup : Config
+            provenance setup
+        wfVerbosity : int
+            verbosity level of workflow
+
+        Notes
+        -----
+        Provenance info is set here has a placeholder for when it gets
+        reintroduced.
+        """
         self.wfVerbosity = wfVerbosity
         self._configureDatabases(provSetup)
         return self._configureSpecialized(provSetup, self.wfConfig)
 
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup
-    # @param wfConfig
-    #
     def _configureSpecialized(self, provSetup, wfConfig):
         log.debug("CondorWorkflowConfigurator:configure")
 
@@ -260,8 +268,18 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
                                                   wfConfig.monitor)
         return workflowLauncher
 
-    # write the HTCondor prescript script
     def writePreScript(self, outputFileName, template, keywords):
+        """Write the HTCondor prescript script
+
+        Parameters
+        ----------
+        outputFileName : str
+            output file name for pre script
+        template : Config
+            config file template
+        keywords : { 'key1' : 'value', 'key2' : 'value2'}
+            keyword/value dictionary
+        """
         pairs = {}
         for value in keywords:
             val = keywords[value]
@@ -271,8 +289,20 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
         writer = TemplateWriter()
         writer.rewrite(template, outputFileName, pairs)
 
-    # write the HTCondor script that is used to execute the job
     def writeJobScript(self, outputFileName, template, keywords, scriptName=None):
+        """Write the HTCondor script that is used to execute the job
+
+        Parameters
+        ----------
+        outputFileName : str
+            output file name for pre script
+        template : Config
+            config file template
+        keywords : { 'key1' : 'value', 'key2' : 'value2'}
+            keyword/value dictionary
+        scriptName : str, optional
+            name of script to substitute in place of default
+        """
         pairs = {}
         for value in keywords:
             val = keywords[value]
@@ -284,8 +314,14 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
         writer = TemplateWriter()
         writer.rewrite(template, outputFileName, pairs)
 
-    # write the HTCondor glide-in file
     def writeGlideinFile(self, glideinConfig):
+        """Write the HTCondor glide-in file
+
+        Parameters
+        ----------
+        glideinConfig : Config
+            config file used to write glide-in information
+        """
         template = glideinConfig.template
         inputFile = EnvString.resolve(template.inputFile)
 
@@ -301,8 +337,9 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
         writer = TemplateWriter()
         writer.rewrite(inputFile, template.outputFile, pairs)
 
-    # get the workflow name
     def getWorkflowName(self):
+        """get the workflow name
+        """
         return self.wfName
 
     # @deprecated

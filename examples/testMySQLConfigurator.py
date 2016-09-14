@@ -24,6 +24,7 @@
 
 
 from __future__ import print_function
+from builtins import input
 from lsst.ctrl.orca.dbservers.MySQLConfigurator import MySQLConfigurator
 from lsst.cat.MySQLBase import MySQLBase
 from lsst.cat.policyReader import PolicyReader
@@ -42,11 +43,11 @@ r = PolicyReader(policyF)
 
 # have to do this to be sure Python 2 uses raw_input
 try:
-    input = raw_input
+    myinput = raw_input
 except NameError:
-    pass
+    myinput = input
 
-usr = input("Enter mysql account name: ")
+usr = eval(myinput("Enter mysql account name: "))
 pwd = getpass.getpass()
 
 

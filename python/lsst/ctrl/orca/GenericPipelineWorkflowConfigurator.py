@@ -1,4 +1,3 @@
-from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -21,6 +20,8 @@ from __future__ import print_function
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
+from builtins import map
 import os
 import os.path
 import shutil
@@ -42,8 +43,21 @@ from lsst.ctrl.orca.GenericFileWaiter import GenericFileWaiter
 
 
 class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
+    """Configurator for generic pipeline workflows
 
-    # initializer
+    Parameters
+    ----------
+    runid : str
+        run id
+    repository : str
+        repository directory
+    prodConfig : Config
+        production config object
+    wfConfig : Config
+        workflow config object
+    wfName : str
+        workflow name
+    """
     def __init__(self, runid, repository, prodConfig, wfConfig, wfName):
         log.debug("GenericPipelineWorkflowConfigurator:__init__")
 
@@ -86,25 +100,21 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         # host name of the event broker
         self.eventBrokerHost = None
 
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup
-    # @param wfVerbosity
-    #
     def configure(self, provSetup, wfVerbosity):
+        """Setup as much as possible in preparation to execute the workflow
+           and return a WorkflowLauncher object that will launch the
+           configured workflow.
+
+        Parameters
+        ----------
+        provSetup : Config
+            provenance setup
+        wfVerbosity : int
+            verbosity level of workflow
+        """
         self.wfVerbosity = wfVerbosity
         self._configureDatabases(provSetup)
         return self._configureSpecialized(provSetup, self.wfConfig)
-
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup provenance info
-    # @param wfConfig the workflow config to use for configuration
-    #
 
     def _configureSpecialized(self, provSetup, wfConfig):
         log.debug("GenericPipelineWorkflowConfigurator:configure")
@@ -141,11 +151,14 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
             launchCmd, self.prodConfig, wfConfig, self.runid, fileWaiter, self.pipelineNames)
         return workflowLauncher
 
-    ##
-    # @brief creates a list of nodes from platform.deploy.nodes
-    # @return the list of nodes
-    #
     def createNodeList(self, pipelineConfig):
+        """Creates a list of nodes from platform.deploy.nodes
+
+        Returns
+        -------
+        nodes : ['node1', 'node2']
+            a list of node names
+        """
         log.debug("GenericPipelineWorkflowConfigurator:createNodeList")
         print("pipelineConfig = ", pipelineConfig)
         print("pipelineConfig.deploy = ", pipelineConfig.deploy)
@@ -153,7 +166,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
 
         print("self.expandNodeHost", self.expandNodeHost)
         print("node", node)
-        nodes = map(self.expandNodeHost, node)
+        nodes = list(map(self.expandNodeHost, node))
 
         # by convention, the master node is the first node in the list
         # we use this later to launch things, so strip out the info past ":", if it's there.
@@ -164,16 +177,35 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
             self.masterNode = self.masterNode[0:colon]
         return nodes
 
-    # @return the name of this workflow
     def getWorkflowName(self):
+        """Accessor to workflow name
+        Returns
+        -------
+        name : `str`
+            the name of this workflow
+        """
         return self.workflow
 
     # @return the number of nodes to acquire
     def getNodeCount(self):
+        """Accessor to return the number of nodes to acquire
+
+        Returns
+        -------
+        c : `int`
+            The number of nodes to acquire.
+
+        """
         return len(self.nodes)
 
-    # deploy any required data specified in the configuration
     def deployData(self, wfConfig):
+        """Deploy any required data specified in the configuration
+
+        Parameters
+        ----------
+        wfConfig : Config
+            workflow configuraiton
+        """
         log.debug("GenericPipelineWorkflowConfigurator:deployData")
 
         # add data deploy here
@@ -201,10 +233,20 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
                               "warning: script '%s' doesn't exist" % deployScript)
         # end data deploy here
 
-    ##
-    # deploy the setup information for this workflow
-    #
     def deploySetup(self, provSetup, wfConfig, platformConfig, pipelineConfigGroup):
+        """Deploy the setup information for this workflow
+
+        Parameters
+        ----------
+        provSetup : Config
+            provenance setup information
+        wfConfig : Config
+            workflow configuration
+        platformConfig : Config
+            platform configuration
+        pipelineConfigGroup: [config1, config2]
+            list of pipeline configurations
+        """
         log.debug("GenericPipelineWorkflowConfigurator:deploySetup")
 
         pipelineConfig = pipelineConfigGroup.getConfigName()
@@ -332,10 +374,16 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         # print "cmd to execute is: ",launchCmd
         return launchCmd
 
-    ##
-    # @brief create the platform.dir directories
-    #
     def createDirs(self, platformConfig, pipelineConfig):
+        """Create the platform.dir directories
+
+        Parameters
+        ----------
+        platformConfig : Config
+            platform configuration
+        pipelineConfig : Config
+            pipeline configuration
+        """
         log.debug("GenericPipelineWorkflowConfigurator:createDirs")
 
         print("pipelineConfig = ", pipelineConfig)
@@ -352,17 +400,14 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
             if not os.path.exists(localDirName):
                 os.makedirs(localDirName)
 
-    ##
-    # @brief set up this workflow's database
-    #
     def setupDatabase(self):
+        """Setup up this workflow's database
+        """
         log.debug("GenericPipelineWorkflowConfigurator:setupDatabase")
 
-    ##
-    # @brief perform a node host name expansion
-    #
     def expandNodeHost(self, nodeentry):
-        """Add a default network domain to a node list entry if necessary """
+        """Add a default network domain to a node list entry if necessary
+        """
 
         if nodeentry.find(".") < 0:
             node = nodeentry

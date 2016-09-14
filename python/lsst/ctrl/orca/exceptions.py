@@ -1,3 +1,4 @@
+from builtins import str
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -22,17 +23,26 @@
 
 
 class ConfigurationError(RuntimeError):
-    """
-    an exception that indicates that an error occurred in the configuration
-    of a production run or one of its components.
+    """An exception that indicates that an error occurred in the configuration
+       of a production run or one of its components.
     """
     pass
 
 
 class MultiIssueConfigurationError(ConfigurationError):
-    """
-    a configuration error that can report on multiple problems.
+    """A configuration error that can report on multiple problems.
 
+    Parameters
+    ----------
+    msg : `str`, optional
+        The general message to report when more than problem has been encountered.  If only one
+        problem is added to this exception, that problem message will be displayed.  If None, a
+        generic message is set.
+    problem: `str`, optional
+        The first problem to add to this exception.
+
+    Extended Summary
+    ---------------
     The intented pattern of use for this class is that it is
     created before any problems are found.  As they are found,
     calls are made to addProblem().  Finally, after all possible
@@ -41,14 +51,6 @@ class MultiIssueConfigurationError(ConfigurationError):
     """
 
     def __init__(self, msg=None, problem=None):
-        """
-        create the exception.
-        @param msg      the general message to report when more than problem has
-                          been encountered.  If only one problem is added to this
-                          exception, that problem message will be displayed.
-                          If None, a generic message is set.
-        @param problem  the first problem to add to this exception.
-        """
         if msg is None:
             msg = "Multiple configuration problems encountered"
         ConfigurationError.__init__(self, msg)
@@ -57,20 +59,25 @@ class MultiIssueConfigurationError(ConfigurationError):
             self.addProblem(problem)
 
     def addProblem(self, msg):
-        """
-        add a message indicating one of the problems encountered
+        """Add a message indicating one of the problems encountered
         """
         self._probs.append(msg)
 
     def hasProblems(self):
         """
-        return True if this exception as at least one problem added to it.
+        Returns
+        -------
+        val : `bool`
+            return True if this exception as at least one problem added to it.
         """
         return len(self._probs) > 0
 
     def getProblems(self):
         """
-        return a copy of the list of problems
+        Returns
+        -------
+        v : ['string1', 'string2']
+            return a copy of the list of problems
         """
         return list(self._probs)
 

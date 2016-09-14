@@ -22,6 +22,7 @@
 
 from __future__ import with_statement
 from __future__ import print_function
+from builtins import str
 import threading
 import time
 import lsst.ctrl.events as events
@@ -35,17 +36,28 @@ from lsst.ctrl.orca.CondorJobs import CondorJobs
 
 # HTCondor workflow monitor
 class CondorWorkflowMonitor(WorkflowMonitor):
+    """Monitors the progress of the running workflow.
 
-    ##
-    # @brief in charge of monitoring and/or controlling the progress of a
-    #        running workflow.
-    #
+    Parameters
+    ----------
+    eventBrokerHost : `str`
+        host name of the event broker
+    shutdownTopic : `str`
+        name of shutdown topic to use for this workflow
+    runid : `str`
+        run id for this workflow
+    condorDagId : `str`
+        job id of submitted HTCondor dag
+    loggerManagers: [ logMgr1, logMgr2 ]
+        list of logger process managers
+    monitorConfig : Config
+        configuration file for monitor information
+    """
     def __init__(self, eventBrokerHost, shutdownTopic, runid, condorDagId, loggerManagers, monitorConfig):
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
-        self._locked = SharedData.SharedData(False,
-                                  {"running": False, "done": False})
+        self._locked = SharedData.SharedData(False, {"running": False, "done": False})
 
         log.debug("CondorWorkflowMonitor:__init__")
         self._statusListeners = []
@@ -57,7 +69,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         for lm in loggerManagers:
             self.loggerPIDs.append(lm.getPID())
 
-        # list of logger process managers
         self.loggerManagers = loggerManagers
 
         self._eventBrokerHost = eventBrokerHost
@@ -66,13 +77,10 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         # the topic that orca uses to monitor events
         self.orcaTopic = "orca.monitor"
 
-        # run id for this workflow
         self.runid = runid
 
-        # HTCondor DAG id assigned to this workflow
         self.condorDagId = condorDagId
 
-        # monitor configuration
         self.monitorConfig = monitorConfig
 
         self._wfMonitorThread = None
@@ -83,19 +91,38 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         # create event identifier for this process
         self.originatorId = self.eventSystem.createOriginatorId()
 
+        # flag to indicate that last logger event has been sent
         self.bSentLastLoggerEvent = False
 
         with self._locked:
-            self._wfMonitorThread = CondorWorkflowMonitor._WorkflowMonitorThread(
-                    self, self._eventBrokerHost, self._shutdownTopic,
-                    self.orcaTopic, runid, self.condorDagId, self.monitorConfig)
+            self._wfMonitorThread = CondorWorkflowMonitor._WorkflowMonitorThread(self,
+                                                                                 self._eventBrokerHost,
+                                                                                 self._shutdownTopic,
+                                                                                 self.orcaTopic,
+                                                                                 runid,
+                                                                                 self.condorDagId,
+                                                                                 self.monitorConfig)
 
-    ##
-    # @brief workflow thread that watches for shutdown
-    #
     class _WorkflowMonitorThread(threading.Thread):
-        ##
-        # @brief initialize
+        """Workflow thread that watches for shutdown
+
+        Parameters
+        ----------
+        parent : `Thread`
+            direct parent thread of this thread
+        eventBrokerHost : `str`
+            host name of the event broker
+        shutdownTopic : `str`
+            name of shutdown topic to use for this workflow
+        runid : `str`
+            run id for this workflow
+        condorDagId : `str`
+            job id of submitted HTCondor dag
+        loggerManagers: [ logMgr1, logMgr2 ]
+            list of logger process managers
+        monitorConfig : `Config`
+            configuration file for monitor information
+        """
         def __init__(self, parent, eventBrokerHost, shutdownTopic,
                      eventTopic, runid, condorDagId, monitorConfig):
             threading.Thread.__init__(self)
@@ -115,10 +142,9 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             # monitor configuration
             self.monitorConfig = monitorConfig
 
-        ##
-        # @brief continously monitor incoming events for shutdown sequence
-        #
         def run(self):
+            """Continously monitor incoming events for shutdown sequence
+            """
             cj = CondorJobs()
             log.debug("CondorWorkflowMonitor Thread started")
             statusCheckInterval = int(self.monitorConfig.statusCheckInterval)
@@ -156,18 +182,30 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                 if cj.isJobAlive(self.condorDagId) is False:
                     self._parent.sendLastLoggerEvent()
 
-    ##
-    # @brief begin one monitor thread
-    #
     def startMonitorThread(self, runid):
+        """Begin one monitor thread
+
+        Parameters
+        ----------
+        runid : `str`
+            run id
+
+        Notes
+        -----
+            run id is current unused
+        """
         with self._locked:
             self._wfMonitorThread.start()
             self._locked.running = True
 
-    ##
-    # @brief wait for final shutdown events from the production processes
-    #
     def handleEvent(self, event):
+        """Wait for final shutdown events from the production processes
+
+        Parameters
+        ----------
+        event : `Event`
+            Event message
+        """
         log.debug("CondorWorkflowMonitor:handleEvent called")
 
         # make sure this is really for us.
@@ -180,7 +218,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("logger.status"):
                 pid = ps.getInt("logger.pid")
-                log.debug("logger.pid = "+ str(pid))
+                log.debug("logger.pid = " + str(pid))
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
 
@@ -196,8 +234,9 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         else:
             print("didn't handle anything")
 
-    # send a message to the logger that we're done
     def sendLastLoggerEvent(self):
+        """Send a message to the logger that we're done
+        """
         # only do this one time
         if self.bSentLastLoggerEvent is False:
             print("sending last Logger Event")
@@ -212,10 +251,9 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             self.bSentLastLoggerEvent = True
 
-    ##
-    # @brief stop the workflow
-    #
     def stopWorkflow(self, urgency):
+        """Stop the workflow
+        """
         log.debug("CondorWorkflowMonitor:stopWorkflow")
 
         # do a condor_rm on the cluster id for the dag we submitted.

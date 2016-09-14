@@ -23,19 +23,30 @@
 #
 
 
+from builtins import object
 import os
 import signal
 import subprocess
 import lsst.log as log
 
 
-##
-# @brief Logger Manager base class
-#
-class LoggerManager:
+class LoggerManager(object):
+    """Manage the Logger process
 
-    ##
-    # @brief initialize
+    Parameters
+    ----------
+    broker : `str`
+        the name of the event broker host
+    runid : `str`
+        run id
+    dbHost : `str`, optional
+        the name of the database process host
+    dbPort : `int`, optional
+        the port number of the database process
+    dbName : `str`, optional
+        the name of the database
+    """
+
     def __init__(self, broker, runid, dbHost=None, dbPort=None, dbName=None):
         log.debug("LoggerManager:__init__")
 
@@ -59,12 +70,18 @@ class LoggerManager:
 
         return
 
-    # @return the id of the logger process
     def getPID(self):
+        """Access to get logger process id
+        Returns
+        -------
+        pid : `int`
+            process id
+        """
         return self.process.pid
 
-    # start the logger daemon process
     def start(self):
+        """Start the logger daemon process
+        """
         log.debug("LoggerManager:start")
         if self.process is not None:
             return
@@ -80,8 +97,9 @@ class LoggerManager:
         self.process = subprocess.Popen(cmd, shell=True)
         return
 
-    # halt the logger daemon process
     def stop(self):
+        """Halt the logger daemon process
+        """
         log.debug("LoggerManager:stop")
         if self.process is None:
             return
@@ -91,7 +109,7 @@ class LoggerManager:
             os.waitpid(self.process.pid, 0)
             self.process = None
             log.debug("LoggerManager:stop: killed Logger process")
-        except Exception as e:
+        except Exception:
             log.debug("LoggerManager:stop: tried to kill Logger process, but it didn't exist")
 
         return

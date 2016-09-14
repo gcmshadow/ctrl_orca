@@ -22,14 +22,30 @@
 
 #
 from __future__ import with_statement
+from builtins import str
+from builtins import object
 import threading
 
 
 class SharedData(object):
-    """
-    @brief a lock-protected container for data that can be shared amongst
-    threads.
+    """A lock-protected container for data that can be shared amongst threads.
 
+    Parameters
+    ----------
+    needLockOnRead : `bool`
+        If true (default), acquiring the lock will be needed when reading the data.  This
+        is recommended if the data items are anything but primitive types; otherwise,
+        a compound data item (e.g. of type dict) could be updated without acquiring a lock.
+    data : `dict`
+        A dictionary of data to initialize the container with.  This is done by calling
+        initData().  Set this value to False when calling from a subclass constructor; this
+        will allow any non-protected attributes to be set via the subclass's constructor.  If
+        None is given (default), it is assumed that all new attributes will be considered protected data.
+    cond : `bool`
+        Reuse this existing Condition instance to protect this container
+
+    Notes
+    -----
     This container holds data that is intended to be shared amongst multiple
     threads.  In order to update or (optionally) examine the data, one must
     first aquire the lock associated with the container.
@@ -39,33 +55,16 @@ class SharedData(object):
     acquire() is reentrant.
 
     SharedData instances may be used with the with statement:
-    @code
+
       sd = SharedData()
       with sd:
           sd.blah = 1
-    @endcode
+
     The with statement will acquire the lock and ensure that it is released
     when its block is exited.
     """
 
     def __init__(self, needLockOnRead=True, data=None, cond=None):
-        """
-        create and initialize the shared data
-        @param needLockOnRead   if true (default), acquiring the lock will
-                      be needed when reading the data.  This is recommended
-                      if the data items are anything but primitive types;
-                      otherwise, a compound data item (e.g. of type dict)
-                      could be updated without acquiring a lock.
-        @param data   a dictionary of data to initialize the container with.
-                      This is done by calling initData().  Set this value to
-                      False when calling from a subclass constructor; this
-                      will allow any non-protected attributes to be set via
-                      the subclass's constructor.  If None is given (default),
-                      it is assumed that all new attributes will be considered
-                      protected data.
-        @param cond   Reuse this existing Condition instance to protect this
-                        container
-        """
         self._d = {}
         if cond is None:
             cond = threading.Condition()
@@ -115,7 +114,7 @@ class SharedData(object):
 
     # overrides __setattr__
     def __setattr__(self, name, value):
-        if name == "_d" or len(self._d) == 0 or name in self.__dict__.keys():
+        if name == "_d" or len(self._d) == 0 or name in list(self.__dict__.keys()):
             object.__setattr__(self, name, value)
             return
 
@@ -125,28 +124,32 @@ class SharedData(object):
         self._d[name] = value
 
     def initData(self, data):
-        """
-        initialize the container with the data from a dictionary.
-        @param data   a dictionary of data to initialize the container with.
-                      Attributes will be added to this container with names
-                      matching the given the dictionary's key names and
-                      initialized to their corresponding values.  The keys
-                      cannot match an existing function (or internal attribute)
-                      name.
-        @throws ValueError   if the dictionary has a key that conflicts with
-                      an existing function or internal attribute name.
+        """Initialize the container with the data from a dictionary.
+
+        Parameters
+        ----------
+        data : `dict`
+            A dictionary of data to initialize the container with.  Attributes will be added to
+            this container with names matching the given the dictionary's key names and
+            initialized to their corresponding values.  The keys cannot match an existing
+            function (or internal attribute) name.
+
+        Raises
+        ------
+        ValueError if the dictionary has a key that conflicts with an existing function or
+        internal attribute name.
         """
         with self._cond:
             bad = []
-            realattrs = self.__dict__.keys()
-            for key in data.keys():
+            realattrs = list(self.__dict__.keys())
+            for key in list(data.keys()):
                 if key in realattrs:
                     bad.append(key)
             if len(bad) > 0:
                 raise ValueError("Names cause conflicts with functions or " +
                                  "internal data: " + str(bad))
 
-            for key in data.keys():
+            for key in list(data.keys()):
                 self._d[key] = data[key]
 
             if len(self._d) == 0:
@@ -154,4 +157,4 @@ class SharedData(object):
 
     # overrides dir() method
     def dir(self):
-        return list(filter(lambda k: k != "__", self._d.keys()))
+        return list([k for k in list(self._d.keys()) if k != "__"])

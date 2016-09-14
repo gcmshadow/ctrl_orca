@@ -22,7 +22,8 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
+from builtins import str
+from builtins import range
 from lsst.cat.MySQLBase import MySQLBase
 import MySQLdb
 

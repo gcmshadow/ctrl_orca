@@ -1,4 +1,3 @@
-from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -21,21 +20,35 @@ from __future__ import print_function
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
+from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
-import lsst.log as log
 from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.DataAnnouncer import DataAnnouncer
 from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
+import lsst.log as log
 
 ##
 # @brief workflow manager base class
 #
 
 
-class WorkflowManager:
-    ##
-    # @brief Manage lifecycle of this workflow
-    #
+class WorkflowManager(object):
+    """Manage lifecycle of this workflow.
+
+    Parameters
+    ----------
+    name : `str`
+        name of this workflow.
+    runid : `str`
+        run id.
+    repository : `str`
+        repository directory
+    prodConfig : `Config`
+        production Config
+    wfConfig : `Config`
+        workflow Config
+    """
 
     def __init__(self, name, runid, repository, prodConfig, wfConfig):
 
@@ -69,9 +82,7 @@ class WorkflowManager:
         self._launcher = None
         self._monitor = None
 
-    ##
     # @deprecated return the name of this workflow
-    #
     def getName(self):
         return self.name
 
@@ -80,6 +91,8 @@ class WorkflowManager:
     #            clean-up.
     #
     def runWorkflow(self, statusListener, loggerManagers):
+        """ setup, launch and monitor a workflow to its completion, and then clean up
+        """
         log.debug("WorkflowManager:runWorkflow")
 
         if not self.isRunnable():
@@ -96,37 +109,47 @@ class WorkflowManager:
                 self._workflowLauncher = self.configure()
             self._monitor = self._workflowLauncher.launch(statusListener, loggerManagers)
 
-            # self.cleanUp()
+            self.cleanUp()
 
         finally:
             self._locked.release()
         return self._monitor
 
-    ##
-    # @brief stop the workflow.
-    #
     def stopWorkflow(self, urgency):
+        """Stop the workflow
+
+        Parameters
+        ----------
+        urgency : `int`
+            urgency at which to shut down this workflow
+        """
+
         log.debug("WorkflowManager:stopWorkflow")
         if self._monitor:
             self._monitor.stopWorkflow(urgency)
         else:
             log.info("Workflow %s is not running" % self.name)
 
-    ##
-    # @brief carry out post-execution tasks for removing workflow data and
-    #            state from the platform and archiving/ingesting products as
-    #            needed.
-    #
     def cleanUp(self):
+        """Carry out post-execution tasks for removing workflow data and state from the
+           platform and archiving/ingesting products as needed.
+        """
+
         log.debug("WorkflowManager:cleanUp")
 
-    ##
-    # @brief prepare a workflow for launching.
-    # @param provSetup    a provenance setup object to pass to
-    #                        DatabaseConfigurator instances
-    # @param workflowVerbosity the log level at which to emit messages
-    # @return WorkflowLauncher
     def configure(self, provSetup=None, workflowVerbosity=None):
+        """Prepare a workflow for launching
+        Parameters
+        ----------
+        provSetup : `object`
+            A provenance setup object to pass to Configurator instances.
+        workflowVerbosity : `int`
+            The logging verbosity level to set for workflows
+
+        Returns
+        -------
+        WorkflowLauncher
+        """
         log.debug("WorkflowManager:configure")
         if self._workflowConfigurator:
             log.info("production has already been configured.")
@@ -146,17 +169,27 @@ class WorkflowManager:
         # calling ProvenanceSetup.getWorkflowCommands()
         return self._workflowLauncher
 
-    ##
-    # @brief  create a Workflow configurator for this workflow.
-    #
-    # @param runid       the production run id
-    # @param repository  the directory location of the repository
-    # @param wfName      the workflow name
-    # @param wfConfig    the config describing the workflow
-    # @param prodConfig  the config describing the overall production.  This
-    #                       provides common data (e.g. event broker host)
-    #                       that needs to be shared with all pipelines.
     def createConfigurator(self, runid, repository, wfName, wfConfig, prodConfig):
+        """Create a Workflow configurator for this workflow.
+
+        Parameters
+        ----------
+        runid : `str`
+            the production run id
+        repository : `str`
+             the directory location of the repository
+        wfName : `str`
+             the workflow name
+        wfConfig : Config
+             the config describing the workflow
+        prodConfig : Config
+             the config describing the overall production.  This provides common data
+             (e.g. event broker host) that needs to be shared with all pipelines.
+
+        Returns
+        -------
+        WorkflowConfigurator
+        """
         log.debug("WorkflowManager:createConfigurator")
 
         className = wfConfig.configurationClass
@@ -166,46 +199,61 @@ class WorkflowManager:
         configurator = configuratorClass(self.runid, repository, prodConfig, wfConfig, wfName)
         return configurator
 
-    ##
-    # @brief determine whether production is currently running
-    #
     def isRunning(self):
+        """Report whether workflow is currently running
+        """
         if self._monitor:
             return self._monitor.isRunning()
         return False
 
-    ##
-    # @brief return True if the workflow has been run to completion.  This will
-    #            be true if the workflow has run normally through cleaned up or
-    #            if it was stopped and clean-up has been called.
-    #
     def isDone(self):
+        """Report whether workflow has completed
+
+        Returns
+        -------
+        True if the workflow has been run to completion.
+
+        Notes
+        -----
+        This will be true if the workflow has run normally through cleaned up or if it was stopped
+        and clean-up has been called.
+        """
         log.debug("WorkflowManager:isDone")
         if self._monitor:
             return self._monitor.isDone()
         return False
 
-    ##
-    # @brief return True if the workflow can still be called.  This may return
-    #            False because the workflow has already been run and cannot be
-    #            re-run.
-    #
     def isRunnable(self):
+        """Report whether workflow is capable of running
+
+        Returns
+        -------
+        True if the workflow can still be called.
+
+        Notes
+        -----
+        This may return False because the workflow has already been run and cannot be re-run.
+        """
         log.debug("WorkflowManager:isRunnable")
         return not self.isRunning() and not self.isDone()
 
-    ##
-    # @brief Runs checks that ensure that the Workflow has been properly set up.
-    # @param care      the thoroughness of the checks.
-    # @param issueExc  an instance of MultiIssueConfigurationError to add
-    #                   problems to.  If not None, this function will not
-    #                   raise an exception when problems are encountered; they
-    #                   will merely be added to the instance.  It is assumed
-    #                   that the caller will raise that exception is necessary.
-    #
     def checkConfiguration(self, care=1, issueExc=None):
-        # care - an indication of how throughly to check.  In general, a
-        # higher number will result in more checks being run.
+        """Runs checks that ensure that the Workflow has been properly set up.
+
+        Raises
+        ------
+        MultiIssueConfigurationError if problems are found
+
+        Parameters
+        ----------
+        care : `int`
+             the thoroughness of the checks. In general, a higher number will result in more checks.
+        issueExc : `MultiIssueConfigurationError`
+             An instance of MultiIssueConfigurationError to add problems to.  If not None, this
+             function will not raise an exception when problems are encountered; they will
+             merely be added to the instance.  It is assumed that the caller will raise that
+             exception is necessary.
+        """
         log.debug("WorkflowManager:createConfiguration")
 
         myProblems = issueExc
@@ -218,22 +266,28 @@ class WorkflowManager:
         if not issueExc and myProblems.hasProblems():
             raise myProblems
 
-    ##
-    # return the name of this workflow
-    #
     def getWorkflowName(self):
+        """Accessor to workflow name
+
+        Returns
+        -------
+        name : `str`
+            The name of this workflow.
+        """
         return self.name
 
-    ##
-    # return the number of nodes used by  f this workflow
-    #
     def getNodeCount(self):
+        """Accessor to the number of nodes specified in this configuration
+
+        Returns
+        -------
+        The number of nodes used by this workflow.
+        """
         return self._workflowConfigurator.getNodeCount()
 
-    ##
-    # Announce that data is available for this workflow
-    #
     def announceData(self):
+        """Announce that data is available for this workflow
+        """
         announcer = DataAnnouncer(self.runid, self.prodConfig, self.wfConfig)
         if announcer.announce():
             print("Data announced via config for %s" % self.name)

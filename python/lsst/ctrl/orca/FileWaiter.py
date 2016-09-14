@@ -24,29 +24,41 @@
 
 
 from __future__ import print_function
+from builtins import object
 import os
 import lsst.log as log
 
 
-##
-# @brief waits for files to come into existence on a remote resource
-#
-class FileWaiter:
+class FileWaiter(object):
     # @brief initializer
+    """Waits for files to come into existence on a remote resource
+    Parameters
+    ----------
+    remoteNode : `str`
+        Name of the remote node to execute on
+    remoteFileWaiter : `str`
+        name of the remote file waiter script
+    fileListName : `str`
+        name of the remote file list file
+    logger: `Log`, optional
+        lsst.log logging object
+
+    Notes
+    -----
+    Use of logger in this way should be deprecated in the future
+    """
     def __init__(self, remoteNode, remoteFileWaiter, fileListName, logger=None):
         log.debug("FileWaiter:__init__")
 
-        # name of the remote node to execute on
         self.remoteNode = remoteNode
 
-        # name of the remote file list file
         self.fileListName = fileListName
 
-        # name of the remote file waiter script
         self.remoteFileWaiter = remoteFileWaiter
 
-    # @brief waits for first file in the list to come into existence
     def waitForFirstFile(self):
+        """Waits for first file in the list to come into existence
+        """
         log.debug("FileWaiter:waitForFirstFile")
         print("waiting for log file to be created to confirm launch.")
         cmd = "gsissh %s %s -f %s" % (self.remoteNode, self.remoteFileWaiter, self.fileListName)
@@ -55,8 +67,9 @@ class FileWaiter:
             os.execvp("gsissh", cmd.split())
         os.wait()[0]
 
-    # @brief waits for all files in the list to come into existence
     def waitForAllFiles(self):
+        """Waits for all files in the list to come into existence
+        """
         log.debug("FileWaiter:waitForAllFiles")
 
         print("waiting for all log files to be created to confirm launch")

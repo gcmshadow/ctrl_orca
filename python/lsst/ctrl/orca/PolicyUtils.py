@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -30,7 +31,7 @@ import lsst.pex.policy as pol
 # @deprecated policy file utilities
 
 
-class PolicyUtils:
+class PolicyUtils(object):
 
     ##
     # @brief given a policy, recursively add all child policies to a policy set

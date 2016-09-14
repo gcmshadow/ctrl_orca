@@ -1,4 +1,3 @@
-from __future__ import print_function
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -21,49 +20,58 @@ from __future__ import print_function
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
+from __future__ import print_function
 import os
 import lsst.log as log
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
 from lsst.ctrl.orca.CondorJobs import CondorJobs
 from lsst.ctrl.orca.CondorWorkflowMonitor import CondorWorkflowMonitor
 
-# @brief launches condor workflows using DAGman files
-
 
 class CondorWorkflowLauncher(WorkflowLauncher):
-    # @brief initialize
+    """Launcher for HTCondor workflows using DAGman files
+
+    Parameters
+    ----------
+    prodConfig : Config
+        production Config
+    wfConfig : Config
+        workflow Config
+    runid : str
+        run id
+    localStagingDir : str
+        local directory where staging occurs
+    dagFile : str
+        DAGman file
+    monitorConfig : Config
+        monitor Config
+    """
 
     def __init__(self, prodConfig, wfConfig, runid, localStagingDir, dagFile, monitorConfig):
         log.debug("CondorWorkflowLauncher:__init__")
 
-        # production configuration
         self.prodConfig = prodConfig
-
-        # workflow configuration
         self.wfConfig = wfConfig
-
-        # run id
         self.runid = runid
-
-        # local directory where staging occurs
         self.localStagingDir = localStagingDir
-
-        # DAGman file
         self.dagFile = dagFile
-
-        # monitor configuration
         self.monitorConfig = monitorConfig
 
-    ##
-    # @brief perform cleanup after workflow has ended.
-    #
     def cleanUp(self):
+        """Perform cleanup after workflow has ended.
+        """
         log.debug("CondorWorkflowLauncher:cleanUp")
 
-    ##
-    # @brief launch this workflow
-    #
     def launch(self, statusListener, loggerManagers):
+        """Launch this workflow
+
+        Parameters
+        ----------
+        statusListener : StatusListener
+            status listener object
+        loggerManagers : list
+            list of all logger managers for this workflow
+        """
         log.debug("CondorWorkflowLauncher:launch")
 
         # start the monitor first, because we want to catch any pipeline
@@ -81,9 +89,8 @@ class CondorWorkflowLauncher(WorkflowLauncher):
         os.chdir(startDir)
 
         # workflow monitor for HTCondor jobs
-        self.workflowMonitor = CondorWorkflowMonitor(
-            eventBrokerHost, shutdownTopic, self.runid, condorDagId,
-            loggerManagers, self.monitorConfig)
+        self.workflowMonitor = CondorWorkflowMonitor(eventBrokerHost, shutdownTopic, self.runid,
+                                                     condorDagId, loggerManagers, self.monitorConfig)
 
         if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)

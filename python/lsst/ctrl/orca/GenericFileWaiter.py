@@ -24,25 +24,30 @@
 
 
 from __future__ import print_function
+from builtins import object
 import os
 import time
 import lsst.log as log
 
 
-##
-# @brief waits for files to come into existence
-#
-class GenericFileWaiter:
+class GenericFileWaiter(object):
+    """Waits for files to come into existence
 
-    # initialize
+    Parameters
+    ----------
+    fileNames : ['file1', 'file2']
+        list of file names
+    """
+
     def __init__(self, fileNames):
         log.debug("GenericFileWaiter:__init__")
 
         # list of file names
         self.fileNames = fileNames
 
-    # wait for the first file in the list to come into existence
     def waitForFirstFile(self):
+        """Wait for the first file in the list to come into existence
+        """
         log.debug("GenericFileWaiter:waitForFirstFile")
         print("waiting for log file to be created to confirm launch.")
 
@@ -50,8 +55,9 @@ class GenericFileWaiter:
             time.sleep(1)
         return
 
-    # wait for all files in the list to come into existence
     def waitForAllFiles(self):
+        """Wait for all files in the list to come into existence
+        """
         log.debug("GenericFileWaiter:waitForAllFiles")
 
         print("waiting for all log files to be created to confirm launch")

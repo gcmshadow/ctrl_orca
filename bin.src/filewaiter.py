@@ -59,18 +59,18 @@ if __name__ == "__main__":
 
     lines = f.readlines()
 
-    list = []
+    fileList = []
     for line in lines:
         list.append(line.split('\n')[0])
 
     if bFirst is True:
-        item = list[0]
+        item = fileList[0]
         while os.path.exists(item) is False:
             time.sleep(1)
         sys.exit(0)
 
-    while len(list) > 0:
-        newlist = [item for item in list if (os.path.exists(item) is False)]
-        list = newlist
+    while len(fileList) > 0:
+        newlist = [item for item2 in fileList if (os.path.exists(item) is False)]
+        fileList = newlist
         time.sleep(1)
     sys.exit(0)

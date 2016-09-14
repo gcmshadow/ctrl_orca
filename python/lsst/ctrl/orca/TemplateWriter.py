@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -28,22 +30,31 @@ import socket
 #
 
 
-class TemplateWriter:
+class TemplateWriter(object):
+    """Takes templates and subtitutes the values for the given keys,
+       writing a new file generated from the template.
+    """
 
-    # initializer
     def __init__(self):
         # local values that are always set
         self.orcaValues = dict()
         self.orcaValues["ORCA_LOCAL_HOSTNAME"] = socket.gethostname()
         return
 
-    ##
-    # given a input template, take the keys from the key/values in the config
-    # object and substitute the values, and write those to the output file.
-    #
-    def rewrite(self, input, output, pairs):
-        fpInput = open(input, 'r')
-        fpOutput = open(output, 'w')
+    def rewrite(self, inputFile, outputFile, pairs):
+        """Given a input template, take the keys from the key/values in the config
+           object and substitute the values, and write those to the output file.
+        Parameters
+        ----------
+        inputFile : `str`
+            template input file
+        outputFile : `str`
+            resulting output file
+        pairs : `dict`
+            dictionary containing key/value pairs
+        """
+        fpInput = open(inputFile, 'r')
+        fpOutput = open(outputFile, 'w')
 
         while True:
             line = fpInput.readline()

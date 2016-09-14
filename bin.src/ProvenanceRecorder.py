@@ -28,6 +28,7 @@ import getopt
 import sets
 import sys
 import lsst.pex.policy as pol
+from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 
 

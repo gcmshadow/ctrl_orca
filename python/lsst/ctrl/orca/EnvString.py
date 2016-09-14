@@ -1,3 +1,4 @@
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -23,21 +24,27 @@
 import re
 import os
 
-##
-# @brief replace $variables within a string
-#
 
-
-class EnvString:
-
-    ##
-    # given a string, look for any $ prefixed word, attempt to subsitute
-    # an environment variable with that name.
-    #
-    # @throw exception if the environment variable doesn't exist
-    #
-    # Return the resulting string
+class EnvString(object):
     def resolve(strVal):
+        """Replace environment variables within a string
+
+        Extended Summary
+        ----------------
+        Given a string, look for any $ prefixed word, attempt to subsitute
+        an environment variable with that name.
+
+        Raises
+        ------
+        `RuntimeError`
+            if the environment variable doesn't exist
+
+        Returns
+        -------
+        retVal : `str`
+            the resulting string with environment variable info substituted.
+        """
+
         p = re.compile('\$[a-zA-Z0-9_]+')
         retVal = strVal
         exprs = p.findall(retVal)

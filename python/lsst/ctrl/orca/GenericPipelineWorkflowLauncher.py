@@ -29,8 +29,24 @@ from lsst.ctrl.orca.GenericPipelineWorkflowMonitor import GenericPipelineWorkflo
 
 
 class GenericPipelineWorkflowLauncher(WorkflowLauncher):
+    """Launcher for HTCondor workflows using DAGman files
 
-    # initializer
+    Parameters
+    ----------
+    cmds : ['cmd1', 'cmd2']
+        list of strings containing commands to execute
+    prodConfig : Config
+        production Config
+    wfConfig : Config
+        workflow Config
+    runid : `str`
+        run id
+    fileWaiter : object
+        object that waits for files to be created
+    pipelineNames : ['pipe1', 'pipe2']
+        list of strings containing pipeline names
+    """
+
     def __init__(self, cmds, prodConfig, wfConfig, runid, fileWaiter, pipelineNames):
         log.debug("GenericPipelineWorkflowLauncher:__init__")
 
@@ -52,16 +68,14 @@ class GenericPipelineWorkflowLauncher(WorkflowLauncher):
         # list of pipeline names
         self.pipelineNames = pipelineNames
 
-    ##
-    # @brief perform cleanup after workflow has ended.
-    #
     def cleanUp(self):
+        """Perform cleanup after workflow has ended.
+        """
         log.debug("GenericPipelineWorkflowLauncher:cleanUp")
 
-    ##
-    # @brief launch this workflow
-    #
     def launch(self, statusListener, loggerManagers):
+        """Launch this workflow
+        """
         log.debug("GenericPipelineWorkflowLauncher:launch")
 
         eventBrokerHost = self.prodConfig.production.eventBrokerHost

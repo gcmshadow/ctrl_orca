@@ -23,15 +23,17 @@
 #
 
 from __future__ import print_function
+from builtins import range
+from builtins import object
 import os
 import sys
 import optparse
 import lsst.pex.policy as pol
 
 
-class CondorJobInfo:
+class CondorJobInfo(object):
 
-    class PipelineJob:
+    class PipelineJob(object):
 
         def __init__(self, scratchDir, wfName, pipelineName, pipelineNumber):
             self.wfName = wfName
@@ -57,7 +59,7 @@ class CondorJobInfo:
             pipelineJobFile = os.path.join(pipelineJobDir, "%s.job" % self.pipelineIndexedName)
             return pipelineJobFile
 
-    class GlideinJob:
+    class GlideinJob(object):
 
         def __init__(self, scratchDir, wfName):
             self.scratchDir = scratchDir
@@ -118,7 +120,7 @@ class CondorJobInfo:
         return os.path.join(localScratch, self.runid)
 
 
-class JobKiller:
+class JobKiller(object):
 
     def __init__(self, workflowName, pipelineName, pipelineNumber):
         self.workflowName = workflowName

@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -29,7 +31,7 @@ from lsst.ctrl.orca.config.AuthConfig import AuthConfig
 # @deprecated DC3Configurator
 
 
-class DC3Configurator:
+class DC3Configurator(object):
 
     def __init__(self, runid, dbConfig, prodConfig=None, wfConfig=None):
         """

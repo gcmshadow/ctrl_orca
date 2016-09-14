@@ -1,4 +1,5 @@
 from __future__ import print_function
+from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -30,7 +31,7 @@ from lsst.ctrl.orca.EnvString import EnvString
 # this class is used to send events with available data
 
 
-class DataAnnouncer:
+class DataAnnouncer(object):
 
     # initialize
     def __init__(self, runid, prodConfig, wfConfig, logger=None):

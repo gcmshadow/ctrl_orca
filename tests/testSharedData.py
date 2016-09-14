@@ -26,15 +26,17 @@
 Tests of the SharedData class
 """
 from __future__ import with_statement
+from builtins import str
 
 import unittest
 import threading
 import lsst.utils.tests
-
 from lsst.ctrl.orca.multithreading import SharedData
+
 
 def setup_module(module):
     lsst.utils.tests.init()
+
 
 class ShareDataTestCase(lsst.utils.tests.TestCase):
 
@@ -78,7 +80,7 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
         try:
             self.sd.name
             self.fail("AttributeError not raised for reading w/o lock ")
-        except AttributeError as e:
+        except AttributeError:
             pass
         self.sd.dir()
 
@@ -121,6 +123,7 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
             self.assertEqual(len(attrs), 4, "Wrong number of items: "+str(attrs))
             self.assertEqual(self.sd.lname, "Plante")
 
+
 class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
 
     def setUp(self):
@@ -155,7 +158,7 @@ class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
         try:
             self.sd.goob
             self.fail("AttributeError not raised for accessing non-existent")
-        except AttributeError as e:
+        except AttributeError:
             pass
 
     def testInit(self):
@@ -195,6 +198,7 @@ class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
             attrs = self.sd.dir()
             self.assertEqual(len(attrs), 4, "Wrong number of items: "+str(attrs))
             self.assertEqual(self.sd.lname, "Plante")
+
 
 class MultiThreadTestCase(lsst.utils.tests.TestCase):
 
@@ -249,6 +253,7 @@ class TstThread(threading.Thread):
 
 
 __all__ = "SharedDataTestCase ReadableShareDataTestCase MultiThreadTestCase".split()
+
 
 class SharedDataMemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
