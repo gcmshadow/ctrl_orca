@@ -27,6 +27,8 @@ import argparse
 import os
 import sys
 import lsst.ctrl.events as events
+import lsst.log as log
+import lsst.utils
 
 from lsst.daf.base import PropertySet
 from lsst.ctrl.orca.db.DatabaseLogger import DatabaseLogger
@@ -160,6 +162,10 @@ if __name__ == "__main__":
     parser.add_argument("--database", action="store", dest="database", default=None, required=False)
 
     args = parser.parse_args()
+
+    package = lsst.utils.getPackageDir("ctrl_orca")
+    configPath = os.path.join(package, "etc", "log4j.properties")
+    log.configure(configPath)
 
     num_args = len([x for x in (args.host, args.port, args.database) if x is not None])
 
