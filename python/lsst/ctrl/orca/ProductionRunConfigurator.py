@@ -157,7 +157,7 @@ class ProductionRunConfigurator(object):
                 if loggerConfig.launch is not None:
                     launch = loggerConfig.launch
                     loggerManager = None
-                    if launch is True:
+                    if launch:
                         loggerManager = LoggerManager(self.eventBrokerHost, self.runid, dbInfo[
                                                       "host"], dbInfo["port"], dbInfo["dbrun"])
                     else:

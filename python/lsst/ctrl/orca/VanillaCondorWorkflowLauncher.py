@@ -101,7 +101,7 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
         condor = CondorJobs()
 
         # if we've set the "skipglidein", just don't do that.
-        if orca.skipglidein is False:
+        if not orca.skipglidein:
             curDir = os.getcwd()
 
             # switch to this directory to make condor happy
@@ -125,7 +125,7 @@ class VanillaCondorWorkflowLauncher(WorkflowLauncher):
         firstJob = True
         jobNumbers = []
         for job in self.jobs:
-            if firstJob is True:
+            if firstJob:
                 jobNumber = condor.submitJob(job)
                 jobDir = os.path.dirname(job)
                 jobFileName = os.path.join(jobDir, "%s.job" % os.path.basename(jobDir))

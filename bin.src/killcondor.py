@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
     killer = JobKiller(workflowArg, pipelineArg, pipelineNumArg)
 
-    if killGlidein is True:
+    if killGlidein:
         glideinJobs = jobInfo.getGlideinJobs()
         for job in glideinJobs:
             killer.processGlideinJob(job)

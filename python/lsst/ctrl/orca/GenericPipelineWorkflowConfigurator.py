@@ -220,7 +220,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
                 deployScript = EnvString.resolve(deployScript)
                 collection = deployConfig.collection
 
-                if os.path.isfile(deployScript) is True:
+                if os.path.isfile(deployScript):
                     runDir = self.directories.getDefaultRunDir()
                     deployCmd = [deployScript, runDir, dataRepository, collection]
                     print(">>> ", deployCmd)

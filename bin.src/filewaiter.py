@@ -63,9 +63,9 @@ if __name__ == "__main__":
     for line in lines:
         list.append(line.split('\n')[0])
 
-    if bFirst is True:
+    if bFirst:
         item = fileList[0]
-        while os.path.exists(item) is False:
+        while not os.path.exists(item):
             time.sleep(1)
         sys.exit(0)
 

@@ -150,7 +150,7 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
                     val = self._parent.handleJobOfficeEvent(jobOfficeEvent)
                 if event is not None:
                     val = self._parent.handleEvent(event)
-                    if self._parent._locked.running is False:
+                    if not self._parent._locked.running:
                         print("and...done!")
                         return
                 elif logEvent is not None:
@@ -158,7 +158,7 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
                     if val is None:
                         print("should have gotten an event")
                         return
-                    if self._parent._locked.running is False:
+                    if not self._parent._locked.running:
                         print("logger handled...and...done!")
                         return
 
@@ -217,11 +217,11 @@ class GenericPipelineWorkflowMonitor(WorkflowMonitor):
             print(self.pipelineNames)
 
             # TODO:  clean up to not specifically name "joboffices_1"
-            if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and self.bSentJobOfficeEvent is False:
+            if cnt == 1 and self.pipelineNames[0] == "joboffices_1" and (not self.bSentJobOfficeEvent):
                 self.stopWorkflow(1)
                 self.bSentJobOfficeEvent = True
 
-            if (cnt == 0) and (self.bSentLastLoggerEvent is False):
+            if (cnt == 0) and not self.bSentLastLoggerEvent:
                 transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
 
                 props = PropertySet()

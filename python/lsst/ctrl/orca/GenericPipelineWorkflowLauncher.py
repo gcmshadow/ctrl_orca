@@ -102,7 +102,7 @@ class GenericPipelineWorkflowLauncher(WorkflowLauncher):
             pid = os.fork()
             if not pid:
                 os.execvp(cmd[0], cmd)
-            if firstJob is True:
+            if firstJob:
                 self.fileWaiter.waitForFirstFile()
                 firstJob = False
 

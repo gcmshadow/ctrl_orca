@@ -141,7 +141,7 @@ class CondorJobs(object):
                     return runstate
             # check to see if we've seen the job before, but that
             # it disappeared
-            if (cJobSeen > 0) and (bJobSeenNow is False):
+            if (cJobSeen > 0) and not bJobSeenNow:
                 pop.close()
                 print("Was monitoring job %s, but it exitted." % num)
                 # throw exception

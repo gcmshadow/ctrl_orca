@@ -331,7 +331,7 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
             val = template.keywords[value]
             pairs[value] = val
         pairs["ORCA_REMOTE_WORKDIR"] = self.defaultRoot+"/"+self.runid
-        if ("ORCA_START_OWNER" in pairs) is False:
+        if not ("ORCA_START_OWNER" in pairs):
             pairs["ORCA_START_OWNER"] = getpass.getuser()
 
         writer = TemplateWriter()

@@ -114,7 +114,7 @@ class SharedData(object):
 
     # overrides __setattr__
     def __setattr__(self, name, value):
-        if name == "_d" or len(self._d) == 0 or name in list(self.__dict__.keys()):
+        if name == "_d" or len(self._d) == 0 or name in self.__dict__:
             object.__setattr__(self, name, value)
             return
 
@@ -141,15 +141,15 @@ class SharedData(object):
         """
         with self._cond:
             bad = []
-            realattrs = list(self.__dict__.keys())
-            for key in list(data.keys()):
+            realattrs = self.__dict__
+            for key in data:
                 if key in realattrs:
                     bad.append(key)
             if len(bad) > 0:
                 raise ValueError("Names cause conflicts with functions or " +
                                  "internal data: " + str(bad))
 
-            for key in list(data.keys()):
+            for key in data:
                 self._d[key] = data[key]
 
             if len(self._d) == 0:
@@ -157,4 +157,4 @@ class SharedData(object):
 
     # overrides dir() method
     def dir(self):
-        return list([k for k in list(self._d.keys()) if k != "__"])
+        return list([k for k in self._d if k != "__"])

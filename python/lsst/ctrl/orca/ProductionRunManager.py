@@ -79,7 +79,7 @@ class ProductionRunManager(object):
 
         # the full path the configuration
         self.fullConfigFilePath = ""
-        if os.path.isabs(configFileName) is True:
+        if os.path.isabs(configFileName):
             self.fullConfigFilePath = configFileName
         else:
             self.fullConfigFilePath = os.path.join(os.path.realpath('.'), configFileName)
@@ -208,7 +208,7 @@ class ProductionRunManager(object):
             if not self._workflowManagers:
                 raise ConfigurationError("Failed to obtain workflowManagers from configurator")
 
-            if skipConfigCheck is False:
+            if not skipConfigCheck:
                 self.checkConfiguration(checkCare)
 
             # launch the logger daemon
@@ -251,7 +251,7 @@ class ProductionRunManager(object):
         # the production is still running.
         #
         for monitor in self._workflowMonitors:
-            if monitor.isRunning() is True:
+            if monitor.isRunning():
                 return True
 
         with self._locked:

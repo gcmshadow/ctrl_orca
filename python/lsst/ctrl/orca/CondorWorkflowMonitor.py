@@ -162,14 +162,14 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                 if event is not None:
                     # val = self._parent.handleEvent(event)
                     self._parent.handleEvent(event)
-                    if self._parent._locked.running is False:
+                    if not self._parent._locked.running:
                         print("and...done!")
                         return
                 elif logEvent is not None:
                     self._parent.handleEvent(logEvent)
                     # val = self._parent.handleEvent(logEvent)
 
-                    if self._parent._locked.running is False:
+                    if not self._parent._locked.running:
                         print("logger handled... and... done!")
                         return
 
@@ -179,7 +179,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                     sleepInterval = statusCheckInterval
                 # if the dag is no longer running, send the logger an event
                 # telling it to clean up.
-                if cj.isJobAlive(self.condorDagId) is False:
+                if not cj.isJobAlive(self.condorDagId):
                     self._parent.sendLastLoggerEvent()
 
     def startMonitorThread(self, runid):
@@ -238,7 +238,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         """Send a message to the logger that we're done
         """
         # only do this one time
-        if self.bSentLastLoggerEvent is False:
+        if not self.bSentLastLoggerEvent:
             print("sending last Logger Event")
             transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
 

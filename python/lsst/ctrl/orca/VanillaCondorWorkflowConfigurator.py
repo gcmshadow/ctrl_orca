@@ -196,7 +196,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
             self.setupDatabase()
 
             # There are some things that are only added to the first work directory
-            if firstGroup is True:
+            if firstGroup:
                 self.initialWorkDir = self.localWorkDir
                 self.createCondorDir(self.localWorkDir)
 
@@ -324,7 +324,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
         localStageName = os.path.join(self.localStagingDir, remoteName)
 
         print("localName = %s, localStageName = %s\n", (localName, localStageName))
-        if os.path.exists(os.path.dirname(localStageName)) is False:
+        if not os.path.exists(os.path.dirname(localStageName)):
             os.makedirs(os.path.dirname(localStageName))
         shutil.copyfile(localName, localStageName)
 
@@ -626,7 +626,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
         deployScript = deployConfig.script
         deployScript = EnvString.resolve(deployScript)
 
-        if os.path.isfile(deployScript) is True:
+        if os.path.isfile(deployScript):
             # copy the script to the remote side
             remoteName = os.path.join(self.dirs.get("workDir"), os.path.basename(deployScript))
             self.copyToRemote(deployScript, remoteName)
@@ -677,7 +677,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
 
         # for glidein request, we add this additional keyword.
         keyValuePairs["ORCA_REMOTE_WORKDIR"] = self.dirs.get("workDir")
-        if ("START_OWNER" in keyValuePairs) is False:
+        if not ("START_OWNER" in keyValuePairs):
             keyValuePairs["START_OWNER"] = getpass.getuser()
 
         writer = TemplateWriter()

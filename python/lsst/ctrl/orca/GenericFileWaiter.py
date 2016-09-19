@@ -51,7 +51,7 @@ class GenericFileWaiter(object):
         log.debug("GenericFileWaiter:waitForFirstFile")
         print("waiting for log file to be created to confirm launch.")
 
-        while os.path.exists(self.fileNames[0]) is False:
+        while not os.path.exists(self.fileNames[0]):
             time.sleep(1)
         return
 
@@ -64,7 +64,7 @@ class GenericFileWaiter(object):
 
         list = self.fileNames
         while len(list):
-            newlist = [item for item in list if (os.path.exists(item) is False)]
+            newlist = [item for item in list if (not os.path.exists(item))]
             list = newlist
             time.sleep(1)
         return
