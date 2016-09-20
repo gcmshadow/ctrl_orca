@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,63 +11,66 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
+from builtins import str
+from builtins import range
 from lsst.cat.MySQLBase import MySQLBase
 import MySQLdb
-import os
-import sys
-import subprocess
 
-##
+#
 # @deprecated insert logging records into the database.  Note that this is
 # completely depedent on the CAT schema for this database, depends on writing
 # to a file, and needs to be completely replaced.
+
+
 class DatabaseLogger(MySQLBase):
 
-    ## initialize
+    # initialize
     def __init__(self, dbHostName, portNumber):
         MySQLBase.__init__(self, dbHostName, portNumber)
 
-        ## table keywords
-        self.keywords = ['HOSTID', 'RUNID', 'LOG', 'workerid', 'stagename', 'SLICEID', 'STAGEID', 'LOOPNUM', 'STATUS', 'LEVEL', 'DATE', 'TIMESTAMP', 'node', 'custom', 'timereceived', 'visitid', 'COMMENT', 'PIPELINE', 'TYPE', 'EVENTTIME', 'PUBTIME', 'usertime', 'systemtime']
+        # table keywords
+        self.keywords = ['HOSTID', 'RUNID', 'LOG', 'workerid', 'stagename', 'SLICEID', 'STAGEID',
+                         'LOOPNUM', 'STATUS', 'LEVEL', 'DATE', 'TIMESTAMP', 'node', 'custom',
+                         'timereceived', 'visitid', 'COMMENT', 'PIPELINE', 'TYPE', 'EVENTTIME',
+                         'PUBTIME', 'usertime', 'systemtime']
 
-        ## set of table keywords
+        # set of table keywords
         self.keywordSet = set(self.keywords)
-        ## @deprecated high water mark
+        # @deprecated high water mark
         self.highwater = 10
 
-    ## insert the messages into the database, using a file
+    # insert the messages into the database, using a file
     def insertRecords(self, dbTable, msgs, filename):
         cnt = len(msgs)
-        
-        file = open(filename,"w")
-        for i in range(0,cnt):
-            #event = msgs.pop(0)
-            #ins = self.createInsertString(dbTable, event.getPropertySet())
+
+        file = open(filename, "w")
+        for i in range(0, cnt):
             propSet = msgs.pop(0)
             ins = self.createInsertString(dbTable, propSet)
             file.write(ins)
         file.close()
-        cmd = "LOAD DATA LOCAL INFILE '%s' INTO TABLE %s FIELDS OPTIONALLY ENCLOSED BY '\"' ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' SET timereceived=NOW();" % (filename, dbTable)
+        cmd = ("LOAD DATA LOCAL INFILE '%s' INTO TABLE %s FIELDS OPTIONALLY ENCLOSED BY '\"' ",
+               "ESCAPED BY '\\\\' LINES TERMINATED BY '\\n' SET timereceived=NOW();")
+        cmd = cmd % (filename, dbTable)
         self.execCommand0(cmd)
 
-    ## insert a record into the table "dbTable" , given the property set "ps"
+    # insert a record into the table "dbTable" , given the property set "ps"
     def insertRecord(self, dbTable, ps):
-        ins = self.createInsertString(dbTable,ps)
+        ins = self.createInsertString(dbTable, ps)
         self.execCommand0(ins)
 
-    ## create an insert string based on the keywords for the table, filling
+    # create an insert string based on the keywords for the table, filling
     # in defaults as needed.
     def createInsertString(self, dbTable, ps):
         hostId = ps.getString("HOSTID")
@@ -90,7 +93,7 @@ class DatabaseLogger(MySQLBase):
 
         commentList = ps.getString("COMMENT")
         comment = ""
-        
+
         if ps.valueCount("COMMENT") == 1:
             comment = commentList
         else:
@@ -99,7 +102,6 @@ class DatabaseLogger(MySQLBase):
                     comment = i
                 else:
                     comment = comment+";"+i
-
 
         if (ps.exists("TOPIC")):
             ps.remove("TOPIC")
@@ -129,7 +131,6 @@ class DatabaseLogger(MySQLBase):
         else:
             workerid = "NULL"
 
-
         if ps.exists("usertime"):
             usertime = ps.getDouble("usertime")
         else:
@@ -145,7 +146,7 @@ class DatabaseLogger(MySQLBase):
         else:
             stagename = "unknown"
 
-        visitid="-1"
+        visitid = "-1"
 
         names = ps.names()
         namesSet = set(names)
@@ -155,19 +156,14 @@ class DatabaseLogger(MySQLBase):
         custom = ""
         for name in diff:
             if custom == "":
-                custom = "%s : %s;" % (name,ps.get(name))
+                custom = "%s : %s;" % (name, ps.get(name))
             else:
-                custom = custom+ "%s : %s;" % (name,ps.get(name))
+                custom = custom + "%s : %s;" % (name, ps.get(name))
         if custom == "":
             custom = "NULL"
 
-        #custom = MySQLdb.escape_string(custom[0:256])
-        #comment = MySQLdb.escape_string(comment[0:256])
         custom = MySQLdb.escape_string(custom[0:4096])
         comment = MySQLdb.escape_string(comment)
-
-        #custom = custom[0:256]
-        #comment = comment[0:256]
 
         timereceived = "0000-00-00 00:00:00"
 

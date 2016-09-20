@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,22 +11,29 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import os, os.path, getopt, sets, sys
+import os
+import os.path
+import getopt
+import sets
+import sys
 import lsst.pex.policy as pol
+from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 
+
 class ProvenanceRecorder(object):
+
     def __init__(self, provenance, repository):
         self.policySet = sets.Set()
         self.provenance = provenance
@@ -35,7 +42,7 @@ class ProvenanceRecorder(object):
 
     def record(self, name):
         # prov object init-ed here
-        filename = os.path.join(self.repository,name) 
+        filename = os.path.join(self.repository, name)
         provenance.recordPolicy(filename)
         policyNamesSet = self._extractPolicies(filename)
         for p in policyNamesSet:
@@ -66,26 +73,26 @@ class ProvenanceRecorder(object):
         if policy.getValueType(field) == pol.Policy.FILE:
             filename = policy.getFile(field).getPath()
             filename = os.path.join(repos, filename)
-            if (filename in self.policySet) == False:
+            if not (filename in self.policySet):
                 self.policySet.add(filename)
-            if (filename in pipelinePolicySet) == False:
+            if not (filename in pipelinePolicySet):
                 pipelinePolicySet.add(filename)
             newPolicy = pol.Policy.createPolicy(filename, False)
             self._extractChildPolicies(repos, newPolicy, pipelinePolicySet)
 
 if __name__ == "__main__":
-    arguments = "--type=<type> --runid=<runid> --user=<user>, --dbrun=<dbrun> --dbglobal=<dbglobal> --filename=<file> --repos=<repos>"
-    options, xarguments = getopt.getopt(sys.argv[1:], "h", ["type=", "runid=", "user=", "dbrun=", "dbglobal=", "filename=", "repos="])
-
+    arguments = ("--type=<type> --runid=<runid> --user=<user>, --dbrun=<dbrun> --dbglobal=<dbglobal> ",
+                 "--filename=<file> --repos=<repos>")
+    options, xarguments = getopt.getopt(
+        sys.argv[1:], "h", ["type=", "runid=", "user=", "dbrun=", "dbglobal=", "filename=", "repos="])
 
     dict = {}
-    for a,o in options:
+    for a, o in options:
         dict[a.lstrip('-')] = o
 
     classFactory = NamedClassFactory()
     provClass = classFactory.createClass(dict["type"])
     provenance = provClass(dict)
 
-
-    recorder = ProvenanceRecorder(provenance,dict["repos"])
+    recorder = ProvenanceRecorder(provenance, dict["repos"])
     recorder.record(dict["filename"])

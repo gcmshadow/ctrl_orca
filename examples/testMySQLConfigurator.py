@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,18 +11,20 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
 
+from __future__ import print_function
+from builtins import input
 from lsst.ctrl.orca.dbservers.MySQLConfigurator import MySQLConfigurator
 from lsst.cat.MySQLBase import MySQLBase
 from lsst.cat.policyReader import PolicyReader
@@ -36,11 +38,16 @@ policyF = os.path.join(catDir, 'policy/defaultTestCatPolicy.paf')
 
 r = PolicyReader(policyF)
 (host, port) = r.readAuthInfo()
-(globalDbName, dcVersion, dcDb, \
+(globalDbName, dcVersion, dcDb,
  minPercDiskSpaceReq, userRunLife) = r.readGlobalSetup()
 
+# have to do this to be sure Python 2 uses raw_input
+try:
+    myinput = raw_input
+except NameError:
+    myinput = input
 
-usr = raw_input("Enter mysql account name: ")
+usr = eval(myinput("Enter mysql account name: "))
 pwd = getpass.getpass()
 
 
@@ -53,19 +60,21 @@ def resetGlobalDb():
     cmd = '%s -f %s' % (x, policyF)
     subprocess.call(cmd.split())
 
-                            
+
 def dropDB():
     admin = MySQLBase(host, port)
     admin.connect(usr, pwd)
     admin.dropDb('%s_%s_u_myFirstRun' % (usr, dcVersion))
     admin.dropDb('%s_%s_u_mySecondRun' % (usr, dcVersion))
     admin.dropDb('%s_%s_p_prodRunA' % (usr, dcVersion))
-    
+
+
 def markRunFinished(dbName):
     admin = MySQLBase(host, port)
     admin.connect(usr, pwd, globalDbName)
     r = admin.execCommand1("SELECT setRunFinished('%s')" % dbName)
-    print r
+    print(r)
+
 
 def startSomeRuns():
     x = MySQLConfigurator(host, port, globalDbName, dcVersion,
@@ -73,13 +82,12 @@ def startSomeRuns():
 
     x.checkStatus(usr, pwd, host)
 
-    r = x.prepareForNewRun('myFirstRun',  usr, pwd);
-    print r
-    markRunFinished('%s_%s_u_myFirstRun' %(usr, dcVersion))
+    r = x.prepareForNewRun('myFirstRun', usr, pwd)
+    print(r)
+    markRunFinished('%s_%s_u_myFirstRun' % (usr, dcVersion))
 
-    r = x.prepareForNewRun('mySecondRun', usr, pwd);
-    print r
-    #markRunFinished('%s_%s_u_mySecondRun' %(usr, dcVersion))
+    r = x.prepareForNewRun('mySecondRun', usr, pwd)
+    print(r)
 
 
 ####################################################

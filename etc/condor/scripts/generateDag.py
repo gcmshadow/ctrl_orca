@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -11,27 +11,22 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import math
+from __future__ import print_function
+from builtins import str
 import argparse
-import os
-import subprocess
 import sys
-import time
-
-from textwrap import dedent
-import glob
-import re
+import shlex
 
 
 def _line_to_args(self, line):
@@ -50,7 +45,6 @@ def makeArgumentParser(description, inRootsRequired=True, addRegistryOption=True
         epilog=" \n"
                "ly.")
     parser.convert_arg_line_to_args = _line_to_args
-
 
     parser.add_argument(
         "-s", "--source", dest="source",
@@ -77,128 +71,117 @@ def makeArgumentParser(description, inRootsRequired=True, addRegistryOption=True
         help="number of ids to run per job")
 
     return parser
- 
 
 
 def writeDagFile(pipeline, templateFile, infile, workerdir, prescriptFile, runid, idsPerJob):
     """
-    Write Condor Dag Submission files. 
+    Write Condor Dag Submission files.
     """
 
-    print "Writing DAG file "
+    print("Writing DAG file ")
 
     outname = pipeline + ".diamond.dag"
 
-    print outname
+    print(outname)
 
-    outObj = open(outname,"w")
+    outObj = open(outname, "w")
 
-    outObj.write("JOB A "+workerdir+"/" + pipeline + ".pre\n"); 
-    outObj.write("JOB B "+workerdir+"/" +  pipeline + ".post\n"); 
-    outObj.write(" \n"); 
+    outObj.write("JOB A "+workerdir+"/" + pipeline + ".pre\n")
+    outObj.write("JOB B "+workerdir+"/" + pipeline + ".post\n")
+    outObj.write(" \n")
 
-    print "prescriptFile = ",prescriptFile
+    print("prescriptFile = ", prescriptFile)
     if prescriptFile is not None:
         outObj.write("SCRIPT PRE A "+prescriptFile+"\n")
 
-    print "First Input File loop "
+    print("First Input File loop ")
 
-    ## Loop over input entries 
-    fileObj = open(infile,"r")
+    # Loop over input entries
+    fileObj = open(infile, "r")
     count = 0
     for aline in fileObj:
-        count+=1
-        outObj.write("JOB A" + str(count) +" "+workerdir+"/" + templateFile + "\n"); 
+        count += 1
+        outObj.write("JOB A" + str(count) + " "+workerdir+"/" + templateFile + "\n")
 
-    outObj.write(" \n"); 
+    outObj.write(" \n")
 
-    print "Second Input File loop "
+    print("Second Input File loop ")
 
-    ## Loop over input entries 
-    fileObj = open(infile,"r")
+    # Loop over input entries
+    fileObj = open(infile, "r")
     count = 0
     for aline in fileObj:
-        count+=1
+        count += 1
         myData = aline.rstrip()
 
-        # Searching for a space detects 
+        # Searching for a space detects
         # extended input like :  visit=887136081 raft=2,2 sensor=0,1
-        # No space is something simple like a skytile id  
+        # No space is something simple like a skytile id
         if " " in myData:
-            # Change space to : 
-            myList  = myData.split(' ');
+            # Change space to :
+            myList = myData.split(' ')
             new1Data = '%s:%s:%s' % tuple(myList)
-            # Change = to - 
-            myList2  = new1Data.split('=');
+            # Change = to -
+            myList2 = new1Data.split('=')
             new2Data = '%s-%s-%s-%s' % tuple(myList2)
-            # Change , to _ 
-            myList3  = new2Data.split(',');
+            # Change , to _
+            myList3 = new2Data.split(',')
             new3Data = '%s_%s_%s' % tuple(myList3)
 
-            newData=new3Data
+            newData = new3Data
             visit = myList[0].split('=')[1]
         else:
-            newData=myData
+            newData = myData
             visit = myData
 
         #  VARS A1 var1="visit=887136081 raft=2,2 sensor=0,1"
         #  VARS A1 var2="visit-887136081:raft-2_2:sensor-0_1"
-        outObj.write("VARS A" + str(count) + " var1=\"" + myData  + "\" \n"); 
-        outObj.write("VARS A" + str(count) + " var2=\"" + newData + "\" \n"); 
-        outObj.write("VARS A" + str(count) + " visit=\"" + visit + "\" \n"); 
-        outObj.write("VARS A" + str(count) + " runid=\"" + runid + "\" \n"); 
-        outObj.write("VARS A" + str(count) + " workerid=\"" + str(count) + "\" \n"); 
+        outObj.write("VARS A" + str(count) + " var1=\"" + myData + "\" \n")
+        outObj.write("VARS A" + str(count) + " var2=\"" + newData + "\" \n")
+        outObj.write("VARS A" + str(count) + " visit=\"" + visit + "\" \n")
+        outObj.write("VARS A" + str(count) + " runid=\"" + runid + "\" \n")
+        outObj.write("VARS A" + str(count) + " workerid=\"" + str(count) + "\" \n")
 
-    print "Third Input File loop "
+    print("Third Input File loop ")
 
-    fileObj = open(infile,"r")
+    fileObj = open(infile, "r")
     count = 0
     for aline in fileObj:
-        count+=1
+        count += 1
         # PARENT A CHILD A1
         # PARENT A1 CHILD B
-        outObj.write("PARENT A CHILD A" + str(count) + " \n"); 
-        outObj.write("PARENT A" + str(count) + " CHILD B \n"); 
+        outObj.write("PARENT A CHILD A" + str(count) + " \n")
+        outObj.write("PARENT A" + str(count) + " CHILD B \n")
 
     outObj.close()
 
 
 def main():
-    print 'Starting generateDag.py'
-    parser = makeArgumentParser(description=
-        "generateDag.py write a Condor DAG for job submission"
-        "by reading input list and writing the attribute as an argument.")
-    print 'Created parser'
+    print('Starting generateDag.py')
+    parser = makeArgumentParser(description="generateDag.py write a Condor DAG for job submission"
+                                "by reading input list and writing the attribute as an argument.")
+    print('Created parser')
     ns = parser.parse_args()
-    print 'Parsed Arguments'
-    print ns
+    print('Parsed Arguments')
+    print(ns)
 
-    # SA 
+    # SA
     # templateFile = "SourceAssoc-template.condor"
     # pipeline = "SourceAssoc"
     # infile   = "sky-tiles"
 
-    # Pipeqa  
+    # Pipeqa
     # templateFile = "pipeqa-template.template"
     # pipeline = "pipeqa"
     # infile   = "visits-449"
 
     #   processCcdLsstSim
     pipeline = "S2012Pipe"
-    #templateFile = "W2012Pipe-template.condor"
-    #infile   = "9429-CCDs.input"
 
-    writeDagFile(pipeline, ns.template, ns.source, ns.workerdir, ns.prescript, ns.runid, ns.idsPerJob )
-
+    writeDagFile(pipeline, ns.template, ns.source, ns.workerdir, ns.prescript, ns.runid, ns.idsPerJob)
 
     sys.exit(0)
 
 
-
-
-
-
-
 if __name__ == '__main__':
     main()
-

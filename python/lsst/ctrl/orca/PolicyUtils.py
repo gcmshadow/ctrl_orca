@@ -1,7 +1,9 @@
-# 
+from __future__ import print_function
+from builtins import object
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,28 +11,31 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import sys
 import sets
 import os.path
 import lsst.pex.policy as pol
 
-## @deprecated policy file utilities
-class PolicyUtils:
+##
+# @brief policy file utilities
+# @deprecated policy file utilities
+
+
+class PolicyUtils(object):
 
     ##
     # @brief given a policy, recursively add all child policies to a policy set
-    # 
+    #
 
     def getAllFilenames(repos, policy, policySet):
         names = policy.names(True)
@@ -48,7 +53,7 @@ class PolicyUtils:
                         if type(val) is pol.PolicyFile:
                             filename = val.getPath()
                             filename = os.path.join(repos, filename)
-                            if (filename in policySet) == False:
+                            if not (filename in policySet):
                                 policySet.add(filename)
                             newPolicy = pol.Policy.createPolicy(filename, False)
                             PolicyUtils.getAllFilenames(repos, newPolicy, policySet)
@@ -62,14 +67,13 @@ class PolicyUtils:
                         # name is a File value
                         filename = policy.getFile(name).getPath()
                         filename = os.path.join(repos, filename)
-                        if (filename in policySet) == False:
+                        if not (filename in policySet):
                             policySet.add(filename)
                         newPolicy = pol.Policy.createPolicy(filename, False)
                         PolicyUtils.getAllFilenames(repos, newPolicy, policySet)
-                    #else:
-                    #  name is a regular value
+                    # else name is a regular value
 
-    ## return all file names from a policy set
+    # return all file names from a policy set
     getAllFilenames = staticmethod(getAllFilenames)
 
 if __name__ == "__main__":
@@ -79,4 +83,4 @@ if __name__ == "__main__":
     PolicyUtils.getAllFilenames("/home/srp/temp_merge/datarel/trunk/pipeline", myPolicy, pset)
 
     for i in pset:
-        print i
+        print(i)

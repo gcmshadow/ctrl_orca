@@ -1,7 +1,7 @@
-# 
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,20 +9,24 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import sys,os, os.path, shutil, sets, stat
+from __future__ import print_function
+from builtins import map
+import os
+import os.path
+import shutil
+import stat
 import lsst.ctrl.orca as orca
-import lsst.pex.config as pexConfig
 
 from lsst.ctrl.orca.Directories import Directories
 import lsst.log as log
@@ -34,79 +38,103 @@ from lsst.ctrl.orca.GenericFileWaiter import GenericFileWaiter
 
 ##
 #
-# GenericPipelineWorkflowConfigurator 
+# GenericPipelineWorkflowConfigurator
 #
+
+
 class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
-    ## initializer
+    """Configurator for generic pipeline workflows
+
+    Parameters
+    ----------
+    runid : str
+        run id
+    repository : str
+        repository directory
+    prodConfig : Config
+        production config object
+    wfConfig : Config
+        workflow config object
+    wfName : str
+        workflow name
+    """
     def __init__(self, runid, repository, prodConfig, wfConfig, wfName):
         log.debug("GenericPipelineWorkflowConfigurator:__init__")
-        ## run id for this workflow
+
+        # run id for this workflow
         self.runid = runid
-        ## production configuration
+
+        # production configuration
         self.prodConfig = prodConfig
-        ## workflow configuration
+
+        # workflow configuration
         self.wfConfig = wfConfig
-        ## workflow name
+
+        # workflow name
         self.wfName = wfName
-        ## repository location
+
+        # repository location
         self.repository = repository
 
-        ## workflow logging verbosity level
+        # workflow logging verbosity level
         self.wfVerbosity = None
 
-        ## nodes used in this workflow
+        # nodes used in this workflow
         self.nodes = None
-        ## directories specified
+
+        # directories specified
         self.directories = None
-        ## @deprecated directories specified
+
+        # @deprecated directories specified
         self.dirs = None
-        ## the default directory used at the beginning of the run
+
+        # the default directory used at the beginning of the run
         self.defaultRunDir = None
-        ## list of log files
+
+        # list of log files
         self.logFileNames = []
-        ## list of pipeline names
+
+        # list of pipeline names
         self.pipelineNames = []
-        ## host name of the event broker
+
+        # host name of the event broker
         self.eventBrokerHost = None
 
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup
-    # @param wfVerbosity
-    #
     def configure(self, provSetup, wfVerbosity):
+        """Setup as much as possible in preparation to execute the workflow
+           and return a WorkflowLauncher object that will launch the
+           configured workflow.
+
+        Parameters
+        ----------
+        provSetup : Config
+            provenance setup
+        wfVerbosity : int
+            verbosity level of workflow
+        """
         self.wfVerbosity = wfVerbosity
         self._configureDatabases(provSetup)
         return self._configureSpecialized(provSetup, self.wfConfig)
-    ##
-    # @brief Setup as much as possible in preparation to execute the workflow
-    #            and return a WorkflowLauncher object that will launch the
-    #            configured workflow.
-    # @param provSetup provenance info
-    # @param wfConfig the workflow config to use for configuration
-    #
-    
+
     def _configureSpecialized(self, provSetup, wfConfig):
         log.debug("GenericPipelineWorkflowConfigurator:configure")
 
         platformConfig = wfConfig.platform
 
-        ## default domain to which we're deploying
+        # default domain to which we're deploying
         self.defaultDomain = platformConfig.deploy.defaultDomain
         pipelineConfig = wfConfig.pipeline
-        print "pipelineConfig = ",pipelineConfig
+        print("pipelineConfig = ", pipelineConfig)
 
-        print ">self.wfName = ",self.wfName
+        print(">self.wfName = ", self.wfName)
         expandedPipelineConfigs = self.expandConfigs(self.wfName)
-        print "expandedPipelineConfig = ",expandedPipelineConfigs
+        print("expandedPipelineConfig = ", expandedPipelineConfigs)
         launchCmd = []
         for pipelineConfigGroup in expandedPipelineConfigs:
             pipelineConfig = pipelineConfigGroup.getConfigName()
             num = pipelineConfigGroup.getConfigNumber()
 
-            print "pipelineConfigGroup = ",pipelineConfigGroup
+            print("pipelineConfigGroup = ", pipelineConfigGroup)
             # TODO - no longer used, remote this, and the method
             self.nodes = self.createNodeList(pipelineConfigGroup.getConfig())
             self.createDirs(platformConfig, pipelineConfig)
@@ -119,73 +147,106 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         self.deployData(wfConfig)
 
         fileWaiter = GenericFileWaiter(self.logFileNames)
-        workflowLauncher = GenericPipelineWorkflowLauncher(launchCmd, self.prodConfig, wfConfig, self.runid, fileWaiter, self.pipelineNames)
+        workflowLauncher = GenericPipelineWorkflowLauncher(
+            launchCmd, self.prodConfig, wfConfig, self.runid, fileWaiter, self.pipelineNames)
         return workflowLauncher
 
-    ##
-    # @brief creates a list of nodes from platform.deploy.nodes
-    # @return the list of nodes
-    #
-    def createNodeList(self,  pipelineConfig):
+    def createNodeList(self, pipelineConfig):
+        """Creates a list of nodes from platform.deploy.nodes
+
+        Returns
+        -------
+        nodes : ['node1', 'node2']
+            a list of node names
+        """
         log.debug("GenericPipelineWorkflowConfigurator:createNodeList")
-        print "pipelineConfig = ",pipelineConfig
-        print "pipelineConfig.deploy = ",pipelineConfig.deploy
+        print("pipelineConfig = ", pipelineConfig)
+        print("pipelineConfig.deploy = ", pipelineConfig.deploy)
         node = pipelineConfig.deploy.processesOnNode
-        
 
+        print("self.expandNodeHost", self.expandNodeHost)
+        print("node", node)
+        nodes = list(map(self.expandNodeHost, node))
 
-        print "self.expandNodeHost",self.expandNodeHost
-        print "node",node
-        nodes = map(self.expandNodeHost, node)
-        ## by convention, the master node is the first node in the list
+        # by convention, the master node is the first node in the list
         # we use this later to launch things, so strip out the info past ":", if it's there.
         self.masterNode = nodes[0]
+
         colon = self.masterNode.find(':')
         if colon > 1:
             self.masterNode = self.masterNode[0:colon]
         return nodes
 
-    ## @return the name of this workflow
     def getWorkflowName(self):
+        """Accessor to workflow name
+        Returns
+        -------
+        name : `str`
+            the name of this workflow
+        """
         return self.workflow
-    
-    ## @return the number of nodes to acquire
+
+    # @return the number of nodes to acquire
     def getNodeCount(self):
+        """Accessor to return the number of nodes to acquire
+
+        Returns
+        -------
+        c : `int`
+            The number of nodes to acquire.
+
+        """
         return len(self.nodes)
 
-    ## deploy any required data specified in the configuration
     def deployData(self, wfConfig):
+        """Deploy any required data specified in the configuration
+
+        Parameters
+        ----------
+        wfConfig : Config
+            workflow configuraiton
+        """
         log.debug("GenericPipelineWorkflowConfigurator:deployData")
 
         # add data deploy here
 
-        if wfConfig.configuration["generic"] != None:
+        if wfConfig.configuration["generic"] is not None:
             configuration = wfConfig.configuration["generic"]
-            if configuration.deployData != None:
+            if configuration.deployData is not None:
                 deployConfig = configuration.deployData
                 dataRepository = deployConfig.dataRepository
                 dataRepository = EnvString.resolve(dataRepository)
                 deployScript = deployConfig.script
                 deployScript = EnvString.resolve(deployScript)
                 collection = deployConfig.collection
-                
-                if os.path.isfile(deployScript) == True:
+
+                if os.path.isfile(deployScript):
                     runDir = self.directories.getDefaultRunDir()
                     deployCmd = [deployScript, runDir, dataRepository, collection]
-                    print ">>> ",deployCmd
+                    print(">>> ", deployCmd)
                     pid = os.fork()
                     if not pid:
                         os.execvp(deployCmd[0], deployCmd)
                     os.wait()[0]
                 else:
-                    log.debug("GenericPipelineWorkflowConfigurator:deployData: warning: script '%s' doesn't exist" % deployScript)
+                    log.debug("GenericPipelineWorkflowConfigurator:deployData: ",
+                              "warning: script '%s' doesn't exist" % deployScript)
         # end data deploy here
 
-
-    ##
-    # deploy the setup information for this workflow
-    #
     def deploySetup(self, provSetup, wfConfig, platformConfig, pipelineConfigGroup):
+        """Deploy the setup information for this workflow
+
+        Parameters
+        ----------
+        provSetup : Config
+            provenance setup information
+        wfConfig : Config
+            workflow configuration
+        platformConfig : Config
+            platform configuration
+        pipelineConfigGroup: [config1, config2]
+            list of pipeline configurations
+        """
         log.debug("GenericPipelineWorkflowConfigurator:deploySetup")
 
         pipelineConfig = pipelineConfigGroup.getConfigName()
@@ -194,8 +255,6 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         pipelineConfigNumber = pipelineConfigGroup.getConfigNumber()
         pipelineName = "%s_%d" % (shortName, pipelineConfigNumber)
 
-        globalPipelineOffset = pipelineConfigGroup.getGlobalOffset()
-
         workDir = self.dirs.get("workDir")
 
         # create the subdirectory for the pipeline specific files
@@ -203,57 +262,45 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         if not os.path.exists(logDir):
             os.makedirs(logDir)
 
-
         self.pipelineNames.append(pipelineName)
 
         # create the list of launch.log files we'll watch for later.
         logFile = os.path.join(pipelineName, "launch.log")
         logFile = os.path.join(workDir, logFile)
         self.logFileNames.append(logFile)
-        
-        # TODO - write "getPath()
-        #filename = self.getPath(pipelineConfig.definition)
-        #fullpath = None
-        #if os.path.isabs(filename):
-        #    fullpath = filename
-        #else:
-        #    fullpath = os.path.join(self.repository, filename)
+
         filename = shortName+"_config.py"
 
-        #definitionConfig = PipelineDefinitionConfig(fullpath)
         definitionConfig = wfConfig.pipeline[shortName].definition
         if pipelineConfigNumber == 1:
-            if platformConfig.dir != None:
-                print "platformConfig.dir ",platformConfig.dir
+            if platformConfig.dir is not None:
+                print("platformConfig.dir ", platformConfig.dir)
                 definitionConfig.execute.dir = platformConfig.dir
-            if self.prodConfig.production.eventBrokerHost != None:
+            if self.prodConfig.production.eventBrokerHost is not None:
                 self.eventBrokerHost = self.prodConfig.production.eventBrokerHost
                 definitionConfig.execute.eventBrokerHost = self.eventBrokerHost
-    
-            if self.wfConfig.shutdownTopic != None:
+
+            if self.wfConfig.shutdownTopic is not None:
                 definitionConfig.execute.shutdownTopic = self.wfConfig.shutdownTopic
-            if self.prodConfig.production.logThreshold != None:
+            if self.prodConfig.production.logThreshold is not None:
                 definitionConfig.execute.logThreshold = self.prodConfig.production.logThreshold
             newConfigFile = os.path.join(workDir, shortName)
 
-            # TODO
-            #pw =ConfigWriter(newConfigFile)
-            #pw.write(definitionConfig)
-            #pw.close()
             definitionConfig.save(newConfigFile)
 
             # copy the workerdone.py utility over to the work directory
             script = EnvString.resolve("$CTRL_ORCA_DIR/bin/workerdone.py")
             remoteName = os.path.join(workDir, os.path.basename(script))
-            shutil.copyfile(script,remoteName)
-            shutil.copystat(script,remoteName)
+            shutil.copyfile(script, remoteName)
+            shutil.copystat(script, remoteName)
 
         # copy /bin/sh script responsible for environment setting
 
         setupPath = definitionConfig.framework.environment
         if setupPath:
-            setupPath = EnvString.resolve(setupPath)        
-        ## the script used for seting up the environment
+            setupPath = EnvString.resolve(setupPath)
+
+        # the script used for seting up the environment
         self.script = setupPath
 
         if orca.envscript is None:
@@ -261,7 +308,7 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         else:
             self.script = orca.envscript
         if not self.script:
-             raise RuntimeError("couldn't find framework.environment")
+            raise RuntimeError("couldn't find framework.environment")
 
         # only copy the setup script once
         if pipelineConfigNumber == 1:
@@ -270,47 +317,14 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         # now point at the new location for the setup script
         self.script = os.path.join(workDir, os.path.basename(self.script))
 
-        #
-        # Write all config files out to the work directory, 
-        # but only do it once.
-        
-# TODO - remove this after we confirm this is no longer needed.
-#        #if pipelineConfigNumber == 1:
-#        
-#            # first, grab all the file names, and throw them into a Set() to 
-#            # avoid duplication
-#            pipelineConfigSet = sets.Set()
-#
-#            ConfigUtils.getAllFilenames(self.repository, definitionConfig, pipelineConfigSet)
-#
-#            # Cycle through the file names, creating subdirectories as required,
-#            # and copy them to the destination directory
-#            for configFile in pipelineConfigSet:
-#                destName = configFile.replace(self.repository+"/","")
-#                tokens = destName.split('/')
-#                tokensLength = len(tokens)
-#                destinationFile = tokens[len(tokens)-1]
-#                destinationDir = workDir
-#                for newDestinationDir in tokens[:len(tokens)-1]:
-#                    newDir = os.path.join(workDir, newDestinationDir)
-#                    if os.path.exists(newDir) == False:
-#                        os.mkdir(newDir)
-#                    destinationDir = newDir
-#                shutil.copyfile(configFile, os.path.join(destinationDir, destinationFile))
-
         # create the launch command
         execPath = definitionConfig.framework.script
-        #execCmd = EnvString.resolve(execPath)
         execCmd = execPath
 
-        #cmd = ["ssh", self.masterNode, "cd %s; source %s; %s %s %s -L %s" % (self.dirs.get("work"), self.script, execCmd, filename, self.runid, self.wfVerbosity) ]
-
-        # write out the launch script
         # write out the script we use to kick things off
         launchName = "launch_%s.sh" % pipelineName
 
         name = os.path.join(logDir, launchName)
-
 
         launcher = open(name, 'w')
         launcher.write("#!/bin/sh\n")
@@ -347,10 +361,11 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
 #            fileargs = ' '.join(filelist)
 #            launcher.write("%s %s\n" % (launchCmd, fileargs))
 
-        
-        launcher.write("%s %s %s -L %s --logdir %s --workerid %s >%s/launch.log 2>&1\n" % (execCmd, filename, self.runid, self.wfVerbosity, logDir, pipelineName, logDir))
+        launcher.write("%s %s %s -L %s --logdir %s --workerid %s >%s/launch.log 2>&1\n" %
+                       (execCmd, filename, self.runid, self.wfVerbosity, logDir, pipelineName, logDir))
         launcher.write("./workerdone.py %s %s %s\n" % (self.eventBrokerHost, self.runid, pipelineName))
         launcher.close()
+
         # make it executable
         os.chmod(name, stat.S_IRWXU)
 
@@ -359,18 +374,25 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
         # print "cmd to execute is: ",launchCmd
         return launchCmd
 
-    ##
-    # @brief create the platform.dir directories
-    #
     def createDirs(self, platformConfig, pipelineConfig):
+        """Create the platform.dir directories
+
+        Parameters
+        ----------
+        platformConfig : Config
+            platform configuration
+        pipelineConfig : Config
+            pipeline configuration
+        """
         log.debug("GenericPipelineWorkflowConfigurator:createDirs")
 
-        print "pipelineConfig = ",pipelineConfig
+        print("pipelineConfig = ", pipelineConfig)
         dirConfig = platformConfig.dir
         dirName = pipelineConfig
         self.directories = Directories(dirConfig, dirName, self.runid)
         self.dirs = self.directories.getDirs()
-        ## default root directory for the platform
+
+        # default root directory for the platform
         self.defaultRootDir = self.directories.getDefaultRootDir()
 
         for name in self.dirs.names():
@@ -378,17 +400,14 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
             if not os.path.exists(localDirName):
                 os.makedirs(localDirName)
 
-    ##
-    # @brief set up this workflow's database
-    #
     def setupDatabase(self):
+        """Setup up this workflow's database
+        """
         log.debug("GenericPipelineWorkflowConfigurator:setupDatabase")
 
-    ##
-    # @brief perform a node host name expansion
-    #
     def expandNodeHost(self, nodeentry):
-        """Add a default network domain to a node list entry if necessary """
+        """Add a default network domain to a node list entry if necessary
+        """
 
         if nodeentry.find(".") < 0:
             node = nodeentry

@@ -1,7 +1,8 @@
-# 
+from builtins import object
+#
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
-# 
+#
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
 #
@@ -9,39 +10,47 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
-# You should have received a copy of the LSST License Statement and 
-# the GNU General Public License along with this program.  If not, 
+#
+# You should have received a copy of the LSST License Statement and
+# the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
 ##
 # @deprecated DatabaseConfigurator
 #
-class DatabaseConfigurator:
-    ## initialize
+
+
+class DatabaseConfigurator(object):
+
+    ##
+    # @brief initialize
+    #
     def __init__(self, runid, config):
-        ## run id
+
+        # run id
         self.runid = runid
-        ## database configuration
+
+        # database configuration
         self.config = config
         return
 
     ##
-    # set the database configurator up
+    # @brief set the database configurator up
     #
     def setDatabase(self, provSetup):
 
-        # setup the database - using Dc3aDatabaseConfigurator as a placeholder
-        dbConfigurator = Dc3aDatabaseConfigurator(self.runid, self.config)
-        dbConfigurator.setup()
+        # steps to implement for configurators:
+        # call configurator constructor using the runid and config
+        # call setup on the configurator object
 
-        if provSetup is not None:
-            # may call provSetup.addProductionRecorder(ProvenanceRecorder)
-            # may call provSetup.addWorkflowRecordCmd(string)
-            return
+        # if provSetup is not None:
+        #     may call provSetup.addProductionRecorder(ProvenanceRecorder)
+        #     may call provSetup.addWorkflowRecordCmd(string)
+
+        return
