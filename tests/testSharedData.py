@@ -50,7 +50,7 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
         pass
 
     def testAcquire(self):
-        self.assertTrue(not self.sd._is_owned(), "lock without acquire")
+        self.assertFalse(self.sd._is_owned(), "lock without acquire")
         self.sd.acquire()
         self.assertTrue(self.sd._is_owned(), "lock not acquired")
         self.sd.acquire()
@@ -58,7 +58,7 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
         self.sd.release()
         self.assertTrue(self.sd._is_owned(), "lock not kept after partial release")
         self.sd.release()
-        self.assertTrue(not self.sd._is_owned(), "lock not released")
+        self.assertFalse(self.sd._is_owned(), "lock not released")
 
     def testNoData(self):
         attrs = self.sd.dir()
@@ -70,18 +70,15 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
     def testWith(self):
         with self.sd:
             self.assertTrue(self.sd._is_owned(), "lock not acquired")
-        self.assertTrue(not self.sd._is_owned(), "lock not released")
+        self.assertFalse(self.sd._is_owned(), "lock not released")
 
     def _initData(self):
         self.sd.initData({"name": "Ray", "test": True, "config": {}})
 
     def testNoLockRead(self):
         self._initData()
-        try:
+        with self.assertRaises(AttributeError):
             self.sd.name
-            self.fail("AttributeError not raised for reading w/o lock ")
-        except AttributeError:
-            pass
         self.sd.dir()
 
     def testInit(self):
@@ -89,17 +86,17 @@ class ShareDataTestCase(lsst.utils.tests.TestCase):
         attrs = self.sd.dir()
         self.assertEqual(len(attrs), 3, "Wrong number of items: "+str(attrs))
         for key in "name test config".split():
-            self.assertTrue(key in attrs, "Missing attr: " + key)
+            self.assertIn(key, attrs, "Missing attr: " + key)
 
     def testAccess(self):
         self._initData()
         protected = None
         with self.sd:
             self.assertEqual(self.sd.name, "Ray")
-            self.assertTrue(isinstance(self.sd.test, bool))
+            self.assertIsInstance(self.sd.test, bool)
             self.assertTrue(self.sd.test)
             protected = self.sd.config
-            self.assertTrue(isinstance(protected, dict))
+            self.assertIsInstance(protected, dict)
             self.assertEqual(len(protected), 0)
 
         # test unsafe access
@@ -133,7 +130,7 @@ class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
         pass
 
     def testAcquire(self):
-        self.assertTrue(not self.sd._is_owned(), "lock without acquire")
+        self.assertFalse(self.sd._is_owned(), "lock without acquire")
         self.sd.acquire()
         self.assertTrue(self.sd._is_owned(), "lock not acquired")
         self.sd.acquire()
@@ -141,7 +138,7 @@ class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
         self.sd.release()
         self.assertTrue(self.sd._is_owned(), "lock not kept after partial release")
         self.sd.release()
-        self.assertTrue(not self.sd._is_owned(), "lock not released")
+        self.assertFalse(self.sd._is_owned(), "lock not released")
 
     def testNoData(self):
         attrs = self.sd.dir()
@@ -155,28 +152,25 @@ class ReadableShareDataTestCase(lsst.utils.tests.TestCase):
         self._initData()
         self.sd.name
         self.sd.dir()
-        try:
+        with self.assertRaises(AttributeError):
             self.sd.goob
-            self.fail("AttributeError not raised for accessing non-existent")
-        except AttributeError:
-            pass
 
     def testInit(self):
         self._initData()
         attrs = self.sd.dir()
         self.assertEqual(len(attrs), 3, "Wrong number of items: "+str(attrs))
         for key in "name test config".split():
-            self.assertTrue(key in attrs, "Missing attr: " + key)
+            self.assertIn(key, attrs, "Missing attr: " + key)
 
     def testAccess(self):
         self._initData()
         protected = None
 
         self.assertEqual(self.sd.name, "Ray")
-        self.assertTrue(isinstance(self.sd.test, bool))
+        self.assertIsInstance(self.sd.test, bool)
         self.assertTrue(self.sd.test)
         protected = self.sd.config
-        self.assertTrue(isinstance(protected, dict))
+        self.assertIsInstance(protected, dict)
         self.assertEqual(len(protected), 0)
 
         # test unsafe access

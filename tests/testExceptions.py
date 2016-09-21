@@ -48,7 +48,7 @@ class MultiIssueTestCase(lsst.utils.tests.TestCase):
 
     def testNoProb(self):
         err = MultiIssueConfigurationError()
-        self.assertTrue(not err.hasProblems(), "no problems added yet")
+        self.assertFalse(err.hasProblems())
         self.assertEqual(str(err), self.unspecified)
 
         probs = err.getProblems()
