@@ -44,7 +44,7 @@ num = len(p.paramNames())
 # write the "nodelist.scr" file out, preserving the order
 nodelist = open(os.path.join(work, "nodelist.scr"), "w")
 
-for x in range(0, num):
+for x in range(num):
     val = p.get("node%d" % x)
     print(val, file=nodelist)
 

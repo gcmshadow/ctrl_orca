@@ -55,7 +55,7 @@ class DatabaseLogger(MySQLBase):
         cnt = len(msgs)
 
         file = open(filename, "w")
-        for i in range(0, cnt):
+        for i in range(cnt):
             propSet = msgs.pop(0)
             ins = self.createInsertString(dbTable, propSet)
             file.write(ins)

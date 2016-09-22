@@ -268,8 +268,8 @@ class WorkflowConfigurator(object):
                     runCount = 1
                     if config.runCount is not None:
                         runCount = config.runCount
-                    for i in range(0, runCount):
-                        expanded.append(self.ConfigGroup(pipelineName, config, i+1, totalCount))
+                    for i in range(runCount):
+                        expanded.append(self.ConfigGroup(pipelineName, config, i + 1, totalCount))
                         totalCount = totalCount + 1
 
                 return expanded
