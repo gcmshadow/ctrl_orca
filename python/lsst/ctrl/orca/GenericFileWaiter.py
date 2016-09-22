@@ -39,11 +39,11 @@ class GenericFileWaiter(object):
         list of file names
     """
 
-    def __init__(self, fileNames):
+    def __init__(self, fileList):
         log.debug("GenericFileWaiter:__init__")
 
         # list of file names
-        self.fileNames = fileNames
+        self.fileList = fileList
 
     def waitForFirstFile(self):
         """Wait for the first file in the list to come into existence
@@ -51,7 +51,7 @@ class GenericFileWaiter(object):
         log.debug("GenericFileWaiter:waitForFirstFile")
         print("waiting for log file to be created to confirm launch.")
 
-        while not os.path.exists(self.fileNames[0]):
+        while not os.path.exists(self.fileList[0]):
             time.sleep(1)
         return
 
@@ -62,9 +62,7 @@ class GenericFileWaiter(object):
 
         print("waiting for all log files to be created to confirm launch")
 
-        list = self.fileNames
-        while len(list):
-            newlist = [item for item in list if (not os.path.exists(item))]
-            list = newlist
-            time.sleep(1)
+        for item in self.fileList:
+            if not os.path.exists(item):
+                time.sleep(1)
         return
