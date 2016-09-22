@@ -36,9 +36,9 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage)
     # TODO: handle "--dryrun"
-    parser.add_option("-f", "--first", action="store_const", const=1,
+    parser.add_option("-f", "--first", action="store_true", default=False,
                       dest="bFirst", help="wait for first file in list")
-    parser.add_option("-l", "--list", action="store_const", const=1,
+    parser.add_option("-l", "--list", action="store_true", default=False,
                       dest="bList", help="wait for all the files in the list")
 
     parser.opts = {}
@@ -69,8 +69,7 @@ if __name__ == "__main__":
             time.sleep(1)
         sys.exit(0)
 
-    while len(fileList) > 0:
-        newlist = [item for item2 in fileList if (os.path.exists(item) is False)]
-        fileList = newlist
-        time.sleep(1)
+    for item in fileList:
+        while not os.path.exists(item):
+            time.sleep(1)
     sys.exit(0)
