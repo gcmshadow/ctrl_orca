@@ -67,7 +67,7 @@ class CondorJobs(object):
 
         line = pop.readline()
         line = pop.readline()
-        line = line.decode('utf-8')
+        line = line.decode()
         num = clusterexp.findall(line)
         if len(num) == 0:
             return None
@@ -109,7 +109,7 @@ class CondorJobs(object):
                 print(msg % ((secondsWaited / 60), ("" if (minutes == 1) else "s"), num))
             while 1:
                 line = pop.readline()
-                line = line.decode('utf-8')
+                line = line.decode()
                 if not line:
                     break
                 values = queueExp.findall(line)
@@ -165,7 +165,7 @@ class CondorJobs(object):
             pop = os.popen("condor_q", "r")
             while 1:
                 line = pop.readline()
-                line = line.decode('utf-8')
+                line = line.decode()
                 if not line:
                     break
                 values = queueExp.findall(line)
@@ -213,13 +213,13 @@ class CondorJobs(object):
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         output = []
         line = process.stdout.readline()
-        line = line.decode('utf-8')
+        line = line.decode()
         i = 0
         while line != "":
             line = line.strip()
             output.append(line)
             line = process.stdout.readline()
-            line = line.decode('utf-8')
+            line = line.decode()
             i += 1
         for line in output:
             num = clusterexp.findall(line)
@@ -243,12 +243,12 @@ class CondorJobs(object):
         cmd = "condor_rm "+str(cid)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         line = process.stdout.readline()
-        line = line.decode('utf-8')
+        line = line.decode()
         while line != "":
             line = line.strip()
             print(line)
             line = process.stdout.readline()
-            line = line.decode('utf-8')
+            line = line.decode()
         # read the rest (if any) and terminate
         stdoutdata, stderrdata = process.communicate()
 
@@ -265,7 +265,7 @@ class CondorJobs(object):
         process = subprocess.Popen("condor_q", shell=False, stdout=subprocess.PIPE)
         while 1:
             line = process.stdout.readline()
-            line = line.decode('utf-8')
+            line = line.decode()
             if not line:
                 break
             values = queueExp.findall(line)
