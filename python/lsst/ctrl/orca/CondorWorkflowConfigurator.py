@@ -245,7 +245,7 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
             # No space is something simple like a skytile id
             for aline in fileObj:
                 count += 1
-                visit = str(int(count / 100))
+                visit = str(count//100)
                 visitSet.add(visit)
             log.debug("CondorWorkflowConfigurator:configure: about to make logs")
             logDirName = os.path.join(self.localStagingDir, "logs")
@@ -253,8 +253,8 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
             logDirName = os.path.join(self.localStagingDir, "logs")
             os.makedirs(logDirName)
             for visit in visitSet:
-                dirName = os.path.join(logDirName, str(visit))
-                log.debug("making dir "+dirName)
+                dirName = os.path.join(logDirName, visit)
+                log.debug("making dir " + dirName)
                 os.makedirs(dirName)
 
             # change back to initial directory
@@ -264,7 +264,7 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
 
         workflowLauncher = CondorWorkflowLauncher(self.prodConfig, self.wfConfig, self.runid,
                                                   self.localStagingDir,
-                                                  task.dagGenerator.dagName+".diamond.dag",
+                                                  task.dagGenerator.dagName + ".diamond.dag",
                                                   wfConfig.monitor)
         return workflowLauncher
 
@@ -331,7 +331,7 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
             val = template.keywords[value]
             pairs[value] = val
         pairs["ORCA_REMOTE_WORKDIR"] = self.defaultRoot+"/"+self.runid
-        if not ("ORCA_START_OWNER" in pairs):
+        if "ORCA_START_OWNER" not in pairs:
             pairs["ORCA_START_OWNER"] = getpass.getuser()
 
         writer = TemplateWriter()
