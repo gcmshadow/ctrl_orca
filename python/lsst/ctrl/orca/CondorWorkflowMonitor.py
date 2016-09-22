@@ -173,7 +173,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                         print("logger handled... and... done!")
                         return
 
-                if (event is not None) or (logEvent is not None):
+                if not event or not logEvent:
                     sleepInterval = 0
                 else:
                     sleepInterval = statusCheckInterval
