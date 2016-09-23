@@ -677,7 +677,7 @@ class VanillaCondorWorkflowConfigurator(WorkflowConfigurator):
 
         # for glidein request, we add this additional keyword.
         keyValuePairs["ORCA_REMOTE_WORKDIR"] = self.dirs.get("workDir")
-        if not ("START_OWNER" in keyValuePairs):
+        if "START_OWNER" not in keyValuePairs:
             keyValuePairs["START_OWNER"] = getpass.getuser()
 
         writer = TemplateWriter()

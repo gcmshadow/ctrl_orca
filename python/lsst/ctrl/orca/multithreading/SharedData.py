@@ -157,4 +157,4 @@ class SharedData(object):
 
     # overrides dir() method
     def dir(self):
-        return list([k for k in self._d if k != "__"])
+        return [k for k in self._d if k != "__"]

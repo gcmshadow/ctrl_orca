@@ -53,7 +53,7 @@ class PolicyUtils(object):
                         if type(val) is pol.PolicyFile:
                             filename = val.getPath()
                             filename = os.path.join(repos, filename)
-                            if not (filename in policySet):
+                            if filename not in policySet:
                                 policySet.add(filename)
                             newPolicy = pol.Policy.createPolicy(filename, False)
                             PolicyUtils.getAllFilenames(repos, newPolicy, policySet)
@@ -67,7 +67,7 @@ class PolicyUtils(object):
                         # name is a File value
                         filename = policy.getFile(name).getPath()
                         filename = os.path.join(repos, filename)
-                        if not (filename in policySet):
+                        if filename not in policySet:
                             policySet.add(filename)
                         newPolicy = pol.Policy.createPolicy(filename, False)
                         PolicyUtils.getAllFilenames(repos, newPolicy, policySet)

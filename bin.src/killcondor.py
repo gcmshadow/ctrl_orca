@@ -92,7 +92,7 @@ class CondorJobInfo(object):
                 runCount = 1  # default to 1, if runCount doesn't exist
                 if policy.exists("runCount"):
                     runCount = policy.get("runCount")
-                for i in range(0, runCount):
+                for i in range(runCount):
                     pipelineShortName = policy.get("shortName")
                     pipelineJob = self.PipelineJob(localScratch, wfShortName, pipelineShortName, i+1)
                     expanded.append(pipelineJob)

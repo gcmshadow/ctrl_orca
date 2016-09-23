@@ -73,9 +73,9 @@ class ProvenanceRecorder(object):
         if policy.getValueType(field) == pol.Policy.FILE:
             filename = policy.getFile(field).getPath()
             filename = os.path.join(repos, filename)
-            if not (filename in self.policySet):
+            if filename not in self.policySet:
                 self.policySet.add(filename)
-            if not (filename in pipelinePolicySet):
+            if filename not in pipelinePolicySet:
                 pipelinePolicySet.add(filename)
             newPolicy = pol.Policy.createPolicy(filename, False)
             self._extractChildPolicies(repos, newPolicy, pipelinePolicySet)

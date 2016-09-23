@@ -218,7 +218,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("logger.status"):
                 pid = ps.getInt("logger.pid")
-                log.debug("logger.pid = " + str(pid))
+                log.debug("logger.pid = %s", str(pid))
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
 

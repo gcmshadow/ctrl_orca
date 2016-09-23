@@ -139,8 +139,7 @@ class VanillaCondorWorkflowMonitor(WorkflowMonitor):
                     if not self._parent._locked.running:
                         print("logger handled... and... done!")
                         return
-                if (jobOfficeEvent is not None) or (jobOfficeEvent is not None) \
-                        or (jobOfficeEvent is not None):
+                if (jobOfficeEvent is not None) or (logEvent is not None) or (event is not None):
                     sleepInterval = 0
                 else:
                     sleepInterval = 5
