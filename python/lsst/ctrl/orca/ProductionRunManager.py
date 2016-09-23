@@ -176,7 +176,7 @@ class ProductionRunManager(object):
         The workflowVerbosity parameter will only be used if the run has not already been configured via
         configure().
         """
-        log.debug("Running production: " + self.runid)
+        log.debug("Running production: %s", self.runid)
 
         if not self.isRunnable():
             if self.isRunning():

@@ -197,7 +197,7 @@ class CondorJobs(object):
         filename : `str`
             name of condor DAG file
         """
-        log.debug("CondorJobs: condorSubmitDag "+filename)
+        log.debug("CondorJobs: condorSubmitDag %s", filename)
         # Just a note about why this was done this way...
         # There's something wierd about how "condor_submit_dag" prints it's output.
         # If you run it on the command line, it'll print the "1 job(s) submitted"
@@ -239,7 +239,7 @@ class CondorJobs(object):
         cid : `str`
             condor job id
         """
-        log.debug("CondorJobs: killCondorId"+str(cid))
+        log.debug("CondorJobs: killCondorId %s", str(cid))
         cmd = "condor_rm "+str(cid)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         line = process.stdout.readline()

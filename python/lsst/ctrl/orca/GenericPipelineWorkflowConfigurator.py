@@ -417,9 +417,9 @@ class GenericPipelineWorkflowConfigurator(WorkflowConfigurator):
             elif colon > 0:
                 node = nodeentry[0:colon]
                 if len(node) < 3:
-                    log.debug("Suspiciously short node name: " + node)
-                log.debug("-> nodeentry  =" + nodeentry)
-                log.debug("-> node  =" + node)
+                    log.debug("Suspiciously short node name: %s", node)
+                log.debug("-> nodeentry  = %s", nodeentry)
+                log.debug("-> node  = %s", node)
 
                 if self.defaultDomain is not None:
                     node += "."+self.defaultDomain

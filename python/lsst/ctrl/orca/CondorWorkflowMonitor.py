@@ -173,7 +173,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                         print("logger handled... and... done!")
                         return
 
-                if not event or not logEvent:
+                if (event is not None) or (logEvent is not None):
                     sleepInterval = 0
                 else:
                     sleepInterval = statusCheckInterval
@@ -218,7 +218,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             if ps.exists("logger.status"):
                 pid = ps.getInt("logger.pid")
-                log.debug("logger.pid = " + str(pid))
+                log.debug("logger.pid = %s", str(pid))
                 if pid in self.loggerPIDs:
                     self.loggerPIDs.remove(pid)
 

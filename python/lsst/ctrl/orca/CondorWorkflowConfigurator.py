@@ -249,12 +249,12 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
                 visitSet.add(visit)
             log.debug("CondorWorkflowConfigurator:configure: about to make logs")
             logDirName = os.path.join(self.localStagingDir, "logs")
-            log.debug("CondorWorkflowConfigurator:configure: logDirName = "+logDirName)
+            log.debug("CondorWorkflowConfigurator:configure: logDirName = %s", logDirName)
             logDirName = os.path.join(self.localStagingDir, "logs")
             os.makedirs(logDirName)
             for visit in visitSet:
                 dirName = os.path.join(logDirName, visit)
-                log.debug("making dir " + dirName)
+                log.debug("making dir %s ", dirName)
                 os.makedirs(dirName)
 
             # change back to initial directory
