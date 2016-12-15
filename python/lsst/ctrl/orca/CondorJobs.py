@@ -246,7 +246,6 @@ class CondorJobs(object):
         line = line.decode()
         while line != "":
             line = line.strip()
-            print(line)
             line = process.stdout.readline()
             line = line.decode()
         # read the rest (if any) and terminate
@@ -260,18 +259,16 @@ class CondorJobs(object):
         cid : `str`
             condor job id
         """
-        jobNum = "%s.0" % cid
-        queueExp = re.compile("\S+")
-        process = subprocess.Popen("condor_q", shell=False, stdout=subprocess.PIPE)
+        jobNum = int(cid)
+        cmd = "condor_q -af ClusterId"
+        process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)
         while 1:
             line = process.stdout.readline()
-            line = line.decode()
+            line = line.strip()
             if not line:
                 break
-            values = queueExp.findall(line)
-            if len(values) == 0:
-                continue
-            if (values[0] == jobNum):
+            value = int(line)
+            if value == jobNum:
                 # read the rest (if any) and terminate
                 stdoutdata, stderrdata = process.communicate()
                 return True
