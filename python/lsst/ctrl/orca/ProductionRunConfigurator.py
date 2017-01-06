@@ -22,7 +22,6 @@
 
 from __future__ import print_function
 from builtins import object
-from lsst.ctrl.orca.LoggerManager import LoggerManager
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.WorkflowManager import WorkflowManager
 from lsst.ctrl.orca.config.ProductionConfig import ProductionConfig
@@ -73,8 +72,6 @@ class ProductionRunConfigurator(object):
         # cache the database configurators for checking the configuraiton.
         self._databaseConfigurators = []
 
-        # logger managers
-        self._loggerManagers = []
 
         # hostname of the event broker
         self.eventBrokerHost = None
@@ -151,19 +148,7 @@ class ProductionRunConfigurator(object):
             cfg = self.createDatabaseConfigurator(databaseConfig)
             cfg.setup(self._provSetup)
             dbInfo = cfg.getDBInfo()
-            # check to see if we're supposed to launch a logging daemon
-            if databaseConfig.logger is not None:
-                loggerConfig = databaseConfig.logger
-                if loggerConfig.launch is not None:
-                    launch = loggerConfig.launch
-                    loggerManager = None
-                    if launch:
-                        loggerManager = LoggerManager(self.eventBrokerHost, self.runid, dbInfo[
-                                                      "host"], dbInfo["port"], dbInfo["dbrun"])
-                    else:
-                        loggerManager = LoggerManager(self.eventBrokerHost, self.runid)
-                    if loggerManager is not None:
-                        self._loggerManagers.append(loggerManager)
+
             self._databaseConfigurators.append(cfg)
 
         #
@@ -188,15 +173,6 @@ class ProductionRunConfigurator(object):
             workflowManagers.append(workflowManager)
 
         return workflowManagers
-
-    def getLoggerManagers(self):
-        """Accessor to return list of all logger Managers for this production
-        Returns
-        -------
-        mgrs = [ logMgr1, logMgr2 ]
-            list of logger managers
-        """
-        return self._loggerManagers
 
     def checkConfiguration(self, care=1, issueExc=None):
         """Carry out production-wide configuration checks.

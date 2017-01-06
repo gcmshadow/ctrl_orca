@@ -48,12 +48,10 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         run id for this workflow
     condorDagId : `str`
         job id of submitted HTCondor dag
-    loggerManagers: [ logMgr1, logMgr2 ]
-        list of logger process managers
     monitorConfig : Config
         configuration file for monitor information
     """
-    def __init__(self, eventBrokerHost, shutdownTopic, runid, condorDagId, loggerManagers, monitorConfig):
+    def __init__(self, eventBrokerHost, shutdownTopic, runid, condorDagId, monitorConfig):
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
@@ -63,13 +61,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         self._statusListeners = []
 
         # make a copy of this liste, since we'll be removing things.
-
-        # list of logger process ids
-        self.loggerPIDs = []
-        for lm in loggerManagers:
-            self.loggerPIDs.append(lm.getPID())
-
-        self.loggerManagers = loggerManagers
 
         self._eventBrokerHost = eventBrokerHost
         self._shutdownTopic = shutdownTopic
@@ -90,9 +81,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
         # create event identifier for this process
         self.originatorId = self.eventSystem.createOriginatorId()
-
-        # flag to indicate that last logger event has been sent
-        self.bSentLastLoggerEvent = False
 
         with self._locked:
             self._wfMonitorThread = CondorWorkflowMonitor._WorkflowMonitorThread(self,
@@ -118,8 +106,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             run id for this workflow
         condorDagId : `str`
             job id of submitted HTCondor dag
-        loggerManagers: [ logMgr1, logMgr2 ]
-            list of logger process managers
         monitorConfig : `Config`
             configuration file for monitor information
         """
@@ -134,7 +120,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
             selector = "RUNID = '%s'" % runid
             self._receiver = events.EventReceiver(self._eventBrokerHost, self._eventTopic, selector)
-            self._Logreceiver = events.EventReceiver(self._eventBrokerHost, "LoggerStatus", selector)
 
             # the dag id assigned to this workflow
             self.condorDagId = condorDagId
@@ -157,30 +142,23 @@ class CondorWorkflowMonitor(WorkflowMonitor):
                     time.sleep(sleepInterval)
                 event = self._receiver.receiveEvent(1)
 
-                logEvent = self._Logreceiver.receiveEvent(1)
-
                 if event is not None:
                     # val = self._parent.handleEvent(event)
                     self._parent.handleEvent(event)
                     if not self._parent._locked.running:
                         print("and...done!")
                         return
-                elif logEvent is not None:
-                    self._parent.handleEvent(logEvent)
-                    # val = self._parent.handleEvent(logEvent)
 
-                    if not self._parent._locked.running:
-                        print("logger handled... and... done!")
-                        return
-
-                if (event is not None) or (logEvent is not None):
+                if (event is not None):
                     sleepInterval = 0
                 else:
                     sleepInterval = statusCheckInterval
-                # if the dag is no longer running, send the logger an event
-                # telling it to clean up.
+                # if the dag is no longer running, return
                 if not cj.isJobAlive(self.condorDagId):
-                    self._parent.sendLastLoggerEvent()
+                    # self._parent.sendLastLoggerEvent()
+                    print("work complete.")
+                    with self._parent._locked:
+                        self._parent._locked.running = False
 
     def startMonitorThread(self, runid):
         """Begin one monitor thread
@@ -212,44 +190,14 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
         ps = event.getPropertySet()
 
-        # check for Logger event status
-        if event.getType() == events.EventTypes.STATUS:
-            ps = event.getPropertySet()
-
-            if ps.exists("logger.status"):
-                pid = ps.getInt("logger.pid")
-                log.debug("logger.pid = %s", str(pid))
-                if pid in self.loggerPIDs:
-                    self.loggerPIDs.remove(pid)
-
-            # if the logger list is empty, we're finished.
-            if len(self.loggerPIDs) == 0:
-                with self._locked:
-                    self._locked.running = False
-        elif event.getType() == events.EventTypes.COMMAND:
-            # TODO: stop this thing right now.
-            # that means the logger and the dag.
+        # check for event type
+        if event.getType() == events.EventTypes.COMMAND:
+            # stop this thing right now.
+            # that means the dag process
             with self._locked:
                 self._locked.running = False
         else:
             print("didn't handle anything")
-
-    def sendLastLoggerEvent(self):
-        """Send a message to the logger that we're done
-        """
-        # only do this one time
-        if not self.bSentLastLoggerEvent:
-            print("sending last Logger Event")
-            transmitter = events.EventTransmitter(self._eventBrokerHost, events.LogEvent.LOGGING_TOPIC)
-
-            props = PropertySet()
-            props.set("LOGGER", "orca.control")
-            props.set("STATUS", "eol")
-
-            e = events.Event(self.runid, props)
-            transmitter.publishEvent(e)
-
-            self.bSentLastLoggerEvent = True
 
     def stopWorkflow(self, urgency):
         """Stop the workflow
@@ -257,7 +205,6 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         log.debug("CondorWorkflowMonitor:stopWorkflow")
 
         # do a condor_rm on the cluster id for the dag we submitted.
+        print("shutdown request received: stopping workflow")
         cj = CondorJobs()
         cj.killCondorId(self.condorDagId)
-
-        self.sendLastLoggerEvent()

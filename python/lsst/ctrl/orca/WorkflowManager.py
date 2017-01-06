@@ -90,7 +90,7 @@ class WorkflowManager(object):
     # @brief setup, launch and monitor a workflow to its completion, and then
     #            clean-up.
     #
-    def runWorkflow(self, statusListener, loggerManagers):
+    def runWorkflow(self, statusListener):
         """ setup, launch and monitor a workflow to its completion, and then clean up
         """
         log.debug("WorkflowManager:runWorkflow")
@@ -107,7 +107,7 @@ class WorkflowManager(object):
 
             if self._workflowConfigurator is None:
                 self._workflowLauncher = self.configure()
-            self._monitor = self._workflowLauncher.launch(statusListener, loggerManagers)
+            self._monitor = self._workflowLauncher.launch(statusListener)
 
             self.cleanUp()
 
