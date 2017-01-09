@@ -71,9 +71,6 @@ class ProductionRunManager(object):
         # a list of workflow Monitors
         self._workflowMonitors = []
 
-        # a list of logger managers
-        self._loggerManagers = []
-
         # the cached ProductionRunConfigurator instance
         self._productionRunConfigurator = None
 
@@ -148,10 +145,6 @@ class ProductionRunManager(object):
                 self._workflowManagers["__order"].append(wfm)
                 self._workflowManagers[wfm.getName()] = wfm
 
-            loggerManagers = self._productionRunConfigurator.getLoggerManagers()
-            for lm in loggerManagers:
-                self._loggerManagers.append(lm)
-
         finally:
             self._locked.release()
 
@@ -211,10 +204,6 @@ class ProductionRunManager(object):
             if not skipConfigCheck:
                 self.checkConfiguration(checkCare)
 
-            # launch the logger daemon
-            for lm in self._loggerManagers:
-                lm.start()
-
             # TODO - Re-add when Provenance is complete
             # provSetup = self._productionRunConfigurator.getProvenanceSetup()
             #
@@ -225,7 +214,7 @@ class ProductionRunManager(object):
 
                 statusListener = StatusListener()
                 # this will block until the monitor is created.
-                monitor = mgr.runWorkflow(statusListener, self._loggerManagers)
+                monitor = mgr.runWorkflow(statusListener)
                 self._workflowMonitors.append(monitor)
 
         finally:
@@ -408,10 +397,6 @@ class ProductionRunManager(object):
             log.debug("Failed to shutdown pipelines within timeout: %ss" % timeout)
             return False
 
-        # stop loggers after everything else has died
-        for lm in self._loggerManagers:
-            lm.stop()
-
         return True
 
     def getWorkflowNames(self):
@@ -473,7 +458,7 @@ class ProductionRunManager(object):
         -----
         This is a private class.
         """
-        def __init__(self, parent, runid, pollingIntv=0.2, listenTimeout=10):
+        def __init__(self, parent, runid, pollingIntv=1.0, listenTimeout=10):
             threading.Thread.__init__(self)
             self.setDaemon(True)
             self._runid = runid

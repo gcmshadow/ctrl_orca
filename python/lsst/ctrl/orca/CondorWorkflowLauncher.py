@@ -62,15 +62,13 @@ class CondorWorkflowLauncher(WorkflowLauncher):
         """
         log.debug("CondorWorkflowLauncher:cleanUp")
 
-    def launch(self, statusListener, loggerManagers):
+    def launch(self, statusListener):
         """Launch this workflow
 
         Parameters
         ----------
         statusListener : StatusListener
             status listener object
-        loggerManagers : list
-            list of all logger managers for this workflow
         """
         log.debug("CondorWorkflowLauncher:launch")
 
@@ -90,7 +88,7 @@ class CondorWorkflowLauncher(WorkflowLauncher):
 
         # workflow monitor for HTCondor jobs
         self.workflowMonitor = CondorWorkflowMonitor(eventBrokerHost, shutdownTopic, self.runid,
-                                                     condorDagId, loggerManagers, self.monitorConfig)
+                                                     condorDagId, self.monitorConfig)
 
         if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
