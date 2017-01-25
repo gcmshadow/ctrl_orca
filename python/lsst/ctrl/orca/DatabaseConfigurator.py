@@ -1,7 +1,7 @@
 from builtins import object
 #
 # LSST Data Management System
-# Copyright 2008, 2009, 2010 LSST Corporation.
+# Copyright 2008-2017 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -22,35 +22,35 @@ from builtins import object
 #
 
 ##
-# @deprecated DatabaseConfigurator
+# DatabaseConfigurator
+#
+# Note: this is currently unused, but being kept in place for when
+# orchestration records provenance before runs
 #
 
 
 class DatabaseConfigurator(object):
+    """Configures a database for use.
 
-    ##
-    # @brief initialize
-    #
-    def __init__(self, runid, config):
+    @param runid - `str`
+        run identifier
+    @param databaseConfig - Config
+        database configuration object
+    @param prodConfig - Config
+        production configuration object
 
-        # run id
+    Note: this is currently unused, but being kept in place for when
+    orchestration records provenance for runs
+    """
+
+    def __init__(self, runid, databaseConfig, prodConfig):
         self.runid = runid
-
-        # database configuration
-        self.config = config
+        self.databaseConfig = databaseConfig
+        self.prodConfig = prodConfig
         return
 
-    ##
-    # @brief set the database configurator up
-    #
-    def setDatabase(self, provSetup):
-
-        # steps to implement for configurators:
-        # call configurator constructor using the runid and config
-        # call setup on the configurator object
-
-        # if provSetup is not None:
-        #     may call provSetup.addProductionRecorder(ProvenanceRecorder)
-        #     may call provSetup.addWorkflowRecordCmd(string)
-
+    def setup(self, provSetup):
+        """setup for a new ru
+        @param provSetup - provenance object
+        """
         return
