@@ -147,7 +147,6 @@ class ProductionRunConfigurator(object):
             databaseConfig = databaseConfigs[databaseName]
             cfg = self.createDatabaseConfigurator(databaseConfig)
             cfg.setup(self._provSetup)
-            dbInfo = cfg.getDBInfo()
 
             self._databaseConfigurators.append(cfg)
 
@@ -224,7 +223,7 @@ class ProductionRunConfigurator(object):
         className = databaseConfig.configurationClass
         classFactory = NamedClassFactory()
         configurationClass = classFactory.createClass(className)
-        configurator = configurationClass(self.runid, databaseConfig, self.prodConfig, None)
+        configurator = configurationClass(self.runid, databaseConfig, self.prodConfig)
         return configurator
 
     def _specializedConfigure(self, specialConfigurationConfig):
