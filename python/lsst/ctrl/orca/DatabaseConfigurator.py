@@ -32,14 +32,18 @@ from builtins import object
 class DatabaseConfigurator(object):
     """Configures a database for use.
 
-    @param runid - `str`
+    Parameters
+    ----------
+    runid : `str`
         run identifier
-    @param databaseConfig - Config
+    databaseConfig : Config
         database configuration object
-    @param prodConfig - Config
+    prodConfig : Config
         production configuration object
 
-    Note: this is currently unused, but being kept in place for when
+    Note
+    ----
+    This is currently unused, but being kept in place for when
     orchestration records provenance for runs
     """
 
@@ -50,7 +54,11 @@ class DatabaseConfigurator(object):
         return
 
     def setup(self, provSetup):
-        """setup for a new ru
-        @param provSetup - provenance object
+        """Setup for a new run, and record provenance information
+    
+        Parameters
+        ----------
+        provSetup : Config
+            provenance configuration object
         """
         return
