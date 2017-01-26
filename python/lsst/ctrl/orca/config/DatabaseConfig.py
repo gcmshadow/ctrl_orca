@@ -31,27 +31,12 @@ class DatabaseSystem(pexConfig.Config):
     # run clean up configuration
     runCleanup = pexConfig.ConfigField("runCleanup ", RunCleanup)
 
-# database logger configuration
-
-
-class DBLogger(pexConfig.Config):
-    # should a database logger be launched?
-    launch = pexConfig.Field("launch", bool)
-
 # production database configuration
 
 
 class ProductionDatabaseConfig(pexConfig.Config):
     # global database name
     globalDbName = pexConfig.Field("global db name", str)
-    # data challenge version
-    dcVersion = pexConfig.Field("data challenge version", str)
-    # data challenge database name
-    dcDbName = pexConfig.Field("data challenge database name", str)
-    # minimum percent free disk space required
-    minPercDiskSpaceReq = pexConfig.Field("minimum percent disk space required", int)
-    # user run life
-    userRunLife = pexConfig.Field("user run life", int)
 
 # workflow database configuration
 
@@ -74,5 +59,3 @@ class DatabaseConfig(pexConfig.Config):
     configurationClass = pexConfig.Field("database configuration class", str)
     # type of database configuration
     configuration = pexConfig.ConfigChoiceField("configuration", dbTypemap)
-    # database logger configuration
-    logger = pexConfig.ConfigField("logger to database", DBLogger)
