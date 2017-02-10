@@ -215,11 +215,14 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
 
             # generate dag
             log.debug("CondorWorkflowConfigurator:configure: generate dag")
-            dagGenerator = EnvString.resolve(task.dagGenerator.script)
-            dagGeneratorInput = EnvString.resolve(task.dagGenerator.input)
+
+            task.generator.name = "dag"
+            generatorConfig = task.generator.active
+            dagGenerator = EnvString.resolve(generatorConfig.script)
+            dagGeneratorInput = EnvString.resolve(generatorConfig.inputFile)
             dagCreatorCmd = [dagGenerator, "-s", dagGeneratorInput, "-w", task.scriptDir, "-t",
                              task.workerJob.condor.outputFile, "-r",
-                             self.runid, "--idsPerJob", str(task.dagGenerator.idsPerJob)]
+                             self.runid, "--idsPerJob", str(generatorConfig.idsPerJob)]
             if task.preScript.script.outputFile is not None:
                 dagCreatorCmd.append("-p")
                 dagCreatorCmd.append(task.preScript.script.outputFile)
@@ -264,7 +267,7 @@ class CondorWorkflowConfigurator(WorkflowConfigurator):
 
         workflowLauncher = CondorWorkflowLauncher(self.prodConfig, self.wfConfig, self.runid,
                                                   self.localStagingDir,
-                                                  task.dagGenerator.dagName + ".diamond.dag",
+                                                  generatorConfig.dagName + ".diamond.dag",
                                                   wfConfig.monitor)
         return workflowLauncher
 
