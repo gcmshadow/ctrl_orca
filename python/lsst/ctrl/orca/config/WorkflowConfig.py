@@ -10,7 +10,9 @@ from . import MonitorConfig as mon
 from . import TaskConfig as task
 
 typemap = {"generic": gen.GenericWorkflowConfig,
-           "vanilla": van.VanillaCondorWorkflowConfig, "condor": condor.CondorWorkflowConfig}
+           "vanilla": van.VanillaCondorWorkflowConfig, 
+           "condor": condor.CondorWorkflowConfig,
+           "pegasus": condor.CondorWorkflowConfig }
 
 #
 # definition of a workflow
