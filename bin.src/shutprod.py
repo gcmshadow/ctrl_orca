@@ -2,7 +2,7 @@
 
 #
 # LSST Data Management System
-# Copyright 2008, 2009, 2010 LSST Corporation.
+# Copyright 2008-2017 LSST Corporation.
 #
 # This product includes software developed by the
 # LSST Project (http://www.lsst.org/).
@@ -22,25 +22,26 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-import lsst.ctrl.events as events
-from lsst.daf.base import PropertySet
+import requests
 import sys
+import argparse
+import json
 
-# usage:  python bin/shutprod.py urgency_level runid
+# usage:  python bin/shutprod.py host port urgency_level runid
 if __name__ == "__main__":
-    host = "lsst8.ncsa.uiuc.edu"
 
-    topic = "productionShutdown2"
+    parser = argparse.ArgumentParser(prog=sys.argv[0])
 
-    level = int(sys.argv[1])
-    runid = sys.argv[2]
+    parser.add_argument("-H", "--host", action="store", type=str, dest="host", default=None, required=True)
+    parser.add_argument("-P", "--port", action="store", type=str, dest="port", default=None, required=True)
+    parser.add_argument("-L", "--level", action="store", type=int, dest="level", default=100, required=True)
+    parser.add_argument("-R", "--runid", action="store", type=str, dest="runid", default=None, required=True)
 
-    trans = events.EventTransmitter(host, topic)
-    eventSystem = events.EventSystem.getDefaultEventSystem()
+    args = parser.parse_args()
 
-    root = PropertySet()
-    root.setInt("level", level)
+    url = 'http://%s:%s/api/v1/production' % (args.host, args.port)
 
-    id = eventSystem.createOriginatorId()
-    event = events.StatusEvent(runid, id, root)
-    trans.publishEvent(event)
+    data = { 'runid': args.runid, 'level' : args.level }
+    data_json = json.dumps(data)
+
+    r = requests.delete(url, data=data_json)

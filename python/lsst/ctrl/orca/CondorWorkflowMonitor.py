@@ -25,7 +25,6 @@ from __future__ import print_function
 from builtins import str
 import threading
 import time
-import lsst.ctrl.events as events
 import lsst.log as log
 
 from lsst.daf.base import PropertySet
@@ -40,18 +39,12 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
     Parameters
     ----------
-    eventBrokerHost : `str`
-        host name of the event broker
-    shutdownTopic : `str`
-        name of shutdown topic to use for this workflow
-    runid : `str`
-        run id for this workflow
     condorDagId : `str`
         job id of submitted HTCondor dag
     monitorConfig : Config
         configuration file for monitor information
     """
-    def __init__(self, eventBrokerHost, shutdownTopic, runid, condorDagId, monitorConfig):
+    def __init__(self, condorDagId, monitorConfig):
 
         # _locked: a container for data to be shared across threads that
         # have access to this object.
@@ -62,32 +55,14 @@ class CondorWorkflowMonitor(WorkflowMonitor):
 
         # make a copy of this liste, since we'll be removing things.
 
-        self._eventBrokerHost = eventBrokerHost
-        self._shutdownTopic = shutdownTopic
-
-        # the topic that orca uses to monitor events
-        self.orcaTopic = "orca.monitor"
-
-        self.runid = runid
-
         self.condorDagId = condorDagId
 
         self.monitorConfig = monitorConfig
 
         self._wfMonitorThread = None
 
-        # registry for event transmitters and receivers
-        self.eventSystem = events.EventSystem.getDefaultEventSystem()
-
-        # create event identifier for this process
-        self.originatorId = self.eventSystem.createOriginatorId()
-
         with self._locked:
             self._wfMonitorThread = CondorWorkflowMonitor._WorkflowMonitorThread(self,
-                                                                                 self._eventBrokerHost,
-                                                                                 self._shutdownTopic,
-                                                                                 self.orcaTopic,
-                                                                                 runid,
                                                                                  self.condorDagId,
                                                                                  self.monitorConfig)
 
@@ -98,28 +73,15 @@ class CondorWorkflowMonitor(WorkflowMonitor):
         ----------
         parent : `Thread`
             direct parent thread of this thread
-        eventBrokerHost : `str`
-            host name of the event broker
-        shutdownTopic : `str`
-            name of shutdown topic to use for this workflow
-        runid : `str`
-            run id for this workflow
         condorDagId : `str`
             job id of submitted HTCondor dag
         monitorConfig : `Config`
             configuration file for monitor information
         """
-        def __init__(self, parent, eventBrokerHost, shutdownTopic,
-                     eventTopic, runid, condorDagId, monitorConfig):
+        def __init__(self, parent, condorDagId, monitorConfig):
             threading.Thread.__init__(self)
             self.setDaemon(True)
             self._parent = parent
-            self._eventBrokerHost = eventBrokerHost
-            self._shutdownTopic = shutdownTopic
-            self._eventTopic = eventTopic
-
-            selector = "RUNID = '%s'" % runid
-            self._receiver = events.EventReceiver(self._eventBrokerHost, self._eventTopic, selector)
 
             # the dag id assigned to this workflow
             self.condorDagId = condorDagId
@@ -128,7 +90,7 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             self.monitorConfig = monitorConfig
 
         def run(self):
-            """Continously monitor incoming events for shutdown sequence
+            """Continously monitor life of workflow, shutting down when complete
             """
             cj = CondorJobs()
             log.debug("CondorWorkflowMonitor Thread started")
@@ -136,68 +98,20 @@ class CondorWorkflowMonitor(WorkflowMonitor):
             sleepInterval = statusCheckInterval
             # we don't decide when we finish, someone else does.
             while True:
-                # TODO:  this timeout value should go away when the GIL lock relinquish is
-                # implemented in events.
-                if sleepInterval != 0:
-                    time.sleep(sleepInterval)
-                event = self._receiver.receiveEvent(1)
+                time.sleep(sleepInterval)
 
-                if event is not None:
-                    # val = self._parent.handleEvent(event)
-                    self._parent.handleEvent(event)
-                    if not self._parent._locked.running:
-                        print("and...done!")
-                        return
-
-                if (event is not None):
-                    sleepInterval = 0
-                else:
-                    sleepInterval = statusCheckInterval
                 # if the dag is no longer running, return
                 if not cj.isJobAlive(self.condorDagId):
-                    # self._parent.sendLastLoggerEvent()
                     print("work complete.")
                     with self._parent._locked:
                         self._parent._locked.running = False
 
-    def startMonitorThread(self, runid):
+    def startMonitorThread(self):
         """Begin one monitor thread
-
-        Parameters
-        ----------
-        runid : `str`
-            run id
-
-        Notes
-        -----
-            run id is current unused
         """
         with self._locked:
             self._wfMonitorThread.start()
             self._locked.running = True
-
-    def handleEvent(self, event):
-        """Wait for final shutdown events from the production processes
-
-        Parameters
-        ----------
-        event : `Event`
-            Event message
-        """
-        log.debug("CondorWorkflowMonitor:handleEvent called")
-
-        # make sure this is really for us.
-
-        ps = event.getPropertySet()
-
-        # check for event type
-        if event.getType() == events.EventTypes.COMMAND:
-            # stop this thing right now.
-            # that means the dag process
-            with self._locked:
-                self._locked.running = False
-        else:
-            print("didn't handle anything")
 
     def stopWorkflow(self, urgency):
         """Stop the workflow

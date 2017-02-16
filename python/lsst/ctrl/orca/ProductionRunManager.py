@@ -27,13 +27,16 @@ from builtins import object
 
 import os
 import os.path
+import socket
 import threading
 import time
-import lsst.ctrl.events as events
 from lsst.ctrl.orca.config.ProductionConfig import ProductionConfig
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.StatusListener import StatusListener
 import lsst.log as log
+from BaseHTTPServer import HTTPServer
+from SocketServer import ThreadingMixIn
+from .ServiceHandler import ServiceHandler
 
 from .EnvString import EnvString
 from .exceptions import ConfigurationError
@@ -41,6 +44,12 @@ from .exceptions import MultiIssueConfigurationError
 from .multithreading import SharedData
 from .ProductionRunConfigurator import ProductionRunConfigurator
 
+def MakeServiceHandlerClass(productionRunManager, runid):
+    class CustomHandler(ServiceHandler, object):
+        def __init__(self, *args, **kwargs):
+            self.setParent(productionRunManager, runid)
+            super(CustomHandler, self).__init__(*args, **kwargs)
+    return CustomHandler
 
 class ProductionRunManager(object):
     """In charge of launching, monitoring, managing, and stopping a production run
@@ -220,9 +229,7 @@ class ProductionRunManager(object):
         finally:
             self._locked.release()
 
-        # start the thread that will listen for shutdown events
-        if self.config.production.productionShutdownTopic is not None:
-            self._startShutdownThread()
+        self._startServiceThread()
 
         print("Production launched.")
         print("Waiting for shutdown request.")
@@ -439,8 +446,21 @@ class ProductionRunManager(object):
             return None
         return self._workflowManagers[name]
 
-    class _ShutdownThread(threading.Thread):
-        """This thread deals with incoming events, and if one is received during production, we
+    class ThreadedServer(ThreadingMixIn, HTTPServer):
+        """ threaded server """
+        def server_bind(self):
+            HTTPServer.server_bind(self)
+
+        def setManager(self, manager):
+            self.manager = manager
+            self.socket.settimeout(1)
+    
+        def serve(self):
+            while self.manager.isRunning():
+                self.handle_request()
+
+    class _ServiceEndpoint(threading.Thread):
+        """This thread deals with incoming requests, and if one is received during production, we
            shut everything down.
 
         Parameters
@@ -452,7 +472,7 @@ class ProductionRunManager(object):
         pollingIntv : `float`
             the polling interval to sleep, in seconds.
         listenTimeout : `int`
-            the interval, in seconds, to wait for an incoming event.
+            the interval, in seconds, to wait for an incoming request
 
         Notes
         -----
@@ -466,35 +486,24 @@ class ProductionRunManager(object):
             self._pollintv = pollingIntv
             self._timeout = listenTimeout
 
-            brokerhost = parent.config.production.eventBrokerHost
-
-            self._topic = parent.config.production.productionShutdownTopic
-            self._evsys = events.EventSystem.getDefaultEventSystem()
-            selector = "RUNID = '%s'" % self._runid
-            self._evsys.createReceiver(brokerhost, self._topic, selector)
+            handlerClass = MakeServiceHandlerClass(parent, runid)
+            self.server = parent.ThreadedServer(('0.0.0.0', 0), handlerClass)
+            self.server.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            print('server socket listening at %d' % self.server.server_port)
 
         def run(self):
-            """Listen for the shutdown event at regular intervals, and shutdown when the event is received.
+            """Set Manager and serve requests until complete.
             """
-            log.debug("listening for shutdown event at %s s intervals" % self._pollintv)
+            self.server.setManager(self._parent)
 
-            log.debug("checking for shutdown event")
-            log.debug("self._timeout = %s" % self._timeout)
-            shutdownEvent = self._evsys.receiveEvent(self._topic, self._timeout)
-            while self._parent.isRunning() and shutdownEvent is None:
-                time.sleep(self._pollintv)
-                shutdownEvent = self._evsys.receiveEvent(self._topic, self._timeout)
-            log.debug("DONE!")
-
-            if shutdownEvent:
-                shutdownData = shutdownEvent.getPropertySet()
-                self._parent.stopProduction(shutdownData.getInt("level"))
+            self.server.serve()
             log.debug("Everything shutdown - All finished")
 
-    def _startShutdownThread(self):
+
+    def _startServiceThread(self):
         """Create a shutdown thread, and start it
         """
-        self._sdthread = ProductionRunManager._ShutdownThread(self, self.runid)
+        self._sdthread = ProductionRunManager._ServiceEndpoint(self, self.runid)
         self._sdthread.start()
 
     def getShutdownThread(self):
