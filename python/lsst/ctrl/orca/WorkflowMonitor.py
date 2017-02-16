@@ -44,10 +44,10 @@ class WorkflowMonitor(object):
         log.debug("WorkflowMonitor:addStatusListener")
         self._statusListeners.append(statusListener)
 
-    def handleEvent(self, event):
-        """Act on an event request
+    def handleRequest(self, request):
+        """Act on a request
         """
-        log.debug("WorkflowMonitor:handleEvent")
+        log.debug("WorkflowMonitor:handleRequest")
 
     def handleFailure(self):
         """Handle a failure

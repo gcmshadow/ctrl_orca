@@ -21,12 +21,6 @@ class Production(pexConfig.Config):
     # repository directory location
     repositoryDirectory = pexConfig.Field("location of production repository", str)
 
-    # hostname of event broker
-    eventBrokerHost = pexConfig.Field("hostname of the event broker", str)
-
-    # shutdown topic
-    productionShutdownTopic = pexConfig.Field("topic used to notify production shutdowns", str)
-
     # config check
     configCheckCare = pexConfig.Field("config check", int, default=-1)
 

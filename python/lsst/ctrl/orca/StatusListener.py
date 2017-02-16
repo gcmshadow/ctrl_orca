@@ -25,16 +25,17 @@ import lsst.log as log
 
 
 class StatusListener(object):
-    """An interface for getting notified about changed in the status of a workflow
+    """An interface for getting notified about changed in the status of
+    a workflow
     """
 
     # initializer
     def __init__(self):
         log.debug("StatusListener:__init__")
 
-    def workflowFailed(self, name, errorName, errmsg, event, pipelineName):
-        """Indicate that a workflow has experience an as-yet unhandled failure that prevents
-           further processing
+    def workflowFailed(self, name, errorName, errmsg, request, pipelineName):
+        """Indicate that a workflow has experienced an as-yet unhandled
+        failure and can't process further
         """
         return
 
@@ -47,20 +48,15 @@ class StatusListener(object):
         """Called when a workflow has started up correctly and is
            ready to process data.
 
-           Notes
-           -----
-           If a pipeline is waiting for an event, the listener should be notified via a workflowWaiting()
-           message.
+        Notes
+        -----
+        If a pipeline is waiting for an request, the listener should be
+        notified via workflowWaiting
         """
         return
 
     def workflowWaiting(self, name):
-        """Indicate that a workflow is waiting for an event to proceed.
+        """Indicate that a workflow is waiting for an request to proceed.
 
-        Notes
-        -----
-        This should only be called only for events that are expected from
-        outside the workflow.  Events that are meant to travel between Pipelines
-        within a workflow should not trigger this notification.
         """
         return
