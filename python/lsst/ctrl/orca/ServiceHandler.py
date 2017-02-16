@@ -37,13 +37,27 @@ class ServiceHandler(BaseHTTPRequestHandler):
     production = "/api/%s/production" % version
 
     def setParent(self, parent, runid):
+        """Set the parent object and runid of this handler
+
+        Parameters
+        ----------
+        parent: object
+            The parent object that will deal with requests from this handler
+        runid: `str`
+            The runid of the production
+        """
         self.parent = parent
         self.runid = runid
 
     def do_DELETE(self):
-        print("self.path = %s" % self.path)
+        """handle a HTTP DELETE request
+        """
+        # check to be sure that we handle this type of request
+        # produce an error if we don't see what we expect to see
         if self.path == self.production:
             s = self.rfile.read(int(self.headers['Content-length']))
+            # check for payload validity
+            # produce an error if we don't see what we expect to see
             try:
                 data = json.loads(s)
                 level = data['level']
@@ -66,10 +80,3 @@ class ServiceHandler(BaseHTTPRequestHandler):
         err = { "status": status, "message": message }
         message = json.dumps(err)
         self.wfile.write(message)
-
-#def MakeServiceHandlerClass(productionRunManager, runid):
-#    class CustomerHandler(ServiceHandler, object):
-#        def __init__(self, *arg, **kwargs):
-#            self.setParent(productionRunManager, runid)
-#            super(CustomerHandler, self).__init__(*args, **kwargs)
-#    return CustomHandler
