@@ -1,7 +1,0 @@
-#<?cfg paf policy ?>
-# Default Detection policy file
-
-# 
-thresholdSigma: 5.0
-numPixMinFootprint: 5
-
