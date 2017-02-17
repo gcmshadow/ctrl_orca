@@ -40,14 +40,24 @@ class WorkflowMonitor(object):
 
     def addStatusListener(self, statusListener):
         """Add a status listener to this monitor
+
+        Parameters
+        ----------
+        statusListener: StatusListener
+            an object that implements the statusListener interface
         """
         log.debug("WorkflowMonitor:addStatusListener")
         self._statusListeners.append(statusListener)
 
-    def handleEvent(self, event):
-        """Act on an event request
+    def handleRequest(self, request):
+        """Act on a request
+
+        Parameters
+        ----------
+        request : dict
+            a dictionary containing a REST request
         """
-        log.debug("WorkflowMonitor:handleEvent")
+        log.debug("WorkflowMonitor:handleRequest")
 
     def handleFailure(self):
         """Handle a failure
@@ -77,5 +87,10 @@ class WorkflowMonitor(object):
 
     def stopWorkflow(self, urgency):
         """Stop the workflow
+
+        Parameters
+        ----------
+        urgency : `int`
+            The severity level of how to handle stopping the workflow
         """
         log.debug("WorkflowMonitor:stopWorkflow")

@@ -25,21 +25,39 @@ import lsst.log as log
 
 
 class StatusListener(object):
-    """An interface for getting notified about changed in the status of a workflow
+    """Used receive messages about changes in a workflow
     """
 
     # initializer
     def __init__(self):
         log.debug("StatusListener:__init__")
 
-    def workflowFailed(self, name, errorName, errmsg, event, pipelineName):
-        """Indicate that a workflow has experience an as-yet unhandled failure that prevents
-           further processing
+    def workflowFailed(self, name, errorName, errmsg, response, pipelineName):
+        """Indicate that a workflow has experienced an as-yet unhandled
+        failure and can't process further
+        
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
+        errorName : `str`
+            name of the error
+        errmsg : `str`
+            error message
+        request : dict
+            dictionary containing the remote response message
+        pipelineName : `str`
+            the name of the pipeline in which this error occurred.
         """
         return
 
     def workflowShutdown(self, name):
         """The workflow has successfully shutdown and ready to be cleaned up
+
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
         """
         return
 
@@ -47,20 +65,24 @@ class StatusListener(object):
         """Called when a workflow has started up correctly and is
            ready to process data.
 
-           Notes
-           -----
-           If a pipeline is waiting for an event, the listener should be notified via a workflowWaiting()
-           message.
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
+
+        Notes
+        -----
+        If a pipeline is waiting for an request, the listener should be
+        notified via workflowWaiting
         """
         return
 
     def workflowWaiting(self, name):
-        """Indicate that a workflow is waiting for an event to proceed.
+        """Indicate that a workflow is waiting for an request to proceed.
 
-        Notes
-        -----
-        This should only be called only for events that are expected from
-        outside the workflow.  Events that are meant to travel between Pipelines
-        within a workflow should not trigger this notification.
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
         """
         return

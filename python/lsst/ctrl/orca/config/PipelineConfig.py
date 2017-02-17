@@ -8,8 +8,6 @@ from lsst.ctrl.orca.config.DirectoryConfig import DirectoryConfig
 class AppStageConfig(pexConfig.Config):
     # class to invoke for parallel execution
     parallelClass = pexConfig.Field("class", str)
-    # event topic
-    eventTopic = pexConfig.Field("topic name", str)
     # stage name
     stageConfig = pexConfig.Field("config name", str)
 

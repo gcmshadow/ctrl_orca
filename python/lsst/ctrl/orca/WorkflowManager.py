@@ -24,7 +24,6 @@ from __future__ import print_function
 from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.multithreading import SharedData
-from lsst.ctrl.orca.DataAnnouncer import DataAnnouncer
 from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 import lsst.log as log
 
@@ -184,7 +183,7 @@ class WorkflowManager(object):
              the config describing the workflow
         prodConfig : Config
              the config describing the overall production.  This provides common data
-             (e.g. event broker host) that needs to be shared with all pipelines.
+             that needs to be shared with all pipelines.
 
         Returns
         -------
@@ -284,12 +283,3 @@ class WorkflowManager(object):
         The number of nodes used by this workflow.
         """
         return self._workflowConfigurator.getNodeCount()
-
-    def announceData(self):
-        """Announce that data is available for this workflow
-        """
-        announcer = DataAnnouncer(self.runid, self.prodConfig, self.wfConfig)
-        if announcer.announce():
-            print("Data announced via config for %s" % self.name)
-        else:
-            print("No data announced for %s.  Waiting for events from external source" % self.name)

@@ -72,10 +72,7 @@ class CondorWorkflowLauncher(WorkflowLauncher):
         """
         log.debug("CondorWorkflowLauncher:launch")
 
-        # start the monitor first, because we want to catch any pipeline
-        # events that might be sent from expiring pipelines.
-        eventBrokerHost = self.prodConfig.production.eventBrokerHost
-        shutdownTopic = self.prodConfig.production.productionShutdownTopic
+        # start the monitor
 
         # Launch process
         startDir = os.getcwd()
@@ -87,11 +84,10 @@ class CondorWorkflowLauncher(WorkflowLauncher):
         os.chdir(startDir)
 
         # workflow monitor for HTCondor jobs
-        self.workflowMonitor = CondorWorkflowMonitor(eventBrokerHost, shutdownTopic, self.runid,
-                                                     condorDagId, self.monitorConfig)
+        self.workflowMonitor = CondorWorkflowMonitor(condorDagId, self.monitorConfig)
 
         if statusListener is not None:
             self.workflowMonitor.addStatusListener(statusListener)
-        self.workflowMonitor.startMonitorThread(self.runid)
+        self.workflowMonitor.startMonitorThread()
 
         return self.workflowMonitor

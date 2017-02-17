@@ -73,9 +73,6 @@ class ProductionRunConfigurator(object):
         self._databaseConfigurators = []
 
 
-        # hostname of the event broker
-        self.eventBrokerHost = None
-
         # these are config settings which can be overriden from what they
         # are in the workflow policies.
 
@@ -83,13 +80,8 @@ class ProductionRunConfigurator(object):
         self.configOverrides = dict()
 
         production = self.prodConfig.production
-        if production.eventBrokerHost is not None:
-            self.eventBrokerHost = production.eventBrokerHost
-            self.configOverrides["execute.eventBrokerHost"] = production.eventBrokerHost
         if production.logThreshold is not None:
             self.configOverrides["execute.logThreshold"] = production.logThreshold
-        if production.productionShutdownTopic is not None:
-            self.configOverrides["execute.shutdownTopic"] = production.productionShutdownTopic
 
     def createWorkflowManager(self, prodConfig, wfName, wfConfig):
         """Create the WorkflowManager for the pipeline with the given shortName
