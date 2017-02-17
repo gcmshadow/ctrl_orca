@@ -77,6 +77,15 @@ class ServiceHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def writeError(self, status, message):
+        """emit an error message as a response to remote client
+
+        Parameters
+        ----------
+        status : `str`
+            type of error
+        message : `str`
+            explanation of error
+        """
         err = { "status": status, "message": message }
         message = json.dumps(err)
         self.wfile.write(message)

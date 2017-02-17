@@ -25,28 +25,50 @@ import lsst.log as log
 
 
 class StatusListener(object):
-    """An interface for getting notified about changed in the status of
-    a workflow
+    """Used receive messages about changes in a workflow
     """
 
     # initializer
     def __init__(self):
         log.debug("StatusListener:__init__")
 
-    def workflowFailed(self, name, errorName, errmsg, request, pipelineName):
+    def workflowFailed(self, name, errorName, errmsg, response, pipelineName):
         """Indicate that a workflow has experienced an as-yet unhandled
         failure and can't process further
+        
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
+        errorName : `str`
+            name of the error
+        errmsg : `str`
+            error message
+        request : dict
+            dictionary containing the remote response message
+        pipelineName : `str`
+            the name of the pipeline in which this error occurred.
         """
         return
 
     def workflowShutdown(self, name):
         """The workflow has successfully shutdown and ready to be cleaned up
+
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
         """
         return
 
     def workflowStarted(self, name):
         """Called when a workflow has started up correctly and is
            ready to process data.
+
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
 
         Notes
         -----
@@ -58,5 +80,9 @@ class StatusListener(object):
     def workflowWaiting(self, name):
         """Indicate that a workflow is waiting for an request to proceed.
 
+        Parameters
+        ----------
+        name : `str`
+            name of the workflow
         """
         return
