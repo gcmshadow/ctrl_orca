@@ -34,8 +34,8 @@ from lsst.ctrl.orca.config.ProductionConfig import ProductionConfig
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.StatusListener import StatusListener
 import lsst.log as log
-from BaseHTTPServer import HTTPServer
-from SocketServer import ThreadingMixIn
+from http.server import HTTPServer
+from socketserver import ThreadingMixIn
 from .ServiceHandler import ServiceHandler
 
 from .EnvString import EnvString
