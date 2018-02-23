@@ -25,8 +25,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from builtins import object
 
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from SocketServer import ThreadingMixIn
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 import threading
 import json
 import socket
