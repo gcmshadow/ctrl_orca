@@ -18,7 +18,7 @@ module add gcc/4.4.5
 
 echo ${HERE}
 
-which gcc
+type -a gcc
 
 date 
 
