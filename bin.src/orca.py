@@ -48,9 +48,6 @@ parser.add_option("-c", "--configcheck", action="store_true", dest="skipconfigch
 
 parser.add_option("-V", "--verbosity", type="int", action="store", dest="verbosity", default=0,
                   metavar="int", help="orca verbosity level (0=normal, 1=debug, -1=quiet, -3=silent)")
-parser.add_option("-r", "--policyRepository", type="string", action="store",
-                  dest="repository", default=None, metavar="dir",
-                  help="directory containing policy files")
 parser.add_option("-e", "--envscript", action="store", dest="envscript",
                   default=None, metavar="script",
                   help="an environment-setting script to source on pipeline platform")

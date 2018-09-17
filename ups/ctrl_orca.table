@@ -1,6 +1,5 @@
 setupRequired(python_future)
 setupRequired(utils)
-setupRequired(pex_policy)
 setupRequired(pex_config)
 setupRequired(daf_persistence)
 setupRequired(log)
