@@ -80,7 +80,6 @@ runId = parser.args[1]
 
 orca.skipglidein = parser.opts.skipglidein
 orca.dryrun = parser.opts.dryrun
-orca.repository = parser.opts.repository
 orca.envscript = parser.opts.envscript
 
 # This is handled via lsst.ctrl.orca (i.e. lsst/ctrl/orca/__init__.py):
@@ -106,7 +105,7 @@ log.debug("pipelineConfigFile = "+pipelineConfigFile)
 log.debug("runId = "+runId)
 
 # create the ProductionRunManager, configure it, and launch it
-productionRunManager = ProductionRunManager(runId, pipelineConfigFile, orca.repository)
+productionRunManager = ProductionRunManager(runId, pipelineConfigFile)
 
 
 productionRunManager.runProduction(skipConfigCheck=parser.opts.skipconfigcheck,
