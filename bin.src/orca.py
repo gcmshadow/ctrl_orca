@@ -48,9 +48,6 @@ parser.add_option("-c", "--configcheck", action="store_true", dest="skipconfigch
 
 parser.add_option("-V", "--verbosity", type="int", action="store", dest="verbosity", default=0,
                   metavar="int", help="orca verbosity level (0=normal, 1=debug, -1=quiet, -3=silent)")
-parser.add_option("-r", "--policyRepository", type="string", action="store",
-                  dest="repository", default=None, metavar="dir",
-                  help="directory containing policy files")
 parser.add_option("-e", "--envscript", action="store", dest="envscript",
                   default=None, metavar="script",
                   help="an environment-setting script to source on pipeline platform")
@@ -83,7 +80,6 @@ runId = parser.args[1]
 
 orca.skipglidein = parser.opts.skipglidein
 orca.dryrun = parser.opts.dryrun
-orca.repository = parser.opts.repository
 orca.envscript = parser.opts.envscript
 
 # This is handled via lsst.ctrl.orca (i.e. lsst/ctrl/orca/__init__.py):
@@ -109,7 +105,7 @@ log.debug("pipelineConfigFile = "+pipelineConfigFile)
 log.debug("runId = "+runId)
 
 # create the ProductionRunManager, configure it, and launch it
-productionRunManager = ProductionRunManager(runId, pipelineConfigFile, orca.repository)
+productionRunManager = ProductionRunManager(runId, pipelineConfigFile)
 
 
 productionRunManager.runProduction(skipConfigCheck=parser.opts.skipconfigcheck,
