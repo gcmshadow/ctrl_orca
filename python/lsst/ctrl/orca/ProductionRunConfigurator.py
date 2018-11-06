@@ -72,7 +72,6 @@ class ProductionRunConfigurator(object):
         # cache the database configurators for checking the configuraiton.
         self._databaseConfigurators = []
 
-
         # these are config settings which can be overriden from what they
         # are in the workflow policies.
 

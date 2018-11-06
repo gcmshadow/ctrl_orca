@@ -250,6 +250,7 @@ __all__ = "SharedDataTestCase ReadableShareDataTestCase MultiThreadTestCase".spl
 class SharedDataMemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
 
+
 if __name__ == "__main__":
     lsst.utils.tests.init()
     unittest.main()

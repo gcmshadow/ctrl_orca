@@ -20,16 +20,9 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from __future__ import with_statement
-from __future__ import print_function
-from __future__ import absolute_import
-from builtins import object
-
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from socketserver import ThreadingMixIn
-import threading
+from http.server import BaseHTTPRequestHandler
 import json
-import socket
+
 
 class ServiceHandler(BaseHTTPRequestHandler):
 
@@ -63,11 +56,11 @@ class ServiceHandler(BaseHTTPRequestHandler):
                 level = data['level']
                 runid = data['runid']
                 if runid != self.runid:
-                    raise ValueException("invalid runid received")
+                    raise ValueError("invalid runid received")
                 self.send_response(204)
                 self.end_headers()
                 self.parent.stopProduction(level)
-            except Exception as error:
+            except Exception as error:  # noqa: F841
                 self.send_response(422)
                 self.end_headers()
                 self.writeError("Unprocessable entity", "Error in syntax of message")
@@ -86,6 +79,6 @@ class ServiceHandler(BaseHTTPRequestHandler):
         message : `str`
             explanation of error
         """
-        err = { "status": status, "message": message }
+        err = {"status": status, "message": message}
         message = json.dumps(err)
         self.wfile.write(message)

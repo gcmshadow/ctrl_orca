@@ -1,8 +1,7 @@
-from __future__ import absolute_import
 import lsst.pex.config as pexConfig
-from . import FakeTypeMap as fake
-from . import WorkflowConfig as work
-from . import DatabaseConfig as db
+from . import FakeTypeMap as fake  # noqa: N813
+from . import WorkflowConfig as work  # noqa: N813
+from . import DatabaseConfig as db  # noqa: N813
 
 # production level configuration
 

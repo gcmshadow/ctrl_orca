@@ -1,14 +1,13 @@
-from __future__ import absolute_import
 import lsst.pex.config as pexConfig
-from . import CondorWorkflowConfig as condor
-from . import FakeTypeMap as fake
-from . import DatabaseConfig as data
-from . import PlatformConfig as plat
-from . import MonitorConfig as mon
-from . import TaskConfig as task
+from . import CondorWorkflowConfig as condor  # noqa: N813
+from . import FakeTypeMap as fake  # noqa: N813
+from . import DatabaseConfig as data  # noqa: N813
+from . import PlatformConfig as plat  # noqa: N813
+from . import MonitorConfig as mon  # noqa: N813
+from . import TaskConfig as task  # noqa: N813
 
 typemap = {"condor": condor.CondorWorkflowConfig,
-           "pegasus": condor.CondorWorkflowConfig }
+           "pegasus": condor.CondorWorkflowConfig}
 
 #
 # definition of a workflow

@@ -90,6 +90,7 @@ class MultiIssueTestCase(lsst.utils.tests.TestCase):
 class ExceptionsMemoryTester(lsst.utils.tests.MemoryTestCase):
     pass
 
+
 __all__ = "MultiIssueTestCase".split()
 
 if __name__ == "__main__":

@@ -44,12 +44,14 @@ from .exceptions import MultiIssueConfigurationError
 from .multithreading import SharedData
 from .ProductionRunConfigurator import ProductionRunConfigurator
 
+
 def MakeServiceHandlerClass(productionRunManager, runid):
     class CustomHandler(ServiceHandler, object):
         def __init__(self, *args, **kwargs):
             self.setParent(productionRunManager, runid)
             super(CustomHandler, self).__init__(*args, **kwargs)
     return CustomHandler
+
 
 class ProductionRunManager(object):
     """In charge of launching, monitoring, managing, and stopping a production run
@@ -454,7 +456,7 @@ class ProductionRunManager(object):
         def setManager(self, manager):
             self.manager = manager
             self.socket.settimeout(1)
-    
+
         def serve(self):
             while self.manager.isRunning():
                 self.handle_request()
@@ -498,7 +500,6 @@ class ProductionRunManager(object):
 
             self.server.serve()
             log.debug("Everything shutdown - All finished")
-
 
     def _startServiceThread(self):
         """Create a shutdown thread, and start it
