@@ -59,7 +59,7 @@ class CondorJobs(object):
         1 job(s) submitted to cluster 1317.
         """
         log.debug("CondorJobs:submitJob")
-        clusterexp = re.compile("1 job\(s\) submitted to cluster (\d+).")
+        clusterexp = re.compile(r"1 job\(s\) submitted to cluster (\d+).")
 
         submitRequest = "condor_submit %s" % condorFile
 
@@ -94,7 +94,7 @@ class CondorJobs(object):
         """
         log.debug("CondorJobs:waitForJobToRun")
         jobNum = "%s.0" % num
-        queueExp = re.compile("\S+")
+        queueExp = re.compile(r"\S+")
         cJobSeen = 0
         print("waiting for job %s to run." % num)
         if extramsg is not None:
@@ -159,7 +159,7 @@ class CondorJobs(object):
             list of condor job ids
         """
         log.debug("CondorJobs:waitForAllJobsToRun")
-        queueExp = re.compile("\S+")
+        queueExp = re.compile(r"\S+")
         jobList = list(numList)
         while 1:
             pop = os.popen("condor_q", "r")
@@ -207,7 +207,7 @@ class CondorJobs(object):
         # In an effort to avoid having to fix any output behavior issues in the
         # future, we just try and match every line of output with "1 jobs(s) submitted"
         # and if we find, it, we grab the cluster id out of that line.
-        clusterexp = re.compile("1 job\(s\) submitted to cluster (\d+).")
+        clusterexp = re.compile(r"1 job\(s\) submitted to cluster (\d+).")
         cmd = "condor_submit_dag %s" % filename
         log.debug(cmd)
         process = subprocess.Popen(cmd.split(), shell=False, stdout=subprocess.PIPE)

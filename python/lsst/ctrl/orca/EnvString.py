@@ -45,7 +45,7 @@ class EnvString(object):
             the resulting string with environment variable info substituted.
         """
 
-        p = re.compile('\$[a-zA-Z0-9_]+')
+        p = re.compile(r'\$[a-zA-Z0-9_]+')
         retVal = strVal
         exprs = p.findall(retVal)
         for i in exprs:

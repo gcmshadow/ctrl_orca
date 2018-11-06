@@ -26,7 +26,6 @@ import lsst.log as log
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
 from lsst.ctrl.orca.PegasusJobs import PegasusJobs
 from lsst.ctrl.orca.CondorWorkflowMonitor import CondorWorkflowMonitor
-from lsst.ctrl.orca.EnvString import EnvString
 
 
 class PegasusWorkflowLauncher(WorkflowLauncher):
@@ -48,7 +47,8 @@ class PegasusWorkflowLauncher(WorkflowLauncher):
         monitor Config
     """
 
-    def __init__(self, prodConfig, wfConfig, runid, localStagingDir, sitesXMLFile, transformFile, daxFile, monitorConfig):
+    def __init__(self, prodConfig, wfConfig, runid, localStagingDir, sitesXMLFile, transformFile,
+                 daxFile, monitorConfig):
         log.debug("PegasusWorkflowLauncher:__init__")
 
         self.prodConfig = prodConfig
@@ -82,10 +82,11 @@ class PegasusWorkflowLauncher(WorkflowLauncher):
         os.chdir(self.localStagingDir)
 
         pj = PegasusJobs()
-        condorDagId, statusInfo, removeInfo = pj.pegasusSubmitDax(self.sitesXMLFile, self.transformFile, self.daxFile)
+        condorDagId, statusInfo, removeInfo = pj.pegasusSubmitDax(self.sitesXMLFile, self.transformFile,
+                                                                  self.daxFile)
         if statusInfo is not None:
             print("Pegasus workspace: %s" % statusInfo[0])
-        
+
         os.chdir(startDir)
 
         # workflow monitor for HTCondor jobs

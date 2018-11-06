@@ -45,6 +45,7 @@ class WorkflowDatabaseConfig(pexConfig.Config):
     # workflow database name
     dbName = pexConfig.Field("database name", str)
 
+
 dbTypemap = {"production": ProductionDatabaseConfig, "workflow": WorkflowDatabaseConfig}
 
 # database configuration

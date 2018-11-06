@@ -29,6 +29,7 @@ class ScriptConfig(pexConfig.Config):
 
 # DAG generation script
 
+
 class DagGeneratorConfig(pexConfig.Config):
     # DAG name
     dagName = pexConfig.Field("dag name", str)
@@ -39,12 +40,14 @@ class DagGeneratorConfig(pexConfig.Config):
     # number of ids per job given to execute
     idsPerJob = pexConfig.Field("the number of ids that will be handled per job", int)
 
+
 class SitesConfig(pexConfig.Config):
     inputFile = pexConfig.Field("input", str)
     outputFile = pexConfig.Field("output", str)
     keywords = pexConfig.DictField("key value pairs", keytype=str, itemtype=str, default=dict())
 
 # DAX generation script
+
 
 class DaxGeneratorConfig(pexConfig.Config):
     # DAG name
@@ -60,7 +63,7 @@ class DaxGeneratorConfig(pexConfig.Config):
 
 
 typemap = {"dag": DagGeneratorConfig,
-            "dax": DaxGeneratorConfig }
+           "dax": DaxGeneratorConfig}
 
 
 # task

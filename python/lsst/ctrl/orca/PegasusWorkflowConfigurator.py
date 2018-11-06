@@ -20,12 +20,9 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from builtins import str
-import stat
 import sys
 import os
 import os.path
-import getpass
 from shutil import copy
 
 import lsst.log as log
@@ -215,11 +212,11 @@ class PegasusWorkflowConfigurator(WorkflowConfigurator):
         # create the Launcher
 
         workflowLauncher = PegasusWorkflowLauncher(self.prodConfig, self.wfConfig, self.runid,
-                                                  self.localStagingDir,
-                                                  sitesXMLFile,
-                                                  transformFile,
-                                                  "output.dax",
-                                                  wfConfig.monitor)
+                                                   self.localStagingDir,
+                                                   sitesXMLFile,
+                                                   transformFile,
+                                                   "output.dax",
+                                                   wfConfig.monitor)
         return workflowLauncher
 
     def writeSitesXML(self, outputFile, template, keywords):

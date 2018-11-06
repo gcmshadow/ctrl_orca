@@ -55,7 +55,7 @@ class DatabaseConfigurator(object):
 
     def setup(self, provSetup):
         """Setup for a new run, and record provenance information
-    
+
         Parameters
         ----------
         provSetup : Config

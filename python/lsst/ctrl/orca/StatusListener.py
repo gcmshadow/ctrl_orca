@@ -35,7 +35,7 @@ class StatusListener(object):
     def workflowFailed(self, name, errorName, errmsg, response, pipelineName):
         """Indicate that a workflow has experienced an as-yet unhandled
         failure and can't process further
-        
+
         Parameters
         ----------
         name : `str`

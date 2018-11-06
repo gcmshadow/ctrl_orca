@@ -22,12 +22,10 @@
 
 from __future__ import with_statement
 from __future__ import print_function
-from builtins import str
 import threading
 import time
 import lsst.log as log
 
-from lsst.daf.base import PropertySet
 from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.CondorJobs import CondorJobs

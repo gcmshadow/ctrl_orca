@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     url = 'http://%s:%s/api/v1/production' % (args.host, args.port)
 
-    data = { 'runid': args.runid, 'level' : args.level }
+    data = {'runid': args.runid, 'level': args.level}
     data_json = json.dumps(data)
 
     r = requests.delete(url, data=data_json)
