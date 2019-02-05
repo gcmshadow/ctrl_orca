@@ -158,7 +158,7 @@ class ProductionRunConfigurator(object):
             workflowManager = self.createWorkflowManager(self.prodConfig, wfName, wfConfig)
             workflowLauncher = workflowManager.configure(self._provSetup, workflowVerbosity)
             if workflowLauncher is None:
-                    raise MultiIssueConfigurationError("error configuring workflowLauncher")
+                raise MultiIssueConfigurationError("error configuring workflowLauncher")
 
             workflowManagers.append(workflowManager)
 
