@@ -21,13 +21,10 @@
 #
 
 #
-from __future__ import with_statement
-from builtins import str
-from builtins import object
 import threading
 
 
-class SharedData(object):
+class SharedData:
     """A lock-protected container for data that can be shared amongst threads.
 
     Parameters

@@ -1,6 +1,3 @@
-from __future__ import print_function
-from builtins import range
-from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -33,7 +30,7 @@ from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 #
 
 
-class WorkflowConfigurator(object):
+class WorkflowConfigurator:
     """Abstract class for configuring a workflow
 
     Parameters
@@ -55,7 +52,7 @@ class WorkflowConfigurator(object):
     """
 
     # configuration group
-    class ConfigGroup(object):
+    class ConfigGroup:
         """Configuration group
 
         Parameters

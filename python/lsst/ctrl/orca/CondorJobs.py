@@ -22,10 +22,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
-from __future__ import print_function
-from builtins import str
-from builtins import object
 import os
 import subprocess
 import re
@@ -33,7 +29,7 @@ import time
 import lsst.log as log
 
 
-class CondorJobs(object):
+class CondorJobs:
     """Handles interaction with HTCondor
     This class is highly dependent on the output of the condor commands
     condor_submit and condor_q

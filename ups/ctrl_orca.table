@@ -1,4 +1,3 @@
-setupRequired(python_future)
 setupRequired(utils)
 setupRequired(pex_config)
 setupRequired(daf_persistence)

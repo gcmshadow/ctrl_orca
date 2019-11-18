@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -22,14 +20,11 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
-from __future__ import print_function
-from builtins import object
 import os
 import lsst.log as log
 
 
-class FileWaiter(object):
+class FileWaiter:
     # @brief initializer
     """Waits for files to come into existence on a remote resource
     Parameters

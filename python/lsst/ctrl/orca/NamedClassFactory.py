@@ -20,10 +20,8 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from builtins import object
 
-
-class NamedClassFactory(object):
+class NamedClassFactory:
     """Create a new "name" class object
 
     Parameters

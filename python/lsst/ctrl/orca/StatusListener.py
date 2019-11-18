@@ -20,11 +20,10 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from builtins import object
 import lsst.log as log
 
 
-class StatusListener(object):
+class StatusListener:
     """Used receive messages about changes in a workflow
     """
 

@@ -20,8 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from __future__ import print_function
-from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.multithreading import SharedData
 from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
@@ -32,7 +30,7 @@ import lsst.log as log
 #
 
 
-class WorkflowManager(object):
+class WorkflowManager:
     """Manage lifecycle of this workflow.
 
     Parameters

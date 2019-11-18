@@ -1,4 +1,3 @@
-from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008-2017 LSST Corporation.
@@ -29,7 +28,7 @@ from builtins import object
 #
 
 
-class DatabaseConfigurator(object):
+class DatabaseConfigurator:
     """Configures a database for use.
 
     Parameters

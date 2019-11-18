@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 import lsst.pex.config as pexConfig
 from lsst.ctrl.orca.config.DirectoryConfig import DirectoryConfig
 
