@@ -20,8 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from __future__ import print_function
-from builtins import object
 from lsst.ctrl.orca.NamedClassFactory import NamedClassFactory
 from lsst.ctrl.orca.WorkflowManager import WorkflowManager
 from lsst.ctrl.orca.config.ProductionConfig import ProductionConfig
@@ -29,7 +27,7 @@ from lsst.ctrl.orca.exceptions import MultiIssueConfigurationError
 import lsst.log as log
 
 
-class ProductionRunConfigurator(object):
+class ProductionRunConfigurator:
     """Create a basic production run.
 
     Parameters

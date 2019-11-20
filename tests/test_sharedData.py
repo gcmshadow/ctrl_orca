@@ -23,8 +23,6 @@
 """
 Tests of the SharedData class
 """
-from __future__ import with_statement
-from builtins import str
 
 import unittest
 import threading

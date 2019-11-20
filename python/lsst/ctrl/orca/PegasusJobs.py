@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #
 # LSST Data Management System
 # Copyright 2017 LSST Corporation.
@@ -22,8 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
-from __future__ import print_function
 import subprocess
 import re
 import lsst.log as log

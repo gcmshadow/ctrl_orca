@@ -1,4 +1,3 @@
-from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -32,7 +31,7 @@ from lsst.ctrl.orca.WorkflowMonitor import WorkflowMonitor
 #
 
 
-class WorkflowLauncher(object):
+class WorkflowLauncher:
     ##
     # @brief
     #

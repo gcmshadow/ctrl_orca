@@ -20,13 +20,11 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
-from builtins import object
 import lsst.log as log
 from lsst.ctrl.orca.multithreading import SharedData
 
 
-class WorkflowMonitor(object):
+class WorkflowMonitor:
     """In charge of monitoring and/or controlling the progress of a running workflow.
     """
 

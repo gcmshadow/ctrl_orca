@@ -1,4 +1,3 @@
-from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -25,7 +24,7 @@ import re
 import os
 
 
-class EnvString(object):
+class EnvString:
     def resolve(strVal):
         """Replace environment variables within a string
 

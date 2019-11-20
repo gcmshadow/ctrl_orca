@@ -22,8 +22,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-
-from builtins import object
 import lsst.pex.exceptions as pexExcept
 
 import lsst.daf.base as dafBase
@@ -31,7 +29,7 @@ import lsst.daf.base as dafBase
 import os
 
 
-class Directories(object):
+class Directories:
     """Determine the various directory roots that can be used by a pipeline
        This class takes a "dir" config and a run identifier and converts the
        values into a set of directory paths that a pipeline is allowed to use.

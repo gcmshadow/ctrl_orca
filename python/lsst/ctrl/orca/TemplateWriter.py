@@ -1,5 +1,3 @@
-from builtins import str
-from builtins import object
 #
 # LSST Data Management System
 # Copyright 2008, 2009, 2010 LSST Corporation.
@@ -30,7 +28,7 @@ import socket
 #
 
 
-class TemplateWriter(object):
+class TemplateWriter:
     """Takes templates and subtitutes the values for the given keys,
        writing a new file generated from the template.
     """

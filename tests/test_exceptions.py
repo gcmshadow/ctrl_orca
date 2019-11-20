@@ -23,7 +23,6 @@
 """
 Tests of orca exceptions
 """
-from builtins import str
 import unittest
 import lsst.utils.tests
 

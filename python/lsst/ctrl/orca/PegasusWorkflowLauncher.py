@@ -20,7 +20,6 @@
 # see <http://www.lsstcorp.org/LegalNotices/>.
 #
 
-from __future__ import print_function
 import os
 import lsst.log as log
 from lsst.ctrl.orca.WorkflowLauncher import WorkflowLauncher
